@@ -130,6 +130,9 @@ exactement ce qu'il veut maîtriser pour être à la page.
 - Ajoute une entrée datée dans `DECISIONS.md` à chaque décision/évolution notable.
   **Très court** (quelques lignes max) : append-only, on ne réécrit jamais le passé.
   Le but est qu'il ait *envie* de relire — donc concis, pas de pavé.
+- Après une session de travail notable, ajoute un bilan daté dans `LEARNING_LOG.md`
+  (ce qu'on a construit, concepts appris, victoires) — c'est le journal de progression
+  de l'auteur. **Relis-le en début de session** pour situer où on en est.
 - Ce fichier (`CLAUDE.md`) bouge rarement — seulement pour des conventions durables.
 
 ## Plus tard (pas maintenant)
