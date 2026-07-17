@@ -1,0 +1,41 @@
+// Prisma schema — see https://pris.ly/d/prisma-schema
+// Connection URLs live in prisma.config.ts (CLI) and lib/prisma.ts (runtime), not here.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// A user of the app. Will later be linked to Supabase Auth (id = auth.users.id).
+model User {
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String   @unique
+  // Body weight in kg — drives the personalized daily protein goal (2 g/kg).
+  weightKg       Float?
+  // Optional explicit daily protein target (g). Overrides the value computed from weight.
+  proteinTargetG Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// A recipe. Seed recipes and AI-validated recipes both live here.
+model Recipe {
+  id       String   @id @default(uuid()) @db.Uuid
+  title    String
+  summary  String?
+  // Ordered preparation steps.
+  steps    String[]
+  // Reference portion; displayed quantities scale from this.
+  servings Int      @default(1)
+  // Highlighted metric (estimate) — protein per serving in grams.
+  proteinPerServingG     Int?
+  caloriesPerServingKcal Int?
+  // Free-form tag for now (chicken, pasta, ...). May become an enum later.
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
