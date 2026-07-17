@@ -148,3 +148,19 @@ un vrai besoin).
 conventions obsolètes, couvre Prisma/Supabase/Next d'un coup.
 **Alternatives :** skills par techno (redondantes) ; se reposer sur `llms.txt`/WebFetch
 (filet gratuit mais moins automatique).
+
+## 2026-07-17 — Déploiement sur Vercel (auto depuis main)
+**Décision :** app en ligne sur Vercel (`https://fitbatchcooker.vercel.app`), auto-deploy
+depuis `main` (prod) + une preview par branche/PR. Variables `DATABASE_URL`/`DIRECT_URL`
+en Production & Preview ; Node figé en `24.x` (`engines.node`). Build = `prisma generate
+&& next build` — **les migrations restent hors du build**.
+**Pourquoi :** premier résultat en ligne, palpable et motivant ; CI/CD gratuit et aligné
+sur le workflow branche `main` + previews.
+
+## 2026-07-17 — Base Supabase partagée dev/prod (temporaire)
+**Décision :** une seule base Supabase pour le dev local **et** la prod, pour l'instant.
+**Pourquoi :** simplicité maximale pour le MVP perso ; `migrate dev` en local suffit à
+mettre la "prod" à jour. Assumé comme **provisoire**.
+**Alternatives :** bases séparées (2ᵉ projet Supabase ou branching) + un GitHub Action
+`prisma migrate deploy` comme étape de release dédiée — à faire quand le risque grandit
+(vrais utilisateurs, données à préserver).
