@@ -6,15 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-// UI copy grouped in one place (i18n habit — spec §7ter: no scattered hardcoded text).
-const copy = {
-  title: "Recettes",
-  empty: "Aucune recette pour l'instant.",
-  protein: (grams: number) => `${grams} g de protéines / portion`,
-  servings: (count: number) => `${count} portion${count > 1 ? "s" : ""}`,
-  calories: (kcal: number) => `${kcal} kcal / portion`,
-};
+import { strings } from "@/lib/strings";
 
 // Server Component: it runs on the server and can await the database directly.
 // Recipes are a shared library, so this query is intentionally NOT scoped to a user
@@ -26,10 +18,10 @@ export default async function RecipesPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
-      <h1 className="mb-6 text-3xl font-bold tracking-tight">{copy.title}</h1>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight">{strings.recipes.title}</h1>
 
       {recipes.length === 0 ? (
-        <p className="text-muted-foreground">{copy.empty}</p>
+        <p className="text-muted-foreground">{strings.recipes.empty}</p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {recipes.map((recipe) => (
@@ -44,15 +36,15 @@ export default async function RecipesPage() {
                 <CardContent className="flex flex-wrap gap-2 text-sm">
                   {recipe.proteinPerServingG != null && (
                     <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
-                      {copy.protein(recipe.proteinPerServingG)}
+                      {strings.recipes.protein(recipe.proteinPerServingG)}
                     </span>
                   )}
                   <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-                    {copy.servings(recipe.servings)}
+                    {strings.recipes.servings(recipe.servings)}
                   </span>
                   {recipe.caloriesPerServingKcal != null && (
                     <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-                      {copy.calories(recipe.caloriesPerServingKcal)}
+                      {strings.recipes.calories(recipe.caloriesPerServingKcal)}
                     </span>
                   )}
                 </CardContent>
