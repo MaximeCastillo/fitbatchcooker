@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
+import { strings } from "@/lib/strings";
 
 export default function Home() {
   return (
@@ -9,8 +10,8 @@ export default function Home() {
         {APP_NAME}
       </h1>
       <p className="max-w-md text-lg text-muted-foreground">{APP_TAGLINE}</p>
-      <Button render={<Link href="/recipes" />} size="lg">
-        Voir les recettes
+      <Button render={<Link href="/recipes" />} size="lg" nativeButton={false}>
+        {strings.home.seeRecipes}
       </Button>
     </main>
   );
