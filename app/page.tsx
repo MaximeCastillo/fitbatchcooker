@@ -9,8 +9,8 @@ export default function Home() {
         {APP_NAME}
       </h1>
       <p className="max-w-md text-lg text-muted-foreground">{APP_TAGLINE}</p>
-      <Button asChild size="lg">
-        <Link href="/recipes">Voir les recettes</Link>
+      <Button render={<Link href="/recipes" />} size="lg">
+        Voir les recettes
       </Button>
     </main>
   );
