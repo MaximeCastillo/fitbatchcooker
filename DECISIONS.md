@@ -123,3 +123,28 @@ pour l'UI, centraliser les textes dès le départ (pas de string en dur), branch
 lib i18n (next-intl) seulement quand une 2ᵉ langue est un vrai besoin.
 **Pourquoi :** même logique que le mobile — une bonne habitude d'archi maintenant
 évite un rétrofit pénible ; le reste = YAGNI.
+
+## 2026-07-17 — Prisma 7 : driver adapter + connexions poolée/directe séparées
+**Décision :** Prisma 7 (sans moteur Rust). Runtime = `@prisma/adapter-pg` sur la
+connexion **poolée** (`DATABASE_URL`, :6543). Migrations CLI = connexion **directe/
+session** (`DIRECT_URL`, :5432) via `prisma.config.ts`. Le champ `directUrl` n'existe
+plus.
+**Pourquoi :** Prisma 7 a supprimé `directUrl` et impose un driver adapter ; c'est le
+montage correct pour Supabase en serverless. Raffine la §9 de la spec.
+**Alternatives :** ancien `url` + `directUrl` dans `schema.prisma` — obsolète en v7.
+
+## 2026-07-17 — Workflow Git : branche main seule + commits gitmoji
+**Décision :** une seule branche `main` (= prod). Pas de `staging` : on s'appuie sur
+les Preview Deployments Vercel (une URL par branche/PR). Commits petits, en anglais,
+gitmoji, auteur Maxime, sans trailer IA.
+**Pourquoi :** Vercel fournit un "staging" jetable par branche → une branche partagée
+n'apporte rien (KISS). Petits commits = historique clair.
+**Alternatives :** flow main+staging (utile seulement si un env partagé stable devient
+un vrai besoin).
+
+## 2026-07-17 — Doc à jour via Context7 (plugin MCP)
+**Décision :** ajout du plugin Context7 pour injecter la doc versionnée des libs.
+**Pourquoi :** stack neuve + libs qui bougent vite (cf. piège Prisma 7) ; évite les
+conventions obsolètes, couvre Prisma/Supabase/Next d'un coup.
+**Alternatives :** skills par techno (redondantes) ; se reposer sur `llms.txt`/WebFetch
+(filet gratuit mais moins automatique).
