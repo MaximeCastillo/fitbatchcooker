@@ -8,6 +8,11 @@ import {
 } from "@/components/ui/card";
 import { strings } from "@/lib/strings";
 
+// Render on each request instead of prerendering at build time. The recipe library
+// grows over time (seed, then AI-created recipes), so we want fresh data — and the
+// build no longer needs a DB connection. Opts out of Next's default static rendering.
+export const dynamic = "force-dynamic";
+
 // Server Component: it runs on the server and can await the database directly.
 // Recipes are a shared library, so this query is intentionally NOT scoped to a user
 // (unlike user-owned data such as saved recipes or preferences — see spec §7).
