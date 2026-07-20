@@ -1,13 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { RecipeCard } from "@/components/recipe-card";
 import { getCurrentUser } from "@/lib/auth";
 import { toggleSaveRecipe } from "./actions";
 import { strings } from "@/lib/strings";
@@ -48,42 +41,19 @@ export default async function RecipesPage() {
             const isSaved = savedRecipeIds.has(recipe.id);
             return (
               <li key={recipe.id}>
-                <Card className="flex h-full flex-col">
-                  <CardHeader>
-                    <CardTitle>{recipe.title}</CardTitle>
-                    {recipe.summary && (
-                      <CardDescription>{recipe.summary}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="flex flex-wrap gap-2 text-sm">
-                    {recipe.proteinPerServingG != null && (
-                      <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
-                        {strings.recipes.protein(recipe.proteinPerServingG)}
-                      </span>
-                    )}
-                    <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-                      {strings.recipes.servings(recipe.servings)}
-                    </span>
-                    {recipe.caloriesPerServingKcal != null && (
-                      <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-                        {strings.recipes.calories(recipe.caloriesPerServingKcal)}
-                      </span>
-                    )}
-                  </CardContent>
-                  <CardFooter className="mt-auto">
-                    <form action={toggleSaveRecipe} className="w-full">
-                      <input type="hidden" name="recipeId" value={recipe.id} />
-                      <Button
-                        type="submit"
-                        variant={isSaved ? "secondary" : "outline"}
-                        size="sm"
-                        className="w-full"
-                      >
-                        {isSaved ? strings.recipes.saved : strings.recipes.save}
-                      </Button>
-                    </form>
-                  </CardFooter>
-                </Card>
+                <RecipeCard recipe={recipe}>
+                  <form action={toggleSaveRecipe} className="w-full">
+                    <input type="hidden" name="recipeId" value={recipe.id} />
+                    <Button
+                      type="submit"
+                      variant={isSaved ? "secondary" : "outline"}
+                      size="sm"
+                      className="w-full"
+                    >
+                      {isSaved ? strings.recipes.saved : strings.recipes.save}
+                    </Button>
+                  </form>
+                </RecipeCard>
               </li>
             );
           })}
