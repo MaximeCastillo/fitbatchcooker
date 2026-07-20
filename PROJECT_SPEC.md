@@ -41,7 +41,8 @@ concret pour l'auteur :
 FitBatchCooker n'est pas une app de suivi jour après jour. C'est un outil de
 **planification en amont** : l'utilisateur passe un moment (typiquement le dimanche) à
 **composer plusieurs jours de repas** (2, 3, une semaine), en remplissant pour chaque
-jour une **jauge de protéines** jusqu'à son objectif personnel (2 g/kg). La sortie
+jour une **jauge de protéines** jusqu'à son **objectif personnel** (qu'il **fixe
+lui-même** ; ~2 g/kg de masse corporelle conseillé). La sortie
 concrète = un **quota de batch** : la liste des plats à cuisiner d'avance, en **nombre
 de parts / nombre de jours**, chaque jour étant validé côté protéines (et idéalement
 côté équilibre légumes). L'expérience est **ludique et satisfaisante** : chaque jour
@@ -81,11 +82,16 @@ de Rails et découvre toute la stack).
 Décrit conceptuellement ; le schéma Prisma exact est défini pendant le build.
 
 - **User** — fourni par Supabase Auth. Les lignes app référencent l'id auth.
-  Profil : **poids** (ou cible protéines directe) → sert à calculer l'objectif
-  protéines quotidien personnalisé (2 g/kg).
+  Profil : **objectif protéines quotidien** saisi **directement** (`proteinTargetG`).
+  On **conseille ~2 g/kg** de masse corporelle, mais l'user fixe sa cible (pas de
+  formule imposée). Le **poids** (`weightKg`) reste **optionnel** (aide éventuelle),
+  non requis — droppable plus tard s'il ne sert pas.
 - **Recipe** — titre, description, étapes, portions (portion de référence), macros
   (protéines/calories… en **estimations**), tags/catégorie (poulet, pâtes, italien…).
-  Les recettes seed ET les recettes IA validées vivent ici.
+  Les recettes seed ET les recettes IA validées vivent ici. Une `Recipe` peut être un
+  **plat complet** ou un **aliment simple** (encas, élément de petit-déj — ex. yaourt
+  grec) : seule la valeur protéines compte pour la jauge, les étapes sont optionnelles.
+  **Pas de modèle `Meal` séparé au MVP** (KISS) ; un tag `mealType` viendra si besoin.
 - **Ingredient** — nom, unité par défaut optionnelle.
 - **RecipeIngredient** — table de jointure : recette ↔ ingrédient avec
   **quantité + unité** pour la portion de référence (on scale à l'affichage pour N
@@ -130,7 +136,9 @@ lui est familier, on le garde.
    - Composer une **période** de N jours (2, 3, une semaine) à partir des recettes
      (livre perso + bibliothèque).
    - Pour chaque jour, une **jauge de protéines** qui se remplit jusqu'à l'objectif
-     personnel (2 g/kg) ; le jour passe au **« vert »** une fois atteint. (Équilibre
+     **fixé par l'user** (~2 g/kg conseillé) ; le jour passe au **« vert »** une fois
+     atteint. Compléments via **encas / petit-déj** (ce sont aussi des `Recipe`).
+     (Équilibre
      légumes : bonus visé, pas jour 1.)
    - **Suggestions de complément** pour boucler un jour (« +35 g avec un blanc de
      poulet… »).
