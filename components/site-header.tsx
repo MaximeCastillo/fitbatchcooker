@@ -23,6 +23,12 @@ export async function SiteHeader() {
         </Link>
         {user ? (
           <>
+            <Link
+              href="/book"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {strings.nav.book}
+            </Link>
             <span className="text-muted-foreground">{user.email}</span>
             <form action={logout}>
               <Button type="submit" variant="outline" size="sm">

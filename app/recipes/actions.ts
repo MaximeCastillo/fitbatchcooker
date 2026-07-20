@@ -26,4 +26,5 @@ export async function toggleSaveRecipe(formData: FormData) {
 
   // Refresh the pages that show saved state.
   revalidatePath("/recipes");
+  revalidatePath("/book");
 }

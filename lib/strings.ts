@@ -7,6 +7,7 @@ export const strings = {
   },
   nav: {
     recipes: "Recettes",
+    book: "Mes recettes",
     login: "Se connecter",
     logout: "Se déconnecter",
   },
@@ -26,5 +27,11 @@ export const strings = {
     calories: (kcal: number) => `${kcal} kcal / portion`,
     save: "Sauvegarder",
     saved: "Enregistré ✓",
+    remove: "Retirer",
+  },
+  book: {
+    title: "Mes recettes",
+    empty: "Tu n'as pas encore sauvegardé de recette.",
+    browse: "Parcourir les recettes",
   },
 } as const;
