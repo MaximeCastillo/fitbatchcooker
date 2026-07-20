@@ -171,3 +171,14 @@ email/mot de passe. **Confirmation par email désactivée** le temps du dev.
 **Pourquoi :** signup/login immédiat, sans aller-retour mail → itération rapide sur le MVP.
 **Alternatives :** garder la confirmation dès maintenant (plus réaliste mais friction en dev).
 **À faire avant prod :** réactiver la confirmation — suivi dans `PROD_CHECKLIST.md`.
+
+## 2026-07-20 — Tests : optionnels, ciblés logique métier + sorties IA
+**Décision :** pas de suite de tests systématique. On testera **la logique métier pure**
+et **la validation des sorties du modèle IA** (tool calling) ; le reste s'appuie sur
+TypeScript + la boucle de vérif (types + runtime + curl). Vitest sera introduit au moment
+du bot.
+**Pourquoi :** priorité = développer et voir des concepts. Les types couvrent déjà une
+grande partie de ce qu'on testerait en Ruby ; tester le CRUD trivial ou le framework =
+faible valeur.
+**Alternatives :** TDD/tests systématiques façon Rails — écarté ici (friction vs objectif
+d'apprentissage).
