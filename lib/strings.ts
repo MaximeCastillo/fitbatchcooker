@@ -8,6 +8,7 @@ export const strings = {
   nav: {
     recipes: "Recettes",
     book: "Mes recettes",
+    chat: "Le chef",
     login: "Se connecter",
     logout: "Se déconnecter",
   },
@@ -33,5 +34,10 @@ export const strings = {
     title: "Mes recettes",
     empty: "Tu n'as pas encore sauvegardé de recette.",
     browse: "Parcourir les recettes",
+  },
+  chat: {
+    title: "Le chef",
+    placeholder: "Demande une recette, une idée de repas…",
+    send: "Envoyer",
   },
 } as const;

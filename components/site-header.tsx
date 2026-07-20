@@ -29,6 +29,12 @@ export async function SiteHeader() {
             >
               {strings.nav.book}
             </Link>
+            <Link
+              href="/chat"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {strings.nav.chat}
+            </Link>
             <span className="text-muted-foreground">{user.email}</span>
             <form action={logout}>
               <Button type="submit" variant="outline" size="sm">
