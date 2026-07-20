@@ -5,6 +5,19 @@ export const strings = {
   home: {
     seeRecipes: "Voir les recettes",
   },
+  nav: {
+    recipes: "Recettes",
+    login: "Se connecter",
+    logout: "Se déconnecter",
+  },
+  login: {
+    title: "Connexion",
+    email: "Email",
+    password: "Mot de passe",
+    signIn: "Se connecter",
+    signUp: "Créer un compte",
+    missingFields: "Renseigne un email et un mot de passe.",
+  },
   recipes: {
     title: "Recettes",
     empty: "Aucune recette pour l'instant.",
