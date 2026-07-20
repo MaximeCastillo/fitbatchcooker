@@ -163,4 +163,11 @@ sur le workflow branche `main` + previews.
 mettre la "prod" à jour. Assumé comme **provisoire**.
 **Alternatives :** bases séparées (2ᵉ projet Supabase ou branching) + un GitHub Action
 `prisma migrate deploy` comme étape de release dédiée — à faire quand le risque grandit
-(vrais utilisateurs, données à préserver).
+(vrais utilisateurs, données à préserver). Suivi dans `PROD_CHECKLIST.md`.
+
+## 2026-07-20 — Auth : confirmation email désactivée en dev (temporaire)
+**Décision :** authentification via **Supabase Auth** (`@supabase/ssr`, cookie-based),
+email/mot de passe. **Confirmation par email désactivée** le temps du dev.
+**Pourquoi :** signup/login immédiat, sans aller-retour mail → itération rapide sur le MVP.
+**Alternatives :** garder la confirmation dès maintenant (plus réaliste mais friction en dev).
+**À faire avant prod :** réactiver la confirmation — suivi dans `PROD_CHECKLIST.md`.

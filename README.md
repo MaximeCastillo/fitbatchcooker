@@ -66,3 +66,4 @@ la stratégie dans `DECISIONS.md`).
 - [`PROJECT_SPEC.md`](./PROJECT_SPEC.md) — le produit et son archi
 - [`DECISIONS.md`](./DECISIONS.md) — historique des décisions (le « pourquoi »)
 - [`LEARNING_LOG.md`](./LEARNING_LOG.md) — journal d'apprentissage par session
+- [`PROD_CHECKLIST.md`](./PROD_CHECKLIST.md) — dettes temporaires à rembourser avant la prod
