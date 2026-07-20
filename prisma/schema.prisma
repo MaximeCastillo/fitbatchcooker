@@ -20,6 +20,8 @@ model User {
   proteinTargetG Int?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  savedRecipes   UserRecipe[]
 }
 
 // A recipe. Seed recipes and AI-validated recipes both live here.
@@ -38,4 +40,23 @@ model Recipe {
   category  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  savedBy   UserRecipe[]
+}
+
+// A user's saved recipe (their "recipe book" entry): links a user to a recipe, with
+// an optional 0-3 star rating and a favorite flag. Classic join model. See spec §3.
+model UserRecipe {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  recipeId  String   @db.Uuid
+  rating    Int?     // 0-3 stars
+  favorite  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
 }
