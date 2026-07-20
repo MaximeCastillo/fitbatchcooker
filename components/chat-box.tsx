@@ -7,7 +7,7 @@ import { strings } from "@/lib/strings";
 
 // Client Component: manages the chat state and streams the chef's replies.
 // It POSTs to /api/chat by default (our route handler).
-export function ChatBox() {
+export function ChatBox({ greeting }: { greeting: string }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat();
 
@@ -22,6 +22,9 @@ export function ChatBox() {
   return (
     <div className="flex flex-1 flex-col gap-4">
       <ul className="flex flex-1 flex-col gap-3">
+        {messages.length === 0 && (
+          <li className="text-sm text-muted-foreground">{greeting}</li>
+        )}
         {messages.map((message) => (
           <li
             key={message.id}

@@ -35,7 +35,12 @@ export async function SiteHeader() {
             >
               {strings.nav.chat}
             </Link>
-            <span className="text-muted-foreground">{user.email}</span>
+            <Link
+              href="/profile"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {user.firstName ?? user.email}
+            </Link>
             <form action={logout}>
               <Button type="submit" variant="outline" size="sm">
                 {strings.nav.logout}

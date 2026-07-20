@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: openai(CHAT_MODEL),
-    system: buildChefSystemPrompt(preferences),
+    system: buildChefSystemPrompt(user.firstName, preferences),
     messages: await convertToModelMessages(messages),
     // userId comes from the session, NOT from the model (authorization stays ours).
     tools: chefTools(user.id),

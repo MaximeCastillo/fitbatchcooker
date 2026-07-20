@@ -14,7 +14,9 @@ datasource db {
 model User {
   id             String   @id @default(uuid()) @db.Uuid
   email          String   @unique
-  // Body weight in kg — drives the personalized daily protein goal (2 g/kg).
+  // First name — set in the profile screen, injected into the chef prompt (greeting).
+  firstName      String?
+  // Body weight in kg — optional helper; the daily protein target is set directly below.
   weightKg       Float?
   // Optional explicit daily protein target (g). Overrides the value computed from weight.
   proteinTargetG Int?
