@@ -195,3 +195,13 @@ partagée aujourd'hui) → défense = validation serveur + plafonds + isolation 
 (l'autorisation ne dépend jamais du modèle).
 **Reporté (voir `PROD_CHECKLIST.md`) :** rate limiting par user, signups restreints,
 BYO-key par user.
+
+## 2026-07-20 — Recentrage produit : planification gamifiée en amont (pas un tracker)
+**Décision :** le cœur du produit devient la **planification en amont, gamifiée** :
+l'user compose plusieurs jours de repas et remplit une **jauge de protéines** par jour
+(objectif 2 g/kg) jusqu'au « vert » ; sortie = un **quota de batch** (plats à cuisiner
+d'avance, en parts/jours). L'ancienne « semaine type » **devient** ce cœur. Modèles
+`MealPlan` + `PlanEntry` (remplacent WeeklyPlan/PlanEntry).
+**Pourquoi :** différenciant et fidèle à l'ADN batch cooking ; le plaisir est dans la
+composition de la période, pas dans un suivi quotidien (moins de friction, plus ludique).
+**Alternatives :** tracker quotidien — rejeté (plus contraignant, moins fun, hors ADN).

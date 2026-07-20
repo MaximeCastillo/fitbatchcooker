@@ -37,6 +37,18 @@ concret pour l'auteur :
 - garder un **stock de bonnes idées** et proposer des **variantes faciles** pour
   rester motivé, aimer ce qu'on mange, et coupler ça à un programme de muscu.
 
+**Le cœur du produit : la planification gamifiée, en amont (PAS un tracker quotidien).**
+FitBatchCooker n'est pas une app de suivi jour après jour. C'est un outil de
+**planification en amont** : l'utilisateur passe un moment (typiquement le dimanche) à
+**composer plusieurs jours de repas** (2, 3, une semaine), en remplissant pour chaque
+jour une **jauge de protéines** jusqu'à son objectif personnel (2 g/kg). La sortie
+concrète = un **quota de batch** : la liste des plats à cuisiner d'avance, en **nombre
+de parts / nombre de jours**, chaque jour étant validé côté protéines (et idéalement
+côté équilibre légumes). L'expérience est **ludique et satisfaisante** : chaque jour
+passe au **« vert »** quand la jauge est atteinte, avec des suggestions de complément
+(« un blanc de poulet (35 g) + un yaourt grec (10 g) et c'est plié »). Le plaisir est
+dans la **composition de la période**, pas dans un suivi quotidien.
+
 Bref : orientation **prise de masse**, pratique et motivante.
 
 L'app est aussi un support d'apprentissage d'une stack JS/TS moderne (l'auteur vient
@@ -82,8 +94,14 @@ Décrit conceptuellement ; le schéma Prisma exact est défini pendant le build.
   avec une **note (0–3 étoiles)** optionnelle et un flag favori.
 - **Preference** — lignes flexibles et typées captées par le bot (voir §5). Forme :
   `{ userId, type, value, sentiment, note }`. `type` volontairement ouvert.
-- **WeeklyPlan** / **PlanEntry** — une "semaine type" composée de recettes choisies
-  par créneau (jour / repas).
+- **MealPlan** — une **période de planification** composée par l'user (2, 3 jours, une
+  semaine). Appartient à un user.
+- **PlanEntry** — un plat placé dans un plan, à un **jour donné** (`dayIndex`) avec un
+  **nombre de parts**. Contribution protéines d'une entrée = `protéines/portion` de la
+  recette × parts.
+- *Dérivés (calculés, non stockés) :* la **jauge d'un jour** = somme des protéines des
+  entrées de ce jour vs l'objectif quotidien de l'user ; le **quota de batch** = pour
+  chaque recette, total des parts à cuisiner sur toute la période.
 
 L'auteur vient de Rails/ActiveRecord — le pattern jointure + portion de référence
 lui est familier, on le garde.
@@ -108,8 +126,17 @@ lui est familier, on le garde.
    - Conversation naturelle pour demander des recettes.
    - Propose des recettes ; **sur "ok" explicite**, les persiste au livre.
    - Capte les préférences en arrière-plan pendant la conversation (voir §5).
-4. **Semaine type**
-   - Composer une semaine de repas à partir des recettes sauvegardées.
+4. **Planification gamifiée (le cœur du produit)**
+   - Composer une **période** de N jours (2, 3, une semaine) à partir des recettes
+     (livre perso + bibliothèque).
+   - Pour chaque jour, une **jauge de protéines** qui se remplit jusqu'à l'objectif
+     personnel (2 g/kg) ; le jour passe au **« vert »** une fois atteint. (Équilibre
+     légumes : bonus visé, pas jour 1.)
+   - **Suggestions de complément** pour boucler un jour (« +35 g avec un blanc de
+     poulet… »).
+   - Sortie concrète : un **quota de batch** — la liste des plats à préparer d'avance,
+     en **parts / jours**.
+   - **Ce n'est pas un tracker quotidien** : le plaisir est dans la composition en amont.
 5. **Recettes de départ (seed)**
    - ~10 recettes saines orientées sport pour que la bibliothèque ne soit jamais
      vide au premier lancement. Seed et générées partagent la même table.
