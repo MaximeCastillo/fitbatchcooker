@@ -182,3 +182,16 @@ grande partie de ce qu'on testerait en Ruby ; tester le CRUD trivial ou le frame
 faible valeur.
 **Alternatives :** TDD/tests systématiques façon Rails — écarté ici (friction vs objectif
 d'apprentissage).
+
+## 2026-07-20 — Sécurité du bot IA : posture et garde-fous
+**Décision :** endpoint chat **authentifié** + clé **serveur-only** (déjà en place).
+Règle d'or du tool calling : le `userId` vient **toujours de la session**, jamais des
+arguments proposés par le modèle ; **chaque entrée d'outil validée (Zod)** avant écriture ;
+**outils étroits** (le modèle ne fait que ce qu'on définit, pas de SQL arbitraire) ;
+`maxOutputTokens` + `maxSteps` pour plafonner coût et boucles. Backstop : **budget cap
+mensuel OpenAI + auto-recharge désactivée** (en place).
+**Pourquoi :** le modèle est non fiable (prompt injection) et l'API est payante (clé
+partagée aujourd'hui) → défense = validation serveur + plafonds + isolation de l'autorité
+(l'autorisation ne dépend jamais du modèle).
+**Reporté (voir `PROD_CHECKLIST.md`) :** rate limiting par user, signups restreints,
+BYO-key par user.
