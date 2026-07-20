@@ -24,5 +24,7 @@ export const strings = {
     protein: (grams: number) => `${grams} g de protéines / portion`,
     servings: (count: number) => `${count} portion${count > 1 ? "s" : ""}`,
     calories: (kcal: number) => `${kcal} kcal / portion`,
+    save: "Sauvegarder",
+    saved: "Enregistré ✓",
   },
 } as const;
