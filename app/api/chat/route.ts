@@ -8,7 +8,8 @@ import {
   type UIMessage,
 } from "ai";
 import { getCurrentUser } from "@/lib/auth";
-import { CHAT_MODEL, CHEF_SYSTEM_PROMPT } from "@/lib/ai/chef";
+import { prisma } from "@/lib/prisma";
+import { CHAT_MODEL, buildChefSystemPrompt } from "@/lib/ai/chef";
 import { chefTools } from "@/lib/ai/tools";
 
 // Allow streaming responses up to 30s.
@@ -21,9 +22,16 @@ export async function POST(req: Request) {
 
   const { messages }: { messages: UIMessage[] } = await req.json();
 
+  // Recall: load what we know about this user and inject it into the prompt (spec §5).
+  const preferences = await prisma.preference.findMany({
+    where: { userId: user.id },
+    select: { type: true, value: true, sentiment: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   const result = streamText({
     model: openai(CHAT_MODEL),
-    system: CHEF_SYSTEM_PROMPT,
+    system: buildChefSystemPrompt(preferences),
     messages: await convertToModelMessages(messages),
     // userId comes from the session, NOT from the model (authorization stays ours).
     tools: chefTools(user.id),
