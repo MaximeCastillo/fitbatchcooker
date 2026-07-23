@@ -4,6 +4,25 @@
 export const strings = {
   home: {
     seeRecipes: "Voir les recettes",
+    title: "Tes repas protéinés, planifiés à l'avance.",
+    subtitle:
+      "Compose tes journées, remplis ta jauge de protéines, et obtiens ta liste de plats à préparer.",
+    ctaPrimary: "Créer un compte",
+    ctaSecondary: "Voir les recettes",
+    steps: [
+      {
+        title: "Compose ta semaine",
+        text: "Choisis tes plats jour par jour, à partir de tes recettes.",
+      },
+      {
+        title: "Remplis ta jauge",
+        text: "Chaque journée passe au vert quand tu atteins ton objectif protéines.",
+      },
+      {
+        title: "Cuisine ton batch",
+        text: "Ta liste de plats à préparer d'avance, en nombre de parts.",
+      },
+    ],
   },
   nav: {
     recipes: "Recettes",
@@ -20,8 +39,8 @@ export const strings = {
     signUp: "Créer un compte",
     missingFields: "Renseigne un email et un mot de passe.",
     // Value panel
-    panelTitle: "Ton meal-prep protéiné, planifié en avance.",
-    panelSubtitle: "Compose ta semaine, remplis ta jauge de protéines, et sache exactement quoi cuisiner.",
+    panelTitle: "Tes repas protéinés, planifiés à l'avance.",
+    panelSubtitle: "Compose ta semaine, remplis ta jauge de protéines, et obtiens ta liste de plats à préparer.",
     benefits: [
       "Un objectif protéines par jour, à ton rythme",
       "Chaque journée qui passe au vert",
