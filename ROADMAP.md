@@ -11,10 +11,13 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 
 ## 🎯 En cours — Cœur produit "Ma semaine"
 - [x] **Étape 1** : modèles `MealPlan` + `PlanEntry` (+ migration). ✅
-- [ ] **Étape 2** : composer un plan (créer, ajouter/retirer un plat à un jour) — actions scopées.
-- [ ] **Étape 3** : jauge de protéines par jour (**motif remplissage**, passage au vert).
-- [ ] **Étape 4** : quota de batch (agrégation des parts par recette) + suggestions de complément.
-- _MVP mono-mangeur (toi) ; le schéma reste additif pour le multi-personnes plus tard._
+- [ ] **Étape 2** : composer un plan (board 1 jour = 1 ligne, drag `@dnd-kit` + fallback tap,
+      recherche recettes, briques régulières, poubelle) — Server Actions scopées + optimistic.
+- [ ] **Étape 3** : jauge par jour = **contenant qui se remplit** (motif signature, scellage vert).
+- [ ] **Étape 4** : récap "À cuisiner" (tuiles par recette, ×N portions, checklist "cuisiné").
+- [ ] **Multi-plans** (décidé) : garder/réutiliser ses batchs — liste de plans nommés,
+      créer / sélectionner / dupliquer / supprimer. Schéma déjà compatible.
+- _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## ⏭️ Court terme
 - **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
