@@ -9,14 +9,16 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 
 ---
 
-## 🎯 En cours — Cœur produit "Ma semaine"
-- [x] **Étape 1** : modèles `MealPlan` + `PlanEntry` (+ migration). ✅
-- [ ] **Étape 2** : composer un plan (board 1 jour = 1 ligne, drag `@dnd-kit` + fallback tap,
-      recherche recettes, briques régulières, poubelle) — Server Actions scopées + optimistic.
-- [ ] **Étape 3** : jauge par jour = **contenant qui se remplit** (motif signature, scellage vert).
-- [ ] **Étape 4** : récap "À cuisiner" (tuiles par recette, ×N portions, checklist "cuisiné").
-- [ ] **Multi-plans** (décidé) : garder/réutiliser ses batchs — liste de plans nommés,
-      créer / sélectionner / dupliquer / supprimer. Schéma déjà compatible.
+## 🎯 En cours — Cœur produit "batch"
+- [x] **Modèles** `MealPlan` + `PlanEntry` (+ migration). ✅
+- [x] **Composer au clic** : board 1 jour = 1 ligne, ajout/retrait, add/remove day. ✅
+- [x] **Jauge par jour** = contenant qui se remplit (motif signature, scellage vert). ✅
+- [x] **Quota "À cuisiner"** (portions par recette). ✅
+- [x] **Multi-plans** : liste « Mes batchs », créer / renommer / supprimer. ✅
+- [ ] **Drag & drop** (`@dnd-kit`) : glisser palette→jour, jour→jour, **Maj = dupliquer**,
+      palette = zone « ranger », + **optimistic UI**. (améliore le composer au clic)
+- [ ] **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
+- [ ] **Polish mobile tap-first.**
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## ⏭️ Court terme
