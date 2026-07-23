@@ -116,7 +116,7 @@ model PlanEntry {
   mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
   recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
-  // One entry per recipe per day — adding an existing one bumps servings instead.
-  @@unique([mealPlanId, dayIndex, recipeId])
+  // No uniqueness on (plan, day, recipe): a user may place the same dish more than once
+  // in a day. Quantity is expressed either by `servings` or by multiple entries.
   @@index([mealPlanId])
 }
