@@ -109,3 +109,54 @@ spec, palpable. Et il t'appelle par ton **prénom** avec des accueils variés �
 1. **La planification gamifiée** (le cœur produit) — l'Étape 0 est déjà prête via le Profil
    (objectif protéines) : modèles `MealPlan`/`PlanEntry`, composition + jauge protéines + quota de batch.
 2. Puis : suggestions de complément, écran « Ce que le chef sait de moi », durcissement prod.
+
+---
+
+## Session 3 — 2026-07-23 — Perf, refonte UI/UX, et le cœur produit "batch"
+
+**Grosse session.** Perf, identité visuelle complète, puis on a bâti le composeur de batchs.
+
+### Ce qu'on a construit
+- **Perf** : région Vercel → **Francfort (`fra1`)** collée à la base ; `getCurrentUser`
+  dédupliqué (`cache()` React) + lecture-avant-écriture ; **optimistic UI** + **skeletons**
+  (`loading.tsx`). Mesuré : **~4,5× plus rapide** en prod (avant/après chiffré).
+- **Refonte UI/UX** (skills `ui-ux-pro-max` + `taste-skill`, aperçus **Artifact**) :
+  identité **vert + orange**, typo **Barlow**, **shell à sidebar**, motif signature
+  **« le contenant qui se remplit »**. Login 2 colonnes, **home nouveau user**, auth
+  **un mode à la fois** (connexion/inscription + bascule).
+- **Cœur produit "batch"** : modèles `Batch`/`BatchEntry`, **logique pure testée** (Vitest :
+  jauge, quota), **Server Actions scopées**, page **« Mes batchs »** (multi-plans) et le
+  **composeur** (jauges par jour, ajout/retrait, add/remove day, quota « À cuisiner »).
+- **Outillage & doc** : whitelist de commandes + `PATH` Node 24 pinné (fini les prompts),
+  **`ROADMAP.md`** vivant, recentrage produit dans la spec (planif gamifiée en amont).
+
+### Concepts appris (🆕)
+- **Server Component = controller + vue fusionnés** ; **Server Action** = action write ;
+  **Client Component** = JS navigateur. Ce trio remplace le MVC de Rails.
+- **`revalidatePath`** = « cette donnée a changé, ré-affiche » (cache Next).
+- **`force-dynamic`** vs statique ; **colocalisation région app↔base** (perf serverless).
+- **`cache()` React** (dédup par requête) ; **optimistic UI** (`useOptimistic`).
+- **Design tokens** (shadcn) : changer l'identité = éditer des variables ; `@dnd-kit` (à venir).
+- **Rename de modèle Prisma** : déclaratif → il ne devine pas un rename (voit DROP+CREATE =
+  perte de données). Solution : **migration `RENAME` écrite à la main** + rename des
+  contraintes/index. Pont Rails : `rename_table`/`rename_column` (impératif) préservent les
+  données ; Prisma (déclaratif) impose de descendre au SQL.
+- **Tests** : Vitest sur la **logique métier pure** (pas le framework).
+
+### Pièges rencontrés & résolus
+- Lenteur prod = **région US vs base Francfort** + appels/écritures répétés.
+- Prisma **refuse** un rename non-interactif (DROP de tables non vides) → migration manuelle
+  appliquée via `migrate deploy`.
+- i18n : textes d'UI qui traînaient en dur → tout dans `lib/strings.ts` (code toujours en
+  anglais, contenu multilingue).
+
+### Victoires
+🎉 L'app **ressemble à un vrai SaaS** (« abouti, pro, du premier coup »), et le **cœur
+produit** (composer un batch, jauges qui passent au vert, quota à cuisiner) est **debout,
+testé et déployable**. Premier **rename de base maîtrisé** sans rien perdre.
+
+### Prochaine session
+1. **Phase 5 : le drag & drop** (`@dnd-kit`) sur le composeur : palette→jour, jour→jour,
+   Maj = dupliquer, palette = zone « ranger », + optimistic.
+2. Puis : **« Ajouter à mon batch »** depuis les cartes recettes, polish **mobile tap-first**.
+3. Plus tard : couche **ingrédients / protéines vérifiées**, suggestions de complément.
