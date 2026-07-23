@@ -50,11 +50,16 @@ export default async function BatchPage({
             className="min-w-0 border-b-2 border-transparent bg-transparent font-display text-3xl font-bold tracking-wide uppercase outline-none hover:border-border focus:border-primary"
           />
           <Button type="submit" variant="outline" size="sm">
-            OK
+            {strings.batch.rename}
           </Button>
         </form>
         <form action={deleteBatch.bind(null, plan.id)}>
-          <Button type="submit" variant="outline" size="sm">
+          <Button
+            type="submit"
+            variant="outline"
+            size="sm"
+            aria-label={strings.batch.delete}
+          >
             <Trash2 className="size-4" aria-hidden />
           </Button>
         </form>
@@ -67,7 +72,7 @@ export default async function BatchPage({
             className="rounded-2xl border border-dashed p-5 text-sm text-muted-foreground"
           >
             <span className="font-display text-lg font-bold tracking-wide uppercase text-foreground">
-              Jour {index + 1}
+              {strings.batch.dayLabel(index + 1)}
             </span>
           </div>
         ))}

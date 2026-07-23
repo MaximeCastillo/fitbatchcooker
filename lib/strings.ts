@@ -42,6 +42,9 @@ export const strings = {
     nameLabel: "Nom du batch",
     days: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
     dishes: (n: number) => `${n} plat${n > 1 ? "s" : ""}`,
+    dayLabel: (n: number) => `Jour ${n}`,
+    rename: "Renommer",
+    delete: "Supprimer le batch",
     composerSoon: "La composition (glisser-déposer) arrive à l'étape suivante.",
   },
   login: {
