@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { strings } from "@/lib/strings";
 
 // All actions are scoped to the logged-in user (authorization — spec §7): we never
 // touch a plan or entry that isn't owned by the current user.
@@ -41,7 +42,7 @@ export async function createBatch() {
     month: "short",
   });
   const plan = await prisma.mealPlan.create({
-    data: { userId, name: `Batch du ${label}`, dayCount: 5 },
+    data: { userId, name: strings.batch.defaultName(label), dayCount: 5 },
   });
   revalidatePath("/batch");
   redirect(`/batch/${plan.id}`);
@@ -50,7 +51,7 @@ export async function createBatch() {
 export async function renameBatch(planId: string, name: string) {
   const userId = await requireUserId();
   if (!(await ownedPlan(planId, userId))) return;
-  const clean = name.trim().slice(0, 80) || "Sans titre";
+  const clean = name.trim().slice(0, 80) || strings.batch.untitled;
   await prisma.mealPlan.update({ where: { id: planId }, data: { name: clean } });
   revalidateBatch(planId);
 }

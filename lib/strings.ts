@@ -31,6 +31,10 @@ export const strings = {
     login: "Se connecter",
     logout: "Se déconnecter",
   },
+  batch: {
+    defaultName: (dateLabel: string) => `Batch du ${dateLabel}`,
+    untitled: "Sans titre",
+  },
   login: {
     title: "Connexion",
     titleSignup: "Créer un compte",
