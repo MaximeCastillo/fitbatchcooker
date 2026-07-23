@@ -19,6 +19,14 @@ export const strings = {
     signIn: "Se connecter",
     signUp: "Créer un compte",
     missingFields: "Renseigne un email et un mot de passe.",
+    // Value panel
+    panelTitle: "Ton meal-prep protéiné, planifié en avance.",
+    panelSubtitle: "Compose ta semaine, remplis ta jauge de protéines, et sache exactement quoi cuisiner.",
+    benefits: [
+      "Un objectif protéines par jour, à ton rythme",
+      "Chaque journée qui passe au vert",
+      "Un chef qui apprend tes goûts",
+    ],
   },
   recipes: {
     title: "Recettes",
