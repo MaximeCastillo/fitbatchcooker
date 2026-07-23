@@ -25,6 +25,7 @@ export const strings = {
     ],
   },
   nav: {
+    batch: "Mes batchs",
     recipes: "Recettes",
     book: "Mes recettes",
     chat: "Le chef",
@@ -34,6 +35,14 @@ export const strings = {
   batch: {
     defaultName: (dateLabel: string) => `Batch du ${dateLabel}`,
     untitled: "Sans titre",
+    title: "Mes batchs",
+    subtitle: "Tes lots de plats à cuisiner d'avance.",
+    new: "Nouveau batch",
+    empty: "Tu n'as pas encore de batch. Crée ton premier lot de plats !",
+    nameLabel: "Nom du batch",
+    days: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
+    dishes: (n: number) => `${n} plat${n > 1 ? "s" : ""}`,
+    composerSoon: "La composition (glisser-déposer) arrive à l'étape suivante.",
   },
   login: {
     title: "Connexion",
