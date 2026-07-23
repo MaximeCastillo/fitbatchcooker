@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { RecipeCard } from "@/components/recipe-card";
+import { SaveRecipeButton } from "@/components/save-recipe-button";
 import { toggleSaveRecipe } from "@/app/recipes/actions";
 import { strings } from "@/lib/strings";
 
@@ -41,14 +42,7 @@ export default async function BookPage() {
               <RecipeCard recipe={recipe}>
                 <form action={toggleSaveRecipe} className="w-full">
                   <input type="hidden" name="recipeId" value={recipe.id} />
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    {strings.recipes.remove}
-                  </Button>
+                  <SaveRecipeButton label={strings.recipes.remove} />
                 </form>
               </RecipeCard>
             </li>

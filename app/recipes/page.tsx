@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 import { RecipeCard } from "@/components/recipe-card";
+import { SaveRecipeButton } from "@/components/save-recipe-button";
 import { getCurrentUser } from "@/lib/auth";
 import { toggleSaveRecipe } from "./actions";
 import { strings } from "@/lib/strings";
@@ -44,14 +44,12 @@ export default async function RecipesPage() {
                 <RecipeCard recipe={recipe}>
                   <form action={toggleSaveRecipe} className="w-full">
                     <input type="hidden" name="recipeId" value={recipe.id} />
-                    <Button
-                      type="submit"
+                    <SaveRecipeButton
+                      label={
+                        isSaved ? strings.recipes.saved : strings.recipes.save
+                      }
                       variant={isSaved ? "secondary" : "outline"}
-                      size="sm"
-                      className="w-full"
-                    >
-                      {isSaved ? strings.recipes.saved : strings.recipes.save}
-                    </Button>
+                    />
                   </form>
                 </RecipeCard>
               </li>
