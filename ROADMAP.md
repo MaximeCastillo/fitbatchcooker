@@ -33,6 +33,10 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
   donc ça ne bloque pas Ma semaine. Débloque aussi liste de courses + scaling.
 - **Multi-personnes** (additif) : `eaters` sur le plan (scale le quota, garde ta jauge perso),
   ou notion d'`Eater` avec objectif par personne. Quand le besoin est réel.
+- **Type de plat** (`mealType` : plat principal / encas / petit-déj…) + **suggestions douces
+  non bloquantes** ("3 petits-déj sur Jour 2 ?") — jamais d'enforcement rigide. Post-MVP.
+- Nommage : "Recette" = catalogue réutilisable ; "Plat" = instance posée dans un plan
+  (décidé — géré via `lib/strings.ts`, re-challengeable).
 - Icônes : tester le duotone **Phosphor** (optionnel).
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
