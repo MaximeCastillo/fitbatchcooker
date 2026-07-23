@@ -10,12 +10,10 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 ---
 
 ## 🎯 En cours
-- _(à choisir avec Maxime — voir Court terme)_
-
-## ⏭️ Court terme
-- **Home nouveau user** : déconnecté = pitch + CTA ; connecté = vers son espace.
 - **Cœur produit — "Ma semaine"** : modèles `MealPlan`/`PlanEntry`, jauges = **motif
   remplissage**, quota de batch, suggestions de complément.
+
+## ⏭️ Court terme
 - **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
 - **Guide** : product-tour léger ("clique ici") + **chef contextuel** (aide par page).
 
@@ -31,6 +29,7 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Home nouveau user** : pitch + CTA (motif remplissage) ; user connecté redirigé vers son espace.
 - **Écran de login soigné** (panneau valeur + formulaire, motif remplissage).
 - Redesign socle : tokens vert+orange, typo Barlow, **shell à sidebar**, motif remplissage (prototype).
 - Perf : région Vercel (fra1), dédup `getCurrentUser` + `cache()`, optimistic UI, skeletons.
