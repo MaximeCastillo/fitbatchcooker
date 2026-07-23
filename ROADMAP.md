@@ -9,9 +9,12 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 
 ---
 
-## 🎯 En cours
-- **Cœur produit — "Ma semaine"** : modèles `MealPlan`/`PlanEntry`, jauges = **motif
-  remplissage**, quota de batch, suggestions de complément.
+## 🎯 En cours — Cœur produit "Ma semaine"
+- [x] **Étape 1** : modèles `MealPlan` + `PlanEntry` (+ migration). ✅
+- [ ] **Étape 2** : composer un plan (créer, ajouter/retirer un plat à un jour) — actions scopées.
+- [ ] **Étape 3** : jauge de protéines par jour (**motif remplissage**, passage au vert).
+- [ ] **Étape 4** : quota de batch (agrégation des parts par recette) + suggestions de complément.
+- _MVP mono-mangeur (toi) ; le schéma reste additif pour le multi-personnes plus tard._
 
 ## ⏭️ Court terme
 - **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
@@ -23,8 +26,13 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - **`create_recipe`** : le chef persiste une recette validée ("ok").
 - **"Ce que le chef sait de moi"** : écran préférences éditable/supprimable.
 - **Éviter les doublons de recettes** : injecter les titres existants / outil `search_recipes`.
-- **Ingrédients structurés** (`Ingredient`/`RecipeIngredient`) quand une feature l'exige
-  (liste de courses, scaling des portions).
+- **Protéines vérifiées — couche ingrédients** (gros milestone, après "Ma semaine") :
+  `Ingredient(name, proteinPer100g, …)` + `RecipeIngredient(recipe, ingredient, quantityG)`
+  → protéines **calculées** (Σ quantité/100 × proteinPer100g) au lieu d'estimées, vérifiables
+  et personnalisables par l'user. La jauge lit "protéines de la recette" via un seul accès,
+  donc ça ne bloque pas Ma semaine. Débloque aussi liste de courses + scaling.
+- **Multi-personnes** (additif) : `eaters` sur le plan (scale le quota, garde ta jauge perso),
+  ou notion d'`Eater` avec objectif par personne. Quand le besoin est réel.
 - Icônes : tester le duotone **Phosphor** (optionnel).
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
