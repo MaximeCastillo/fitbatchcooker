@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/app/login/actions";
 import { Button } from "@/components/ui/button";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
 import { strings } from "@/lib/strings";
 
@@ -31,9 +32,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-dvh flex-col">
         <header className="flex items-center justify-between border-b px-6 py-3">
           <BrandMark />
-          <Button render={<Link href="/login" />} size="sm" nativeButton={false}>
-            {strings.nav.login}
-          </Button>
+          <AuthTopbarAction />
         </header>
         {children}
       </div>
