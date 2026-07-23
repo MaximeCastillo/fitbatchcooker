@@ -25,6 +25,7 @@ model User {
 
   savedRecipes   UserRecipe[]
   preferences    Preference[]
+  mealPlans      MealPlan[]
 }
 
 // A recipe. Seed recipes and AI-validated recipes both live here.
@@ -44,7 +45,8 @@ model Recipe {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  savedBy   UserRecipe[]
+  savedBy      UserRecipe[]
+  planEntries  PlanEntry[]
 }
 
 // A user's saved recipe (their "recipe book" entry): links a user to a recipe, with
@@ -80,4 +82,41 @@ model Preference {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// A planning period the user composes ("Ma semaine"): N days of meals. Belongs to a
+// user. The daily protein gauge and the batch quota are COMPUTED from entries, not
+// stored (spec §3). See ROADMAP for the later ingredient layer + multi-eater support.
+model MealPlan {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  name      String?
+  dayCount  Int      @default(5)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries PlanEntry[]
+
+  @@index([userId])
+}
+
+// A dish placed in a plan, on a given day (0-based dayIndex) with a number of servings.
+// Protein contribution = servings × recipe.proteinPerServingG. Batch quota = total
+// servings of a recipe across the whole plan.
+model PlanEntry {
+  id         String   @id @default(uuid()) @db.Uuid
+  mealPlanId String   @db.Uuid
+  recipeId   String   @db.Uuid
+  dayIndex   Int
+  servings   Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // One entry per recipe per day — adding an existing one bumps servings instead.
+  @@unique([mealPlanId, dayIndex, recipeId])
+  @@index([mealPlanId])
 }
