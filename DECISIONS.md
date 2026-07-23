@@ -205,3 +205,16 @@ d'avance, en parts/jours). L'ancienne « semaine type » **devient** ce cœur. M
 **Pourquoi :** différenciant et fidèle à l'ADN batch cooking ; le plaisir est dans la
 composition de la période, pas dans un suivi quotidien (moins de friction, plus ludique).
 **Alternatives :** tracker quotidien — rejeté (plus contraignant, moins fun, hors ADN).
+
+## 2026-07-21 — Performance : région, dédup des appels, feedback UI
+**Décision :** (1) fonctions Vercel épinglées à **Francfort (`fra1`)** via `vercel.json`,
+collées à la base Supabase (eu-central-1) — avant : défaut `iad1` (US), chaque requête
+traversait l'Atlantique. (2) `getCurrentUser` enveloppé dans **`cache()` de React**
+(dédup par requête : layout + page + action = 1 appel) et **lecture avant écriture**
+(`findUnique` puis `create` si absent, au lieu d'un `upsert` qui écrivait à chaque visite).
+(3) Feedback UI : **`loading.tsx`** (skeletons Suspense) + **`useFormStatus`** (bouton
+désactivé pendant l'action) + **`useOptimistic`** (toggle sauvegarde instantané).
+**Pourquoi :** en prod l'app était lente ; le symptôme du double-clic venait de l'absence
+de feedback, la lenteur brute surtout du décalage de région et des appels/écritures répétés.
+**Alternatives / reporté :** optimiser davantage la latence si besoin (moins d'allers-retours
+séquentiels) ; optimistic sur la liste `/book` (plus complexe, gain faible — YAGNI).
