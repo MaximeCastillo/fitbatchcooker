@@ -133,6 +133,8 @@ exactement ce qu'il veut maîtriser pour être à la page.
 - Après une session de travail notable, ajoute un bilan daté dans `LEARNING_LOG.md`
   (ce qu'on a construit, concepts appris, victoires) — c'est le journal de progression
   de l'auteur. **Relis-le en début de session** pour situer où on en est.
+- `ROADMAP.md` = le plan vivant "à faire / en cours". **Relis-le en début de session** ;
+  retire un item dès qu'il est livré (garde une courte section "Livré récemment").
 - Ce fichier (`CLAUDE.md`) bouge rarement — seulement pour des conventions durables.
 
 ## Plus tard (pas maintenant)
