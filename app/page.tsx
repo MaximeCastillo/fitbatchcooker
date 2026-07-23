@@ -49,7 +49,11 @@ export default async function Home() {
             {strings.home.subtitle}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button render={<Link href="/login" />} size="lg" nativeButton={false}>
+            <Button
+              render={<Link href="/login?mode=signup" />}
+              size="lg"
+              nativeButton={false}
+            >
               {strings.home.ctaPrimary}
             </Button>
             <Button
