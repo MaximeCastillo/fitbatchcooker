@@ -8,8 +8,7 @@ import { prisma } from "@/lib/prisma";
 // Save/unsave a recipe to the current user's book. Every query is scoped to the
 // logged-in user's id — this is our authorization model (spec §7): a user can only
 // ever touch their own rows.
-export async function toggleSaveRecipe(formData: FormData) {
-  const recipeId = String(formData.get("recipeId") ?? "");
+export async function toggleSaveRecipe(recipeId: string) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (!recipeId) return;

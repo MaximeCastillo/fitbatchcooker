@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { RecipeCard } from "@/components/recipe-card";
-import { SaveRecipeButton } from "@/components/save-recipe-button";
+import { SaveToggle } from "@/components/save-toggle";
 import { getCurrentUser } from "@/lib/auth";
-import { toggleSaveRecipe } from "./actions";
 import { strings } from "@/lib/strings";
 
 // Render on each request (not prerendered at build): the library grows over time and
@@ -42,15 +41,7 @@ export default async function RecipesPage() {
             return (
               <li key={recipe.id}>
                 <RecipeCard recipe={recipe}>
-                  <form action={toggleSaveRecipe} className="w-full">
-                    <input type="hidden" name="recipeId" value={recipe.id} />
-                    <SaveRecipeButton
-                      label={
-                        isSaved ? strings.recipes.saved : strings.recipes.save
-                      }
-                      variant={isSaved ? "secondary" : "outline"}
-                    />
-                  </form>
+                  <SaveToggle recipeId={recipe.id} saved={isSaved} />
                 </RecipeCard>
               </li>
             );

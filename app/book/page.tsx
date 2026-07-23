@@ -40,8 +40,10 @@ export default async function BookPage() {
           {saved.map(({ recipe }) => (
             <li key={recipe.id}>
               <RecipeCard recipe={recipe}>
-                <form action={toggleSaveRecipe} className="w-full">
-                  <input type="hidden" name="recipeId" value={recipe.id} />
+                <form
+                  action={toggleSaveRecipe.bind(null, recipe.id)}
+                  className="w-full"
+                >
                   <SaveRecipeButton label={strings.recipes.remove} />
                 </form>
               </RecipeCard>
