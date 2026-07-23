@@ -9,7 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,6 +28,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-accent-warm: var(--accent-warm);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -48,73 +50,92 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ---- FitBatchCooker theme ----
+   Brand identity: green (--primary, also the "goal reached" success signal) +
+   warm orange (--accent-warm, energy/appetite highlight). Colors are intentionally
+   token-driven — change them here and the whole app re-skins. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+
+  --background: #f4f6f1;
+  --foreground: #16201a;
+  --card: #ffffff;
+  --card-foreground: #16201a;
+  --popover: #ffffff;
+  --popover-foreground: #16201a;
+
+  --primary: #16a34a;
+  --primary-foreground: #ffffff;
+  --secondary: #edf0e9;
+  --secondary-foreground: #16201a;
+  --muted: #edf0e9;
+  --muted-foreground: #5c6b5f;
+
+  /* shadcn subtle accent (hover backgrounds) — green-tinted, not the brand pop */
+  --accent: #e7efe3;
+  --accent-foreground: #15803d;
+  /* brand warm accent (energy / appetite) */
+  --accent-warm: #f97316;
+
+  --destructive: #dc2626;
+  --border: #e2e7dc;
+  --input: #e2e7dc;
+  --ring: #16a34a;
+
+  --chart-1: #16a34a;
+  --chart-2: #f97316;
+  --chart-3: #22c55e;
+  --chart-4: #84cc16;
+  --chart-5: #0d9488;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #16201a;
+  --sidebar-primary: #16a34a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e7efe3;
+  --sidebar-accent-foreground: #15803d;
+  --sidebar-border: #e2e7dc;
+  --sidebar-ring: #16a34a;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --background: #0e120f;
+  --foreground: #eaf1e9;
+  --card: #151b16;
+  --card-foreground: #eaf1e9;
+  --popover: #151b16;
+  --popover-foreground: #eaf1e9;
+
+  --primary: #34d27b;
+  --primary-foreground: #08140c;
+  --secondary: #1c241d;
+  --secondary-foreground: #eaf1e9;
+  --muted: #1c241d;
+  --muted-foreground: #94a497;
+
+  --accent: #1e2a20;
+  --accent-foreground: #eaf1e9;
+  --accent-warm: #fb923c;
+
+  --destructive: #f87171;
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --input: oklch(1 0 0 / 14%);
+  --ring: #34d27b;
+
+  --chart-1: #34d27b;
+  --chart-2: #fb923c;
+  --chart-3: #4ade80;
+  --chart-4: #a3e635;
+  --chart-5: #2dd4bf;
+
+  --sidebar: #151b16;
+  --sidebar-foreground: #eaf1e9;
+  --sidebar-primary: #34d27b;
+  --sidebar-primary-foreground: #08140c;
+  --sidebar-accent: #1e2a20;
+  --sidebar-accent-foreground: #eaf1e9;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #34d27b;
 }
 
 @layer base {
@@ -126,5 +147,10 @@
   }
   html {
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
   }
 }
