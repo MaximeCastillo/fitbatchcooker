@@ -26,15 +26,15 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
-  if (!email || !password) {
-    redirect(`/login?error=${encodeURIComponent(strings.login.missingFields)}`);
-  }
+  // Keep the user in signup mode if we bounce back with an error.
+  const back = (message: string) =>
+    redirect(`/login?mode=signup&error=${encodeURIComponent(message)}`);
+
+  if (!email || !password) back(strings.login.missingFields);
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
-  }
+  if (error) back(error.message);
 
   redirect("/recipes");
 }

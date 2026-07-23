@@ -33,11 +33,14 @@ export const strings = {
   },
   login: {
     title: "Connexion",
+    titleSignup: "Créer un compte",
     email: "Email",
     password: "Mot de passe",
     signIn: "Se connecter",
     signUp: "Créer un compte",
     missingFields: "Renseigne un email et un mot de passe.",
+    noAccount: "Pas encore de compte ?",
+    haveAccount: "Déjà un compte ?",
     // Value panel
     panelTitle: "Tes repas protéinés, planifiés à l'avance.",
     panelSubtitle: "Compose ta semaine, remplis ta jauge de protéines, et obtiens ta liste de plats à préparer.",
