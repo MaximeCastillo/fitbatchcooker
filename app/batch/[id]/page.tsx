@@ -35,7 +35,7 @@ export default async function BatchPage({
   if (!user) redirect("/login");
 
   const [plan, recipes] = await Promise.all([
-    prisma.mealPlan.findFirst({
+    prisma.batch.findFirst({
       where: { id, userId: user.id },
       include: {
         entries: { include: { recipe: true }, orderBy: { createdAt: "asc" } },

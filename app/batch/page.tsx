@@ -14,7 +14,7 @@ export default async function BatchListPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const plans = await prisma.mealPlan.findMany({
+  const plans = await prisma.batch.findMany({
     where: { userId: user.id },
     orderBy: { updatedAt: "desc" },
     include: { _count: { select: { entries: true } } },
