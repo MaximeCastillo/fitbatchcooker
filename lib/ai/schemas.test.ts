@@ -4,7 +4,7 @@ import { savePreferenceInput } from "./schemas";
 // We test the validation guard: what the model proposes must be shaped correctly
 // before we ever write it to the DB.
 describe("savePreferenceInput", () => {
-  it("accepte une préférence valide", () => {
+  it("accepts a valid preference", () => {
     const result = savePreferenceInput.safeParse({
       type: "goût",
       value: "adore le poulet",
@@ -13,7 +13,7 @@ describe("savePreferenceInput", () => {
     expect(result.success).toBe(true);
   });
 
-  it("accepte sans sentiment (optionnel)", () => {
+  it("accepts without sentiment (optional)", () => {
     const result = savePreferenceInput.safeParse({
       type: "aversion",
       value: "n'aime pas l'aubergine",
@@ -21,12 +21,12 @@ describe("savePreferenceInput", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejette un type vide", () => {
+  it("rejects an empty type", () => {
     const result = savePreferenceInput.safeParse({ type: "", value: "x" });
     expect(result.success).toBe(false);
   });
 
-  it("rejette un sentiment hors liste", () => {
+  it("rejects a sentiment outside the allowed list", () => {
     const result = savePreferenceInput.safeParse({
       type: "goût",
       value: "x",
