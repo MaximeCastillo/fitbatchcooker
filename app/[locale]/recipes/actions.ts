@@ -4,9 +4,10 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { recipeVisibilityWhere } from "@/lib/recipes";
+import { recipeVisibilityWhere, recomputeRecipeProtein } from "@/lib/recipes";
+import { normalizeName } from "@/lib/ingredients";
 import { redirect } from "@/i18n/navigation";
-import type { MealType } from "@/lib/generated/prisma/enums";
+import type { IngredientCategory, MealType } from "@/lib/generated/prisma/enums";
 
 // Shape a recipe card needs (a "use server" module may only export async functions +
 // types — types are erased, so these are fine here).
@@ -109,4 +110,77 @@ export async function toggleSaveRecipe(recipeId: string) {
   // Refresh the pages that show saved state.
   revalidatePath("/recipes");
   revalidatePath("/book");
+}
+
+// Create (or reuse) a shared ingredient — used by the manual recipe form's inline
+// "new ingredient". Deduped by normalizedName so we never add a duplicate; if it already
+// exists we return it as-is (don't overwrite a shared row's values).
+export async function createIngredient(input: {
+  name: string;
+  category: IngredientCategory;
+  proteinPer100g: number;
+}): Promise<{ id: string; name: string; category: IngredientCategory }> {
+  const user = await getCurrentUser();
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+
+  const name = input.name.trim();
+  const normalizedName = normalizeName(name);
+  if (!name) throw new Error("Ingredient name is required.");
+  const proteinPer100g = Math.max(0, Math.min(100, input.proteinPer100g || 0));
+
+  return prisma.ingredient.upsert({
+    where: { normalizedName },
+    update: {},
+    create: { name, normalizedName, category: input.category, proteinPer100g },
+    select: { id: true, name: true, category: true },
+  });
+}
+
+// Create a recipe owned by the current user from the manual form. Ingredients are
+// already resolved to ids by the picker (existing or just-created). Recompute the cached
+// protein/part in the same transaction. Redirects to the new recipe on success.
+export async function createRecipe(input: {
+  title: string;
+  mealType: MealType;
+  steps: string[];
+  ingredients: { ingredientId: string; quantityG: number }[];
+}): Promise<void> {
+  const user = await getCurrentUser();
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+
+  const title = input.title.trim();
+  const steps = input.steps.map((s) => s.trim()).filter(Boolean);
+  // Merge duplicate ingredients (one row per ingredient — @@unique([recipeId, ingredientId])).
+  const merged = new Map<string, number>();
+  for (const link of input.ingredients) {
+    if (link.ingredientId && link.quantityG > 0) {
+      merged.set(link.ingredientId, (merged.get(link.ingredientId) ?? 0) + link.quantityG);
+    }
+  }
+  if (!title || steps.length === 0 || merged.size === 0) {
+    throw new Error("Recipe needs a title, at least one step and one ingredient.");
+  }
+
+  const recipe = await prisma.$transaction(async (tx) => {
+    const created = await tx.recipe.create({
+      data: {
+        userId: user.id,
+        title,
+        mealType: input.mealType,
+        steps,
+        ingredients: {
+          create: [...merged].map(([ingredientId, quantityG]) => ({
+            ingredientId,
+            quantityG,
+          })),
+        },
+      },
+      select: { id: true },
+    });
+    await recomputeRecipeProtein(created.id, tx);
+    return created;
+  });
+
+  revalidatePath("/recipes");
+  redirect({ href: `/recipes/${recipe.id}`, locale: await getLocale() });
 }

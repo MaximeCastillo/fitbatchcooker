@@ -137,6 +137,24 @@
       "BREAKFAST": "Petit-déj"
     },
     "end": "Tu as tout vu !",
+    "form": {
+      "title": "Titre",
+      "titlePlaceholder": "Ex. Poulet grillé, riz & brocoli",
+      "mealType": "Type",
+      "steps": "Étapes",
+      "step": "Étape",
+      "addStep": "Ajouter une étape",
+      "ingredients": "Ingrédients",
+      "pickIngredient": "Choisir…",
+      "addIngredient": "Ajouter un ingrédient",
+      "newIngredient": "Nouvel ingrédient",
+      "name": "Nom",
+      "proteinPer100g": "Prot. / 100 g",
+      "category": "Catégorie",
+      "add": "Ajouter",
+      "cancel": "Annuler",
+      "submit": "Créer la recette"
+    },
     "detail": {
       "back": "Toutes les recettes",
       "ingredientsTitle": "Ingrédients",

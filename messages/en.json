@@ -137,6 +137,24 @@
       "BREAKFAST": "Breakfast"
     },
     "end": "You've seen it all!",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. Grilled chicken, rice & broccoli",
+      "mealType": "Type",
+      "steps": "Steps",
+      "step": "Step",
+      "addStep": "Add a step",
+      "ingredients": "Ingredients",
+      "pickIngredient": "Pick…",
+      "addIngredient": "Add an ingredient",
+      "newIngredient": "New ingredient",
+      "name": "Name",
+      "proteinPer100g": "Protein / 100 g",
+      "category": "Category",
+      "add": "Add",
+      "cancel": "Cancel",
+      "submit": "Create recipe"
+    },
     "detail": {
       "back": "All recipes",
       "ingredientsTitle": "Ingredients",
