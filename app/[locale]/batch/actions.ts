@@ -120,7 +120,7 @@ export async function addEntry(
   if (!recipe) return null;
 
   const created = await prisma.batchEntry.create({
-    data: { batchId: planId, recipeId, dayIndex, servings: 1 },
+    data: { batchId: planId, recipeId, dayIndex },
   });
   revalidateBatch(planId);
   return created.id;
@@ -151,7 +151,6 @@ export async function duplicateEntry(
       batchId: entry.batchId,
       recipeId: entry.recipeId,
       dayIndex: toDayIndex,
-      servings: entry.servings,
     },
   });
   revalidateBatch(entry.batchId);

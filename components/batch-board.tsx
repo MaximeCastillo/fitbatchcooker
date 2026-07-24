@@ -41,6 +41,7 @@ import {
 import { showUndoToast } from "@/components/undo-toast";
 import { ProteinGauge } from "@/components/protein-gauge";
 import { RecipeDetail } from "@/components/recipe-detail";
+import { Link } from "@/i18n/navigation";
 import {
   Dialog,
   DialogContent,
@@ -55,7 +56,6 @@ type Recipe = {
   title: string;
   proteinPerServingG: number | null;
   summary: string | null;
-  servings: number;
   caloriesPerServingKcal: number | null;
   steps: string[];
 };
@@ -63,7 +63,6 @@ type Entry = {
   id: string;
   recipeId: string;
   dayIndex: number;
-  servings: number;
   title: string;
   proteinPerServingG: number | null;
 };
@@ -169,10 +168,7 @@ export function BatchBoard({
   ).length;
   const avgPerDay = dayCount
     ? Math.round(
-        entries.reduce(
-          (s, e) => s + (e.proteinPerServingG ?? 0) * e.servings,
-          0,
-        ) / dayCount,
+        entries.reduce((s, e) => s + (e.proteinPerServingG ?? 0), 0) / dayCount,
       )
     : 0;
 
@@ -187,7 +183,6 @@ export function BatchBoard({
         id: temp,
         recipeId,
         dayIndex,
-        servings: 1,
         title: recipe.title,
         proteinPerServingG: recipe.proteinPerServingG,
       },
@@ -350,43 +345,63 @@ export function BatchBoard({
           <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
             {t("batch.recipes")}
           </h2>
-          <div className="relative mb-2">
-            <Search
-              className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("batch.searchPlaceholder")}
-              aria-label={t("batch.searchPlaceholder")}
-              className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            {filteredRecipes.length === 0 ? (
+          {recipes.length === 0 ? (
+            // Empty book → nothing to compose with yet. Send them to the library to save
+            // some recipes first (same "no recipe → go browse" logic as /book).
+            <div className="flex flex-col items-start gap-3">
               <p className="text-sm text-muted-foreground">
-                {t("batch.noRecipe")}
+                {t("batch.emptyPalette")}
               </p>
-            ) : (
-              filteredRecipes.map((recipe) => (
-                <RecipeChip
-                  key={recipe.id}
-                  draggableId={`recipe:${recipe.id}`}
-                  draggableData={{ kind: "recipe", recipeId: recipe.id }}
-                  title={recipe.title}
-                  proteinPerServingG={recipe.proteinPerServingG}
-                  onPreview={(source) => openPreview(recipe, source)}
-                  onAdd={() => setAddFor(recipe)}
+              <Link
+                href="/recipes"
+                className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                {t("book.browse")}
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="relative mb-2">
+                <Search
+                  className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden
                 />
-              ))
-            )}
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            <span className="md:hidden">{t("batch.tapHint")}</span>
-            <span className="hidden md:inline">{t("batch.dragHint")}</span>
-          </p>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("batch.searchPlaceholder")}
+                  aria-label={t("batch.searchPlaceholder")}
+                  className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
+                />
+              </div>
+              {/* Bounded height so a long book scrolls inside the palette instead of
+                  stretching the page (the palette is sticky on desktop). */}
+              <div className="flex max-h-[24rem] flex-col gap-2 overflow-y-auto md:max-h-[calc(100vh-11rem)]">
+                {filteredRecipes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    {t("batch.noRecipe")}
+                  </p>
+                ) : (
+                  filteredRecipes.map((recipe) => (
+                    <RecipeChip
+                      key={recipe.id}
+                      draggableId={`recipe:${recipe.id}`}
+                      draggableData={{ kind: "recipe", recipeId: recipe.id }}
+                      title={recipe.title}
+                      proteinPerServingG={recipe.proteinPerServingG}
+                      onPreview={(source) => openPreview(recipe, source)}
+                      onAdd={() => setAddFor(recipe)}
+                    />
+                  ))
+                )}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                <span className="md:hidden">{t("batch.tapHint")}</span>
+                <span className="hidden md:inline">{t("batch.dragHint")}</span>
+              </p>
+            </>
+          )}
         </PaletteZone>
 
         {/* Days + add-day + quota */}
@@ -576,17 +591,26 @@ const chipCardClass =
 function ChipBody({
   title,
   proteinPerServingG,
+  count,
 }: {
   title: string;
   proteinPerServingG: number | null;
+  count?: number;
 }) {
   return (
     <>
       <span className="line-clamp-2 text-sm font-semibold leading-tight">
         {title}
       </span>
-      <span className="font-mono text-xs font-bold text-accent-warm">
-        {proteinPerServingG ?? "—"} g
+      <span className="flex items-center gap-1.5">
+        <span className="font-mono text-xs font-bold text-accent-warm">
+          {proteinPerServingG ?? "—"} g
+        </span>
+        {count && count > 1 ? (
+          <span className="rounded-full bg-primary/10 px-1.5 font-display text-xs font-bold text-primary">
+            ×{count}
+          </span>
+        ) : null}
       </span>
     </>
   );
@@ -607,6 +631,7 @@ function RecipeChip({
   draggableData,
   title,
   proteinPerServingG,
+  count,
   onPreview,
   onAdd,
   onRemove,
@@ -616,6 +641,7 @@ function RecipeChip({
   draggableData: Record<string, unknown>;
   title: string;
   proteinPerServingG: number | null;
+  count?: number;
   onPreview: (source: HTMLElement) => void;
   onAdd?: () => void;
   onRemove?: () => void;
@@ -639,7 +665,7 @@ function RecipeChip({
         fadeWhenDragging && isDragging && "opacity-40",
       )}
     >
-      <ChipBody title={title} proteinPerServingG={proteinPerServingG} />
+      <ChipBody title={title} proteinPerServingG={proteinPerServingG} count={count} />
       <div className="absolute right-1 top-1 flex gap-0.5">
         {onAdd && (
           <button
@@ -675,6 +701,30 @@ function RecipeChip({
       </div>
     </div>
   );
+}
+
+// Collapse a day's entries into one group per recipe (one entry = one part), preserving
+// first-seen order so chips don't jump around as parts are added/removed.
+type EntryGroup = {
+  recipeId: string;
+  title: string;
+  proteinPerServingG: number | null;
+  entryIds: string[];
+};
+function groupByRecipe(entries: Entry[]): EntryGroup[] {
+  const groups = new Map<string, EntryGroup>();
+  for (const entry of entries) {
+    const group = groups.get(entry.recipeId);
+    if (group) group.entryIds.push(entry.id);
+    else
+      groups.set(entry.recipeId, {
+        recipeId: entry.recipeId,
+        title: entry.title,
+        proteinPerServingG: entry.proteinPerServingG,
+        entryIds: [entry.id],
+      });
+  }
+  return [...groups.values()];
 }
 
 function DayRow({
@@ -741,21 +791,25 @@ function DayRow({
         </div>
       </div>
 
-      {/* Right: dishes */}
+      {/* Right: dishes. Same recipe placed several times = ONE chip with ×N (one entry
+          per part). Dragging moves one part; the trash removes one part. */}
       <div className="flex-1">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("dropHere")}</p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-            {entries.map((entry) => (
+            {groupByRecipe(entries).map((group) => (
               <RecipeChip
-                key={entry.id}
-                draggableId={`entry:${entry.id}`}
-                draggableData={{ kind: "entry", entryId: entry.id }}
-                title={entry.title}
-                proteinPerServingG={entry.proteinPerServingG}
-                onPreview={(source) => onPreviewRecipe(entry.recipeId, source)}
-                onRemove={() => onRemoveEntry(entry.id)}
+                key={group.recipeId}
+                draggableId={`entry:${group.entryIds[0]}`}
+                draggableData={{ kind: "entry", entryId: group.entryIds[0] }}
+                title={group.title}
+                proteinPerServingG={group.proteinPerServingG}
+                count={group.entryIds.length}
+                onPreview={(source) => onPreviewRecipe(group.recipeId, source)}
+                onRemove={() =>
+                  onRemoveEntry(group.entryIds[group.entryIds.length - 1])
+                }
                 fadeWhenDragging
               />
             ))}

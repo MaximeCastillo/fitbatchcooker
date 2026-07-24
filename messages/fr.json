@@ -90,6 +90,7 @@
     "recipes": "Recettes",
     "searchPlaceholder": "Rechercher…",
     "noRecipe": "Aucune recette.",
+    "emptyPalette": "Sauvegarde des recettes dans ton livre pour composer un batch.",
     "dragHint": "Glisse une recette sur un jour (Maj = dupliquer), ou touche +.",
     "tapHint": "Touche + pour ajouter une recette à un jour.",
     "preview": "Aperçu de la recette",

@@ -4,14 +4,14 @@
 // functions. See ROADMAP.
 
 export type ProteinEntry = {
-  servings: number;
   proteinPerServingG: number | null;
 };
 
-// Total protein (g) placed on a day.
+// Total protein (g) placed on a day. One entry = one part; placing a recipe twice means
+// two entries (there is no per-entry servings count).
 export function dayProteinG(entries: ProteinEntry[]): number {
   return entries.reduce(
-    (sum, entry) => sum + entry.servings * (entry.proteinPerServingG ?? 0),
+    (sum, entry) => sum + (entry.proteinPerServingG ?? 0),
     0,
   );
 }
@@ -42,20 +42,21 @@ export function dayProgressPct(totalG: number, targetG: number | null): number {
   return Math.min(100, Math.round((totalG / targetG) * 100));
 }
 
-// Batch quota: total portions to cook per recipe across the whole plan.
+// Batch quota: number of parts to cook per recipe across the whole plan (one entry =
+// one part, so this counts the entries per recipe).
 export function batchQuota(
-  entries: { recipeId: string; servings: number }[],
+  entries: { recipeId: string }[],
 ): Record<string, number> {
   const quota: Record<string, number> = {};
   for (const entry of entries) {
-    quota[entry.recipeId] = (quota[entry.recipeId] ?? 0) + entry.servings;
+    quota[entry.recipeId] = (quota[entry.recipeId] ?? 0) + 1;
   }
   return quota;
 }
 
-// Total portions to cook across the whole plan.
-export function totalPortions(entries: { servings: number }[]): number {
-  return entries.reduce((sum, entry) => sum + entry.servings, 0);
+// Total parts to cook across the whole plan.
+export function totalPortions(entries: unknown[]): number {
+  return entries.length;
 }
 
 export type RecipeIngredientAmount = {

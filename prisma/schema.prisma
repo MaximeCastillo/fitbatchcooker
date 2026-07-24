@@ -68,9 +68,7 @@ model Recipe {
   // Cached, derived from the recipe's ingredients (protein for one part), in grams.
   proteinPerServingG     Int?
   caloriesPerServingKcal Int?
-  // Legacy: `servings` unused in the MVP (a recipe is one part); `category` unused
-  // (superseded by mealType). Kept to stay additive; removable later.
-  servings Int      @default(1)
+  // Legacy: `category` unused (superseded by mealType). Kept additive; removable later.
   category String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -168,15 +166,14 @@ model Batch {
   @@index([userId])
 }
 
-// A dish placed in a plan, on a given day (0-based dayIndex) with a number of servings.
-// Protein contribution = servings × recipe.proteinPerServingG. Batch quota = total
-// servings of a recipe across the whole plan.
+// A dish placed in a plan, on a given day (0-based dayIndex). One entry = one part;
+// protein contribution = recipe.proteinPerServingG. Placing a recipe twice in a day = two
+// entries (shown grouped as ×N). Batch quota = number of entries of a recipe across the plan.
 model BatchEntry {
   id        String   @id @default(uuid()) @db.Uuid
   batchId   String   @db.Uuid
   recipeId  String   @db.Uuid
   dayIndex  Int
-  servings  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -184,6 +181,6 @@ model BatchEntry {
   recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   // No uniqueness on (batch, day, recipe): a user may place the same dish more than once
-  // in a day. Quantity is expressed either by `servings` or by multiple entries.
+  // in a day (each placement is one part; the UI groups them as ×N).
   @@index([batchId])
 }

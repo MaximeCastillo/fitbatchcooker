@@ -4,7 +4,6 @@ import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
-import { recipeVisibilityWhere } from "@/lib/recipes";
 import { BatchBoard } from "@/components/batch-board";
 import { BatchTitle } from "@/components/batch-title";
 import { Link, redirect } from "@/i18n/navigation";
@@ -31,8 +30,10 @@ export default async function BatchPage({
         entries: { include: { recipe: true }, orderBy: { createdAt: "asc" } },
       },
     }),
+    // Palette = the user's book (saved recipes): what they can drop into days. Same
+    // source as /book. An empty book sends them to /recipes to save some first.
     prisma.recipe.findMany({
-      where: recipeVisibilityWhere(user.id),
+      where: { savedBy: { some: { userId: user.id } } },
       orderBy: { title: "asc" },
     }),
   ]);
@@ -44,7 +45,6 @@ export default async function BatchPage({
     id: e.id,
     recipeId: e.recipeId,
     dayIndex: e.dayIndex,
-    servings: e.servings,
     title: e.recipe.title,
     proteinPerServingG: e.recipe.proteinPerServingG,
   }));
@@ -54,7 +54,6 @@ export default async function BatchPage({
     title: r.title,
     proteinPerServingG: r.proteinPerServingG,
     summary: r.summary,
-    servings: r.servings,
     caloriesPerServingKcal: r.caloriesPerServingKcal,
     steps: r.steps,
   }));

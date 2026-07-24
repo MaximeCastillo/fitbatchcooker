@@ -90,6 +90,7 @@
     "recipes": "Recipes",
     "searchPlaceholder": "Search…",
     "noRecipe": "No recipe.",
+    "emptyPalette": "Save recipes to your book to compose a batch.",
     "dragHint": "Drag a recipe onto a day (Shift = duplicate), or tap +.",
     "tapHint": "Tap + to add a recipe to a day.",
     "preview": "Recipe preview",

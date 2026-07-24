@@ -10,17 +10,18 @@ import {
 } from "./nutrition";
 
 describe("dayProteinG", () => {
-  it("sums protein × servings", () => {
+  it("sums protein across parts (one entry = one part)", () => {
     expect(
       dayProteinG([
-        { servings: 1, proteinPerServingG: 45 },
-        { servings: 2, proteinPerServingG: 20 },
+        { proteinPerServingG: 45 },
+        { proteinPerServingG: 20 },
+        { proteinPerServingG: 20 },
       ]),
     ).toBe(85);
   });
 
   it("treats null protein as 0", () => {
-    expect(dayProteinG([{ servings: 3, proteinPerServingG: null }])).toBe(0);
+    expect(dayProteinG([{ proteinPerServingG: null }])).toBe(0);
   });
 
   it("is 0 for an empty day", () => {
@@ -80,11 +81,12 @@ describe("dayProgressPct", () => {
 });
 
 describe("batchQuota", () => {
-  it("aggregates servings per recipe over the whole period", () => {
+  it("counts the parts (entries) per recipe over the whole period", () => {
     const quota = batchQuota([
-      { recipeId: "poulet", servings: 1 },
-      { recipeId: "poulet", servings: 1 },
-      { recipeId: "saumon", servings: 2 },
+      { recipeId: "poulet" },
+      { recipeId: "poulet" },
+      { recipeId: "saumon" },
+      { recipeId: "saumon" },
     ]);
     expect(quota).toEqual({ poulet: 2, saumon: 2 });
   });
@@ -95,10 +97,8 @@ describe("batchQuota", () => {
 });
 
 describe("totalPortions", () => {
-  it("sums all servings", () => {
-    expect(
-      totalPortions([{ servings: 1 }, { servings: 2 }, { servings: 1 }]),
-    ).toBe(4);
+  it("counts all parts (entries)", () => {
+    expect(totalPortions([{}, {}, {}, {}])).toBe(4);
   });
 });
 
