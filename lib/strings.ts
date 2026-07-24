@@ -60,6 +60,12 @@ export const strings = {
     toCookHint: "Ton lot de plats à préparer d'avance.",
     perServing: (g: number | null) => `${g ?? "—"} g / portion`,
     times: (n: number) => `×${n}`,
+    recipes: "Recettes",
+    searchPlaceholder: "Rechercher…",
+    noRecipe: "Aucune recette.",
+    dragHint: "Glisse sur un jour. Maj + glisser = dupliquer.",
+    removeZone: "Relâche pour ranger ce plat",
+    dropHere: "Glisse un plat ici",
   },
   login: {
     title: "Connexion",

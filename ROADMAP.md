@@ -15,20 +15,24 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - [x] **Jauge par jour** = contenant qui se remplit (motif signature, scellage vert). ✅
 - [x] **Quota "À cuisiner"** (portions par recette). ✅
 - [x] **Multi-plans** : liste « Mes batchs », créer / renommer / supprimer. ✅
-- [ ] **Drag & drop** (`@dnd-kit`) : glisser palette→jour, jour→jour, **Maj = dupliquer**,
-      palette = zone « ranger », + **optimistic UI**. (améliore le composer au clic)
+- [x] **Drag & drop** (`@dnd-kit`) : palette→jour, jour→jour, **Maj = dupliquer**,
+      palette = zone « ranger », **optimistic UI** + fallback select. ✅
 - [ ] **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
 - [ ] **Polish mobile tap-first.**
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## ⏭️ Court terme
+- **`create_recipe` (tool calling)** : le chef crée des recettes (voire plus) sur « ok ».
+- **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
+  serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
+  pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
+- **Comptes admin** : rôle `admin` (gérer les limites, voir l'usage) — introduit avec le point ci-dessus.
 - **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
 - **Guide** : product-tour léger ("clique ici") + **chef contextuel** (aide par page).
 
 ## 🔭 Plus tard / idées
 - **3D** : d'abord la **célébration "jour scellé au vert"** (1er moment 3D, périmètre
   maîtrisé) ; **mascotte** (2D puis éventuellement 3D) bien après, si ça décolle.
-- **`create_recipe`** : le chef persiste une recette validée ("ok").
 - **"Ce que le chef sait de moi"** : écran préférences éditable/supprimable.
 - **Éviter les doublons de recettes** : injecter les titres existants / outil `search_recipes`.
 - **Protéines vérifiées — couche ingrédients** (gros milestone, après "Ma semaine") :

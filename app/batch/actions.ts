@@ -106,18 +106,19 @@ export async function addEntry(
   planId: string,
   dayIndex: number,
   recipeId: string,
-) {
+): Promise<string | null> {
   const userId = await requireUserId();
   const plan = await ownedPlan(planId, userId);
-  if (!plan || dayIndex < 0 || dayIndex >= plan.dayCount) return;
+  if (!plan || dayIndex < 0 || dayIndex >= plan.dayCount) return null;
 
   const recipe = await prisma.recipe.findUnique({ where: { id: recipeId } });
-  if (!recipe) return;
+  if (!recipe) return null;
 
-  await prisma.batchEntry.create({
+  const created = await prisma.batchEntry.create({
     data: { batchId: planId, recipeId, dayIndex, servings: 1 },
   });
   revalidateBatch(planId);
+  return created.id;
 }
 
 export async function moveEntry(entryId: string, toDayIndex: number) {
@@ -132,12 +133,15 @@ export async function moveEntry(entryId: string, toDayIndex: number) {
   revalidateBatch(entry.batchId);
 }
 
-export async function duplicateEntry(entryId: string, toDayIndex: number) {
+export async function duplicateEntry(
+  entryId: string,
+  toDayIndex: number,
+): Promise<string | null> {
   const userId = await requireUserId();
   const entry = await ownedEntry(entryId, userId);
-  if (!entry || toDayIndex < 0 || toDayIndex >= entry.batch.dayCount) return;
+  if (!entry || toDayIndex < 0 || toDayIndex >= entry.batch.dayCount) return null;
 
-  await prisma.batchEntry.create({
+  const created = await prisma.batchEntry.create({
     data: {
       batchId: entry.batchId,
       recipeId: entry.recipeId,
@@ -146,6 +150,7 @@ export async function duplicateEntry(entryId: string, toDayIndex: number) {
     },
   });
   revalidateBatch(entry.batchId);
+  return created.id;
 }
 
 export async function removeEntry(entryId: string) {
