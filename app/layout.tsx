@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import { AppShell } from "@/components/app-shell";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // Body: Barlow. Display/headings: Barlow Condensed (athletic). Numbers/macros: mono.
 const barlow = Barlow({
@@ -36,11 +37,14 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
+      suppressHydrationWarning
       className={`${barlow.variable} ${barlowCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AppShell>{children}</AppShell>
-        <Toaster position="bottom-center" />
+        <ThemeProvider>
+          <AppShell>{children}</AppShell>
+          <Toaster position="bottom-center" />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -148,6 +148,11 @@ export const strings = {
     connectedAs: "Connecté en tant que",
     // Profile section reuses strings.profile.* for its field labels.
     profileSection: "Profil",
+    // Appearance — light/dark/system theme toggle.
+    appearanceSection: "Apparence",
+    themeLight: "Clair",
+    themeDark: "Sombre",
+    themeSystem: "Système",
     // Change email
     emailSection: "Adresse email",
     emailHint: "Un email de confirmation sera envoyé à la nouvelle adresse.",

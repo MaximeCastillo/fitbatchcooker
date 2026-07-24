@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { updateProfile } from "./actions";
 import { logout } from "@/app/login/actions";
 import { EmailForm, PasswordForm } from "@/components/account-forms";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Card,
   CardContent,
@@ -107,6 +108,16 @@ export default async function AccountPage({
         </CardHeader>
         <CardContent>
           <PasswordForm />
+        </CardContent>
+      </Card>
+
+      {/* Appearance — light/dark/system theme toggle (next-themes). */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{strings.account.appearanceSection}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ThemeToggle />
         </CardContent>
       </Card>
 
