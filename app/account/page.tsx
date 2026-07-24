@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { updateProfile } from "./actions";
+import { logout } from "@/app/login/actions";
 import { EmailForm, PasswordForm } from "@/components/account-forms";
 import {
   Card,
@@ -108,6 +109,13 @@ export default async function AccountPage({
           <PasswordForm />
         </CardContent>
       </Card>
+
+      {/* Logout — infrequent action, kept visually secondary at the bottom. */}
+      <form action={logout} className="mt-2">
+        <Button type="submit" variant="outline" className="w-full">
+          {strings.nav.logout}
+        </Button>
+      </form>
     </main>
   );
 }
