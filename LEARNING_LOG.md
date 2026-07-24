@@ -214,3 +214,56 @@ d'abord pour le mobile. Résultat : Phase A livrée + gros polish UX du composeu
 1. Relire + valider la **page « Mon compte »** (agent), puis push.
 2. **Phase B — encas** (`Recipe.kind` MAIN/SNACK + onglets palette + seed).
 3. Test **mobile réel** du composeur, itérer le tap-first si besoin.
+
+---
+
+## Session 5 — 2026-07-24 (suite) — App multilingue, thème, et 1ᵉʳ workflow PR
+
+**Objectif :** rendre l'app bilingue « pro », polir les réglages (thème/langue), et
+découvrir le workflow **branche → PR → preview → merge**. Résultat : app FR/EN en prod,
+première PR mergée.
+
+### Ce qu'on a construit
+- **Réglages dans le chrome** : compte via l'avatar, **déconnexion rangée dans « Mon compte »**,
+  nav réordonnée, **toggle clair/sombre** (défaut clair) puis **sélecteur de langue** — comme
+  des contrôles, pas des liens de nav.
+- **App multilingue FR/EN** (next-intl) **sans préfixe d'URL** (`localePrefix: "never"`),
+  **défaut anglais + détection du device** (un device FR → français aux mêmes URLs propres),
+  catalogues **ICU** `messages/fr.json`/`en.json` (`lib/strings.ts` supprimé), **404 localisé**,
+  chef IA multilingue, `middleware.ts` → **`proxy.ts`** (Next 16).
+- Livré via une **vraie PR** (branche + preview Vercel + relecture + merge) — une première.
+
+### Concepts appris (🆕)
+- **i18n avec/sans préfixe d'URL** : arbitrage **SEO (URLs par langue, reco Google)** vs
+  **URLs propres façon app (cookie + `Accept-Language`)**. Choix : sans préfixe (`never`),
+  réversible/sélectif (une landing pourra repasser en `/fr` `/en`).
+- **next-intl** : segment `[locale]`, `getRequestConfig`, `NextIntlClientProvider`,
+  navigation locale-aware, **catalogues ICU** (pluriels `{count, plural, …}`).
+- **Composition de middleware/proxy** : chaîner next-intl (locale) **et** le refresh de
+  session Supabase sur **une même réponse**.
+- **Piège RSC** : en sans-préfixe, changer de langue ne change pas l'URL → il faut
+  **`router.refresh()`** pour que les Server Components (navbar) se re-rendent.
+- **Workflow pro** : **branche → PR → preview deployment Vercel (« review app ») → merge**.
+  Vercel déploie chaque PR sur une URL éphémère ; la prod ne part que de `main`.
+- **Playwright** : piloter un vrai navigateur headless pour **tester les interactions
+  client** (le clic !) — ce que `curl` ne peut pas. A prouvé le fix du sélecteur de langue.
+
+### Pièges rencontrés & résolus
+- Sélecteur de langue : textes partiellement mis à jour + switch bloqué → **cookie posé mais
+  RSC pas rafraîchis** → `router.refresh()`. Bug attrapé en **recette sur le preview**.
+- 404 non localisé : `[locale]/not-found` ne se déclenche pas pour une URL arbitraire →
+  **catch-all `[locale]/[...rest]`** qui appelle `notFound()`.
+- Incident **API GitHub** bloquant la création de PR → **boucle de retry auto** toutes les 5 min.
+
+### Règle actée
+**Parité stricte des locales** : toute chaîne UI se fait en FR **et** en EN (jamais l'une
+sans l'autre). Inscrite dans `CLAUDE.md`.
+
+### Victoires
+🎉 L'app parle **deux langues** et s'adapte au device toute seule, les réglages sont propres,
+et on a bouclé un **cycle PR complet** (branche, preview, relecture, merge) — plus un
+**test navigateur réel** pour la première fois.
+
+### Prochaine session
+1. **Phase B — encas** (`Recipe.kind` + onglets palette + seed).
+2. Éventuel : couche E2E **Playwright** propre (helper d'auth + CI) si on veut.

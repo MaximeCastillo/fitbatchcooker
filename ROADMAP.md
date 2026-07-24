@@ -67,6 +67,10 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **App multilingue (FR/EN)** — next-intl **sans préfixe** (défaut EN, détection device),
+  catalogues ICU `messages/fr.json`/`en.json`, **sélecteur de langue** + **toggle clair/sombre**
+  dans le chrome, 404 localisé, chef IA multilingue, `proxy.ts` (Next 16). **1ʳᵉ PR + preview
+  Vercel** du projet (mergée). Détail : `DECISIONS.md`.
 - **Recettes riches — Phase A** : page détail `/recipes/[id]` (étapes, macros, note « valeurs
   approximatives »), **cartes cliquables** (stretched-link), **marque-page** save en coin de carte.
 - **Aperçu recette dans le composeur** : modale (Radix Dialog) qui **jaillit de la carte**
@@ -74,7 +78,7 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
 - **Composeur unifié + mobile v1** : `RecipeChip` unique (palette = jours), **tap-to-add**
   (« + » → « ajouter à quel jour ? »), sensors Mouse/Touch (scroll vs drag), actions visibles au doigt.
 - **Page « Mon compte »** (`/account`) : email connecté visible, changer email (confirmation
-  Supabase) + mot de passe (re-vérif du MDP actuel), sync `User.email`. *(à relire + push)*
+  Supabase) + mot de passe (re-vérif du MDP actuel), sync `User.email`.
 - **Undo à la Notion** (jour + batch) : suppression différée + toast « Annuler » (10 s, barre
   de décompte), zéro soft-delete en base. Drag & drop poli : **DragOverlay** (la recette reste
   en place dans la palette), jauge plus vivante, nommage unifié « recette ».

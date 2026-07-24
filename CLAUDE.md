@@ -22,6 +22,9 @@ côté serveur uniquement.
 
 - **Tout le code et les commentaires en anglais.**
 - **On travaille et on discute en français.** Explique en français.
+- **App bilingue (i18n, next-intl).** Toute chaîne UI vit dans `messages/fr.json` **et**
+  `messages/en.json`, en **parité stricte** : on n'ajoute/modifie/supprime **jamais** une
+  clé dans une locale sans faire l'équivalent dans l'autre (FR d'abord, adapté en EN).
 
 ## Conventions de code
 
