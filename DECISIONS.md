@@ -218,3 +218,27 @@ désactivé pendant l'action) + **`useOptimistic`** (toggle sauvegarde instantan
 de feedback, la lenteur brute surtout du décalage de région et des appels/écritures répétés.
 **Alternatives / reporté :** optimiser davantage la latence si besoin (moins d'allers-retours
 séquentiels) ; optimistic sur la liste `/book` (plus complexe, gain faible — YAGNI).
+
+## 2026-07-24 — Principe fondateur : régularité > précision (+ `PRINCIPLES.md`, `DESIGN.md`)
+**Décision :** acter que l'app vise la **régularité long terme** (plusieurs mois), pas la
+précision d'un jour. L'**approximation est un choix de design**. Le modèle protéines reste
+grossier : un ingrédient = **protéines/100 g + quantité habituelle** saisies à la louche →
+**protéines/part** dérivées ; **pré-remplies par l'IA** (le chef doit être bon pour éviter de
+repasser derrière), ajustables à la volée. Deux nouveaux docs : `PRINCIPLES.md` (principes +
+règles métier) et `DESIGN.md` (direction artistique), pour la cohérence entre sessions.
+**Pourquoi :** en prise de masse, ce sont la régularité et le plaisir qui produisent les
+résultats ; viser la précision (%, pesée) serait une fausse rigueur qui décourage. L'app doit
+**simplifier**, gamifier, aller vite.
+**⚠️ À valider ensemble avant construction :** l'ergonomie du modèle ingrédient/part est le
+**socle du sens de l'app** — point de validation dédié avant la Phase D.
+
+## 2026-07-24 — Encas = `Recipe.kind` (pas d'entité séparée) ; chantier recettes phasé A→D
+**Décision :** les encas/compléments (skyr, noix, tartine PB) sont des **`Recipe` avec
+`kind = SNACK`**, pas une table à part. Chantier « recettes riches » séquencé : **A** page
+détail, **B** encas (`kind` + onglets palette + seed), **C** images (Supabase Storage), **D**
+couche ingrédients (différée). Détail dans `ROADMAP.md`.
+**Pourquoi :** drag/jauge/`BatchEntry`/quota marchent déjà avec `Recipe` → zéro duplication
+(KISS). Modèle unifié, l'UI étiquette « Recettes / Encas ». Ingrédients repoussés car le batch
+n'a besoin que de **protéines/part** — la couche ingrédients ne fait que *dériver* ce nombre.
+**Alternatives :** table `Snack` séparée (duplication inutile) ; couche ingrédients tout de
+suite (sur-ingénierie avant que la précision/les courses soient un besoin réel).

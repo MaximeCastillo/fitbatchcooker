@@ -8,7 +8,9 @@
 > Document vivant. Décrit **ce qu'est le produit et comment il est construit
 > aujourd'hui**. Quand le cœur change, mets à jour ce fichier. Pour l'historique du
 > *pourquoi*, voir `DECISIONS.md`. Pour les conventions de code et la façon de
-> travailler avec l'auteur, voir `CLAUDE.md`.
+> travailler avec l'auteur, voir `CLAUDE.md`. Pour les **principes fondateurs et
+> règles métier** (régularité > précision, modèle protéines/part), voir
+> `PRINCIPLES.md` ; pour la **direction artistique**, `DESIGN.md`.
 
 ---
 
@@ -88,23 +90,31 @@ Décrit conceptuellement ; le schéma Prisma exact est défini pendant le build.
   non requis — droppable plus tard s'il ne sert pas.
 - **Recipe** — titre, description, étapes, portions (portion de référence), macros
   (protéines/calories… en **estimations**), tags/catégorie (poulet, pâtes, italien…).
-  Les recettes seed ET les recettes IA validées vivent ici. Une `Recipe` peut être un
-  **plat complet** ou un **aliment simple** (encas, élément de petit-déj — ex. yaourt
-  grec) : seule la valeur protéines compte pour la jauge, les étapes sont optionnelles.
-  **Pas de modèle `Meal` séparé au MVP** (KISS) ; un tag `mealType` viendra si besoin.
-- **Ingredient** — nom, unité par défaut optionnelle.
-- **RecipeIngredient** — table de jointure : recette ↔ ingrédient avec
-  **quantité + unité** pour la portion de référence (on scale à l'affichage pour N
-  portions).
+  Les recettes seed ET les recettes IA validées vivent ici. Une `Recipe` porte un
+  **`kind`** : `MAIN` (plat complet) | `SNACK` (encas / complément simple — poignée de
+  noix, skyr, tartine de beurre de cacahuète…). **Les encas ne sont pas une entité à
+  part** : juste des recettes triviales (1 part, protéines/part, étapes optionnelles).
+  Seule la valeur **protéines/part** compte pour la jauge. **Pas de modèle
+  `Meal`/`Snack` séparé** (KISS). *(L'UI peut afficher « Recettes » / « Encas » tout
+  en gardant ce modèle unifié.)*
+- **Ingredient** — nom + **protéines/100 g** (à la louche) + **quantité habituelle**
+  (g) → l'app en **déduit les protéines/part grosso modo**. Pré-rempli par l'IA,
+  ajustable à la volée par l'user. Voir `PRINCIPLES.md` §3 pour la philosophie.
+- **RecipeIngredient** — jointure recette ↔ ingrédient (quantité pour cette recette),
+  sert à **dériver** les protéines/part d'une recette (et, plus tard, courses + scaling).
+- ⚠️ **Couche ingrédients = différée (Phase D, cf. `ROADMAP.md`).** Au MVP, la
+  protéine/part est **saisie directement** sur la `Recipe`. La couche ingrédients arrive
+  quand la précision / la liste de courses devient un besoin réel — après un **point de
+  validation** dédié (c'est le socle du sens de l'app).
 - **UserRecipe** (le "livre de recettes") — lie un user à une recette sauvegardée,
   avec une **note (0–3 étoiles)** optionnelle et un flag favori.
 - **Preference** — lignes flexibles et typées captées par le bot (voir §5). Forme :
   `{ userId, type, value, sentiment, note }`. `type` volontairement ouvert.
-- **MealPlan** — une **période de planification** composée par l'user (2, 3 jours, une
-  semaine). Appartient à un user.
-- **PlanEntry** — un plat placé dans un plan, à un **jour donné** (`dayIndex`) avec un
-  **nombre de parts**. Contribution protéines d'une entrée = `protéines/portion` de la
-  recette × parts.
+- **Batch** — une **période de planification** composée par l'user (2, 3 jours, une
+  semaine). Appartient à un user. *(Anciennement `MealPlan` — renommé.)*
+- **BatchEntry** — une recette placée dans un batch, à un **jour donné** (`dayIndex`)
+  avec un **nombre de parts**. Contribution protéines = `protéines/part` × parts.
+  *(Anciennement `PlanEntry` — renommé.)*
 - *Dérivés (calculés, non stockés) :* la **jauge d'un jour** = somme des protéines des
   entrées de ce jour vs l'objectif quotidien de l'user ; le **quota de batch** = pour
   chaque recette, total des parts à cuisiner sur toute la période.

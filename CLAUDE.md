@@ -8,7 +8,9 @@ C'est la constitution du projet.
 Un SaaS perso de meal-prep avec un bot "chef" qui apprend les préférences
 alimentaires de l'utilisateur. Spec produit complète : **`PROJECT_SPEC.md`**.
 Historique des décisions techniques et leur pourquoi : **`DECISIONS.md`**.
-Lis `PROJECT_SPEC.md` avant toute tâche non triviale.
+**Principes fondateurs & règles métier** (régularité > précision, modèle
+protéines/part) : **`PRINCIPLES.md`**. **Direction artistique** : **`DESIGN.md`**.
+Lis `PROJECT_SPEC.md` et `PRINCIPLES.md` avant toute tâche produit non triviale.
 
 ## Stack (déjà décidée — ne pas re-challenger)
 

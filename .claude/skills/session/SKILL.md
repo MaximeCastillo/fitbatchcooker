@@ -13,6 +13,8 @@ Objectif : garder le rythme « avancer vite, prendre du plaisir, apprendre au pa
 
 - Relire **`ROADMAP.md`** (à faire / en cours) et **`LEARNING_LOG.md`** (où on en est,
   ce qu'on vient d'apprendre). Survoler les dernières entrées de **`DECISIONS.md`**.
+- Garder en tête **`PRINCIPLES.md`** (régularité > précision, modèle protéines/part) et
+  **`DESIGN.md`** (direction artistique) pour toute tâche produit / UI.
 - Annoncer en **1–2 lignes** le plan de la session, puis attaquer. Pas de sur-préparation
   (l'auteur a tendance à trop préparer — on passe à l'action vite).
 
