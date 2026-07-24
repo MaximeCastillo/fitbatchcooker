@@ -138,13 +138,7 @@ export function RecipeBrowser({
           {recipes.map((recipe) => (
             <li key={recipe.id}>
               <RecipeCard
-                recipe={{
-                  title: recipe.title,
-                  summary: recipe.summary,
-                  servings: 1,
-                  proteinPerServingG: recipe.proteinPerServingG,
-                  caloriesPerServingKcal: recipe.caloriesPerServingKcal,
-                }}
+                recipe={recipe}
                 href={`/recipes/${recipe.id}`}
                 bookmark={
                   showMine ? (

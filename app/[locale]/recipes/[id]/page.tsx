@@ -21,7 +21,15 @@ export default async function RecipeDetailPage({
   const { id } = await params;
   const t = await getTranslations("recipes");
   const [recipe, user] = await Promise.all([
-    prisma.recipe.findUnique({ where: { id } }),
+    prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        ingredients: {
+          include: { ingredient: { select: { name: true, category: true } } },
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    }),
     getCurrentUser(),
   ]);
 
@@ -50,7 +58,20 @@ export default async function RecipeDetailPage({
         {user && <SaveToggle recipeId={recipe.id} saved={isSaved} />}
       </div>
 
-      <RecipeDetail recipe={recipe} />
+      <RecipeDetail
+        recipe={{
+          summary: recipe.summary,
+          mealType: recipe.mealType,
+          proteinPerServingG: recipe.proteinPerServingG,
+          caloriesPerServingKcal: recipe.caloriesPerServingKcal,
+          steps: recipe.steps,
+          ingredients: recipe.ingredients.map((link) => ({
+            name: link.ingredient.name,
+            category: link.ingredient.category,
+            quantityG: link.quantityG,
+          })),
+        }}
+      />
     </main>
   );
 }

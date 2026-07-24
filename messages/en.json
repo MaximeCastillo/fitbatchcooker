@@ -139,6 +139,7 @@
     "end": "You've seen it all!",
     "detail": {
       "back": "All recipes",
+      "ingredientsTitle": "Ingredients",
       "stepsTitle": "Preparation",
       "stepsEmpty": "The steps for this recipe are coming soon.",
       "approxNote": "Approximate values — what matters is consistency."
