@@ -20,7 +20,7 @@ export async function login(formData: FormData) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/recipes");
+  redirect("/batch");
 }
 
 export async function signup(formData: FormData) {
@@ -36,7 +36,7 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp({ email, password });
   if (error) back(error.message);
 
-  redirect("/recipes");
+  redirect("/batch");
 }
 
 export async function logout() {
