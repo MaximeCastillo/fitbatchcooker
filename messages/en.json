@@ -57,7 +57,7 @@
       "FRUIT": "Fruit",
       "NUTS_SEEDS": "Nuts & seeds",
       "LEGUME": "Legume",
-      "FAT": "Fat",
+      "CONDIMENT": "Condiment",
       "OTHER": "Other"
     }
   },
@@ -147,12 +147,6 @@
       "ingredients": "Ingredients",
       "pickIngredient": "Pick…",
       "addIngredient": "Add an ingredient",
-      "newIngredient": "New ingredient",
-      "name": "Name",
-      "proteinPer100g": "Protein / 100 g",
-      "category": "Category",
-      "add": "Add",
-      "cancel": "Cancel",
       "submit": "Create recipe"
     },
     "detail": {

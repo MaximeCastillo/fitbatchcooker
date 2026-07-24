@@ -21,7 +21,7 @@ enum IngredientCategory {
   FRUIT
   NUTS_SEEDS
   LEGUME
-  FAT
+  CONDIMENT
   OTHER
 }
 

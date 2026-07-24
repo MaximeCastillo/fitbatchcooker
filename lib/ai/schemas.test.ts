@@ -11,7 +11,7 @@ const validRecipe = {
   mealType: "MAIN" as const,
   ingredients: [
     { name: "Blanc de poulet", quantityG: 150 },
-    { name: "Riz", quantityG: 75, proteinPer100g: 7, category: "STARCH" as const },
+    { name: "Riz", quantityG: 75 },
   ],
 };
 
@@ -63,7 +63,7 @@ describe("searchIngredientsInput", () => {
 });
 
 describe("createRecipeInput", () => {
-  it("accepts a valid recipe (existing + new ingredient)", () => {
+  it("accepts a valid recipe (catalog ingredients only)", () => {
     expect(createRecipeInput.safeParse(validRecipe).success).toBe(true);
   });
 
@@ -88,11 +88,11 @@ describe("createRecipeInput", () => {
     ).toBe(false);
   });
 
-  it("rejects an implausible proteinPer100g (> 100)", () => {
+  it("rejects an ingredient with an empty name", () => {
     expect(
       createRecipeInput.safeParse({
         ...validRecipe,
-        ingredients: [{ name: "X", quantityG: 100, proteinPer100g: 150 }],
+        ingredients: [{ name: "", quantityG: 100 }],
       }).success,
     ).toBe(false);
   });

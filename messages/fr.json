@@ -57,7 +57,7 @@
       "FRUIT": "Fruit",
       "NUTS_SEEDS": "Noix & graines",
       "LEGUME": "Légumineuse",
-      "FAT": "Matière grasse",
+      "CONDIMENT": "Condiment",
       "OTHER": "Autre"
     }
   },
@@ -147,12 +147,6 @@
       "ingredients": "Ingrédients",
       "pickIngredient": "Choisir…",
       "addIngredient": "Ajouter un ingrédient",
-      "newIngredient": "Nouvel ingrédient",
-      "name": "Nom",
-      "proteinPer100g": "Prot. / 100 g",
-      "category": "Catégorie",
-      "add": "Ajouter",
-      "cancel": "Annuler",
       "submit": "Créer la recette"
     },
     "detail": {

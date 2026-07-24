@@ -40,51 +40,47 @@ export function chefTools(userId: string) {
       },
     }),
 
-    // WRITE: create a recipe owned by the current user, reusing/creating shared
-    // ingredients. Only call after the user has explicitly confirmed the proposal.
+    // WRITE: create a recipe owned by the current user, composed ONLY from existing
+    // catalog ingredients (locked catalog — the chef can't invent ingredients). Only
+    // call after the user has explicitly confirmed the proposal.
     create_recipe: tool({
       description:
-        "Crée une recette pour l'utilisateur. À n'appeler QU'APRÈS confirmation explicite de l'utilisateur. Réutilise les ingrédients du catalogue (cherchés au préalable) et ne fournit protéines/100 g + catégorie que pour les ingrédients réellement absents.",
+        "Crée une recette pour l'utilisateur. À n'appeler QU'APRÈS confirmation explicite. Les ingrédients doivent TOUS exister dans le catalogue partagé (cherchés au préalable via search_ingredients) — si un ingrédient n'existe pas, choisis-en un proche qui existe, n'en invente jamais.",
       inputSchema: createRecipeInput,
       execute: async (input) => {
         // Merge duplicate ingredient names within the call (one row per ingredient per
         // recipe — @@unique([recipeId, ingredientId])).
-        const merged = new Map<
-          string,
-          {
-            name: string;
-            quantityG: number;
-            proteinPer100g?: number;
-            category?: (typeof input.ingredients)[number]["category"];
-          }
-        >();
+        const merged = new Map<string, { name: string; quantityG: number }>();
         for (const ing of input.ingredients) {
           const key = normalizeName(ing.name);
           const prev = merged.get(key);
           if (prev) prev.quantityG += ing.quantityG;
-          else merged.set(key, { ...ing });
+          else merged.set(key, { name: ing.name, quantityG: ing.quantityG });
+        }
+
+        // Resolve every ingredient to an EXISTING catalog row. Unknown names are rejected
+        // (not created) so the model retries with real catalog ingredients.
+        const keys = [...merged.keys()];
+        const rows = await prisma.ingredient.findMany({
+          where: { normalizedName: { in: keys } },
+          select: { id: true, normalizedName: true },
+        });
+        const idByKey = new Map(rows.map((r) => [r.normalizedName, r.id]));
+        const unknown = [...merged.values()]
+          .filter((ing) => !idByKey.has(normalizeName(ing.name)))
+          .map((ing) => ing.name);
+        if (unknown.length > 0) {
+          return {
+            created: false,
+            error: `Ingrédients absents du catalogue : ${unknown.join(", ")}. Utilise search_ingredients et ne garde que des ingrédients existants.`,
+          };
         }
 
         const recipe = await prisma.$transaction(async (tx) => {
-          const links: { ingredientId: string; quantityG: number }[] = [];
-          for (const [key, ing] of merged) {
-            const existing = await tx.ingredient.findUnique({
-              where: { normalizedName: key },
-              select: { id: true },
-            });
-            const ingredient =
-              existing ??
-              (await tx.ingredient.create({
-                data: {
-                  name: ing.name.trim(),
-                  normalizedName: key,
-                  category: ing.category ?? "OTHER",
-                  proteinPer100g: ing.proteinPer100g ?? 0,
-                },
-                select: { id: true },
-              }));
-            links.push({ ingredientId: ingredient.id, quantityG: ing.quantityG });
-          }
+          const links = [...merged.entries()].map(([key, ing]) => ({
+            ingredientId: idByKey.get(key)!,
+            quantityG: ing.quantityG,
+          }));
 
           const created = await tx.recipe.create({
             data: {
@@ -94,6 +90,8 @@ export function chefTools(userId: string) {
               steps: input.steps,
               mealType: input.mealType,
               ingredients: { create: links },
+              // Auto-save to the author's book so it's immediately composable in a batch.
+              savedBy: { create: { userId } },
             },
             select: { id: true },
           });

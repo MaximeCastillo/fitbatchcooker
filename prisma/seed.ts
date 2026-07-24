@@ -31,21 +31,30 @@ type SeedIngredient = {
   defaultQuantityG: number;
 };
 
-// ~44 common meal-prep / sport-nutrition ingredients across all categories.
-// proteinPer100g: plausible reference values, not lab-exact (see header note).
+// ~80 common meal-prep / sport-nutrition ingredients across all categories. Since the
+// chef and the manual form only ever pick from EXISTING ingredients (locked catalog),
+// this base is deliberately broad. proteinPer100g: plausible reference values, not
+// lab-exact (see header note).
 const INGREDIENTS: SeedIngredient[] = [
   // MEAT — raw values
   { name: "Blanc de poulet", category: IngredientCategory.MEAT, proteinPer100g: 22, defaultQuantityG: 150 },
   { name: "Cuisse de poulet", category: IngredientCategory.MEAT, proteinPer100g: 18, defaultQuantityG: 150 },
-  { name: "Steak haché 5% MG", category: IngredientCategory.MEAT, proteinPer100g: 21, defaultQuantityG: 125 },
-  { name: "Dinde hachée", category: IngredientCategory.MEAT, proteinPer100g: 20, defaultQuantityG: 125 },
   { name: "Escalope de dinde", category: IngredientCategory.MEAT, proteinPer100g: 22, defaultQuantityG: 130 },
+  { name: "Dinde hachée", category: IngredientCategory.MEAT, proteinPer100g: 20, defaultQuantityG: 125 },
+  { name: "Steak haché 5% MG", category: IngredientCategory.MEAT, proteinPer100g: 21, defaultQuantityG: 125 },
+  { name: "Bœuf (rumsteck)", category: IngredientCategory.MEAT, proteinPer100g: 21, defaultQuantityG: 150 },
+  { name: "Filet mignon de porc", category: IngredientCategory.MEAT, proteinPer100g: 21, defaultQuantityG: 150 },
   { name: "Jambon blanc", category: IngredientCategory.MEAT, proteinPer100g: 18, defaultQuantityG: 50 },
+  { name: "Lardons", category: IngredientCategory.MEAT, proteinPer100g: 15, defaultQuantityG: 40 },
 
   // FISH — raw / canned-drained values
   { name: "Saumon", category: IngredientCategory.FISH, proteinPer100g: 20, defaultQuantityG: 130 },
   { name: "Thon au naturel", category: IngredientCategory.FISH, proteinPer100g: 24, defaultQuantityG: 100 },
   { name: "Cabillaud", category: IngredientCategory.FISH, proteinPer100g: 18, defaultQuantityG: 130 },
+  { name: "Colin", category: IngredientCategory.FISH, proteinPer100g: 18, defaultQuantityG: 130 },
+  { name: "Truite", category: IngredientCategory.FISH, proteinPer100g: 20, defaultQuantityG: 130 },
+  { name: "Maquereau", category: IngredientCategory.FISH, proteinPer100g: 18, defaultQuantityG: 100 },
+  { name: "Sardines", category: IngredientCategory.FISH, proteinPer100g: 25, defaultQuantityG: 90 },
   { name: "Crevettes", category: IngredientCategory.FISH, proteinPer100g: 20, defaultQuantityG: 100 },
 
   // DAIRY_EGG
@@ -56,47 +65,77 @@ const INGREDIENTS: SeedIngredient[] = [
   { name: "Fromage blanc 0%", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 8, defaultQuantityG: 150 },
   { name: "Fromage cottage", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 11, defaultQuantityG: 100 },
   { name: "Feta", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 14, defaultQuantityG: 40 },
+  { name: "Mozzarella", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 18, defaultQuantityG: 60 },
+  { name: "Parmesan", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 35, defaultQuantityG: 15 },
+  { name: "Emmental", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 28, defaultQuantityG: 30 },
   { name: "Lait demi-écrémé", category: IngredientCategory.DAIRY_EGG, proteinPer100g: 3, defaultQuantityG: 200 },
 
   // STARCH — dry / raw values
   { name: "Riz", category: IngredientCategory.STARCH, proteinPer100g: 7, defaultQuantityG: 75 },
+  { name: "Riz complet", category: IngredientCategory.STARCH, proteinPer100g: 8, defaultQuantityG: 75 },
   { name: "Pâtes", category: IngredientCategory.STARCH, proteinPer100g: 12, defaultQuantityG: 80 },
+  { name: "Semoule", category: IngredientCategory.STARCH, proteinPer100g: 12, defaultQuantityG: 70 },
+  { name: "Boulgour", category: IngredientCategory.STARCH, proteinPer100g: 12, defaultQuantityG: 70 },
+  { name: "Quinoa", category: IngredientCategory.STARCH, proteinPer100g: 14, defaultQuantityG: 60 },
   { name: "Pomme de terre", category: IngredientCategory.STARCH, proteinPer100g: 2, defaultQuantityG: 200 },
   { name: "Patate douce", category: IngredientCategory.STARCH, proteinPer100g: 2, defaultQuantityG: 200 },
   { name: "Flocons d'avoine", category: IngredientCategory.STARCH, proteinPer100g: 13, defaultQuantityG: 60 },
   { name: "Pain complet", category: IngredientCategory.STARCH, proteinPer100g: 9, defaultQuantityG: 60 },
-  { name: "Quinoa", category: IngredientCategory.STARCH, proteinPer100g: 14, defaultQuantityG: 60 },
+  { name: "Wrap (tortilla)", category: IngredientCategory.STARCH, proteinPer100g: 8, defaultQuantityG: 60 },
 
   // VEGETABLE
   { name: "Brocoli", category: IngredientCategory.VEGETABLE, proteinPer100g: 3, defaultQuantityG: 150 },
   { name: "Épinards", category: IngredientCategory.VEGETABLE, proteinPer100g: 3, defaultQuantityG: 100 },
   { name: "Haricots verts", category: IngredientCategory.VEGETABLE, proteinPer100g: 2, defaultQuantityG: 150 },
+  { name: "Courgette", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 150 },
+  { name: "Carotte", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 100 },
+  { name: "Champignons de Paris", category: IngredientCategory.VEGETABLE, proteinPer100g: 3, defaultQuantityG: 100 },
+  { name: "Chou-fleur", category: IngredientCategory.VEGETABLE, proteinPer100g: 2, defaultQuantityG: 150 },
+  { name: "Aubergine", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 150 },
   { name: "Tomate", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 100 },
   { name: "Poivron", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 100 },
+  { name: "Oignon", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 60 },
+  { name: "Concombre", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 100 },
+  { name: "Salade verte", category: IngredientCategory.VEGETABLE, proteinPer100g: 1, defaultQuantityG: 50 },
+  { name: "Maïs", category: IngredientCategory.VEGETABLE, proteinPer100g: 3, defaultQuantityG: 80 },
   { name: "Petits pois", category: IngredientCategory.VEGETABLE, proteinPer100g: 5, defaultQuantityG: 100 },
+  { name: "Avocat", category: IngredientCategory.VEGETABLE, proteinPer100g: 2, defaultQuantityG: 100 },
 
   // FRUIT
   { name: "Banane", category: IngredientCategory.FRUIT, proteinPer100g: 1, defaultQuantityG: 120 },
   { name: "Pomme", category: IngredientCategory.FRUIT, proteinPer100g: 0.3, defaultQuantityG: 150 },
   { name: "Fruits rouges", category: IngredientCategory.FRUIT, proteinPer100g: 1, defaultQuantityG: 100 },
+  { name: "Orange", category: IngredientCategory.FRUIT, proteinPer100g: 1, defaultQuantityG: 150 },
+  { name: "Fraise", category: IngredientCategory.FRUIT, proteinPer100g: 0.7, defaultQuantityG: 120 },
+  { name: "Mangue", category: IngredientCategory.FRUIT, proteinPer100g: 0.8, defaultQuantityG: 120 },
+  { name: "Kiwi", category: IngredientCategory.FRUIT, proteinPer100g: 1, defaultQuantityG: 100 },
 
   // NUTS_SEEDS
   { name: "Amandes", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 21, defaultQuantityG: 30 },
+  { name: "Noix", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 15, defaultQuantityG: 30 },
+  { name: "Noix de cajou", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 18, defaultQuantityG: 30 },
   { name: "Beurre de cacahuète", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 25, defaultQuantityG: 20 },
   { name: "Graines de chia", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 17, defaultQuantityG: 15 },
+  { name: "Graines de courge", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 30, defaultQuantityG: 15 },
+  { name: "Graines de lin", category: IngredientCategory.NUTS_SEEDS, proteinPer100g: 18, defaultQuantityG: 15 },
 
   // LEGUME — cooked / canned-drained values (how they're used in a recipe)
   { name: "Lentilles", category: IngredientCategory.LEGUME, proteinPer100g: 9, defaultQuantityG: 150 },
   { name: "Pois chiches", category: IngredientCategory.LEGUME, proteinPer100g: 8, defaultQuantityG: 150 },
   { name: "Haricots rouges", category: IngredientCategory.LEGUME, proteinPer100g: 9, defaultQuantityG: 150 },
+  { name: "Haricots blancs", category: IngredientCategory.LEGUME, proteinPer100g: 7, defaultQuantityG: 150 },
+  { name: "Edamame", category: IngredientCategory.LEGUME, proteinPer100g: 11, defaultQuantityG: 100 },
   { name: "Tofu ferme", category: IngredientCategory.LEGUME, proteinPer100g: 15, defaultQuantityG: 150 },
+  { name: "Tempeh", category: IngredientCategory.LEGUME, proteinPer100g: 19, defaultQuantityG: 120 },
 
-  // FAT
-  { name: "Huile d'olive", category: IngredientCategory.FAT, proteinPer100g: 0, defaultQuantityG: 10 },
-  { name: "Avocat", category: IngredientCategory.FAT, proteinPer100g: 2, defaultQuantityG: 100 },
-
-  // OTHER
-  { name: "Miel", category: IngredientCategory.OTHER, proteinPer100g: 0, defaultQuantityG: 20 },
+  // CONDIMENT — basics assumed on hand; near-zero protein, small quantities
+  { name: "Huile d'olive", category: IngredientCategory.CONDIMENT, proteinPer100g: 0, defaultQuantityG: 10 },
+  { name: "Sel", category: IngredientCategory.CONDIMENT, proteinPer100g: 0, defaultQuantityG: 2 },
+  { name: "Poivre", category: IngredientCategory.CONDIMENT, proteinPer100g: 0, defaultQuantityG: 1 },
+  { name: "Sauce soja", category: IngredientCategory.CONDIMENT, proteinPer100g: 8, defaultQuantityG: 15 },
+  { name: "Moutarde", category: IngredientCategory.CONDIMENT, proteinPer100g: 5, defaultQuantityG: 10 },
+  { name: "Sauce tomate", category: IngredientCategory.CONDIMENT, proteinPer100g: 1, defaultQuantityG: 100 },
+  { name: "Miel", category: IngredientCategory.CONDIMENT, proteinPer100g: 0, defaultQuantityG: 20 },
 ];
 
 type SeedRecipe = {

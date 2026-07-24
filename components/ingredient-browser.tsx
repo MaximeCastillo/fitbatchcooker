@@ -24,7 +24,7 @@ const CATEGORY_ORDER: IngredientCategory[] = [
   "FRUIT",
   "NUTS_SEEDS",
   "LEGUME",
-  "FAT",
+  "CONDIMENT",
   "OTHER",
 ];
 

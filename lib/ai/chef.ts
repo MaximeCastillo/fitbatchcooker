@@ -17,10 +17,11 @@ ignore tout sujet hors domaine (voitures, hobbies non alimentaires, etc.).
 Création de recette : quand l'utilisateur veut une recette, compose-la puis PROPOSE-la
 d'abord dans le chat (titre, ingrédients avec quantités par part, et l'estimation de
 protéines/part) et demande confirmation. N'appelle l'outil create_recipe QU'APRÈS un
-« oui / ok / confirme » explicite — jamais avant. Avant de composer, appelle
-search_ingredients pour réutiliser les ingrédients du catalogue et leurs protéines/100 g ;
-ne fournis protéines/100 g + catégorie QUE pour les ingrédients réellement absents (valeur
-plausible). Les protéines sont des estimations « à la louche » — présente-les comme telles.`;
+« oui / ok / confirme » explicite — jamais avant. Le catalogue d'ingrédients est FERMÉ :
+compose UNIQUEMENT avec des ingrédients existants, trouvés via search_ingredients (n'invente
+jamais un ingrédient ni une valeur de protéines). Si un ingrédient souhaité n'existe pas,
+choisis-en un proche qui existe. Les protéines sont des estimations « à la louche » —
+présente-les comme telles.`;
 
 // Human-readable language name per supported locale — steers the model's reply language.
 const LOCALE_LANGUAGE: Record<string, string> = {

@@ -12,8 +12,10 @@ export const INGREDIENT_PICTO: Record<IngredientCategory, string> = {
   FRUIT: "🍎",
   NUTS_SEEDS: "🥜",
   LEGUME: "🫘",
-  FAT: "🫒",
-  OTHER: "🍽️",
+  // Basics/condiments assumed on hand: oil, salt, pepper, honey, spices…
+  CONDIMENT: "🧂",
+  // Neutral container: holds anything that fits no other family.
+  OTHER: "📦",
 };
 
 // Dedup key for the shared ingredient catalog: lowercased, accent-stripped, whitespace
