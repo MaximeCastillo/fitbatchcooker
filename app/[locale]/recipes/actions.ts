@@ -4,7 +4,7 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { recomputeRecipeProtein } from "@/lib/recipes";
+import { recipeVisibilityWhere, recomputeRecipeProtein } from "@/lib/recipes";
 import { redirect } from "@/i18n/navigation";
 import type { MealType } from "@/lib/generated/prisma/enums";
 
@@ -77,6 +77,54 @@ export async function loadRecipes(
         where: { userId },
         select: { id: true },
       },
+    },
+  });
+
+  const hasMore = rows.length > RECIPES_PAGE_SIZE;
+  const page = hasMore ? rows.slice(0, RECIPES_PAGE_SIZE) : rows;
+  const recipes: RecipeCardData[] = page.map((r) => ({
+    id: r.id,
+    title: r.title,
+    summary: r.summary,
+    mealType: r.mealType,
+    proteinPerServingG: r.proteinPerServingG,
+    caloriesPerServingKcal: r.caloriesPerServingKcal,
+    imageUrl: r.imageUrl,
+    saved: r.savedBy.length > 0,
+  }));
+
+  return { recipes, nextCursor: hasMore ? page[page.length - 1].id : null };
+}
+
+// Reverse search (Marmiton-style): recipes that USE a given ingredient, among those the
+// user can see (shared library + their own). Cursor-paginated for the ingredient modal's
+// infinite scroll; carries per-user saved state for the bookmark toggle.
+export async function loadRecipesByIngredient(
+  ingredientId: string,
+  cursor: string | null,
+): Promise<{ recipes: RecipeCardData[]; nextCursor: string | null }> {
+  const user = await getCurrentUser();
+  const userId = user?.id ?? NO_USER;
+
+  const rows = await prisma.recipe.findMany({
+    where: {
+      AND: [
+        recipeVisibilityWhere(user?.id),
+        { ingredients: { some: { ingredientId } } },
+      ],
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: RECIPES_PAGE_SIZE + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      mealType: true,
+      proteinPerServingG: true,
+      caloriesPerServingKcal: true,
+      imageUrl: true,
+      savedBy: { where: { userId }, select: { id: true } },
     },
   });
 

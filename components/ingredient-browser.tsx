@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
 import { INGREDIENT_PICTO } from "@/lib/ingredients";
+import { IngredientRecipesModal } from "@/components/ingredient-recipes-modal";
 import { cn } from "@/lib/utils";
 
 type Ingredient = {
@@ -29,11 +30,19 @@ const CATEGORY_ORDER: IngredientCategory[] = [
 ];
 
 // Client-side search + category filter over the (small) global catalog — no server
-// round-trip needed at this size.
-export function IngredientBrowser({ ingredients }: { ingredients: Ingredient[] }) {
+// round-trip needed at this size. Tapping an ingredient opens a reverse-search modal
+// (recipes that use it). `canSave` gates the bookmark toggle inside that modal.
+export function IngredientBrowser({
+  ingredients,
+  canSave,
+}: {
+  ingredients: Ingredient[];
+  canSave: boolean;
+}) {
   const t = useTranslations("ingredients");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<IngredientCategory | null>(null);
+  const [selected, setSelected] = useState<Ingredient | null>(null);
 
   const search = query.trim().toLowerCase();
   const filtered = ingredients.filter(
@@ -98,29 +107,43 @@ export function IngredientBrowser({ ingredients }: { ingredients: Ingredient[] }
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {filtered.map((ing) => (
-            <li
-              key={ing.id}
-              className="flex items-center gap-3 rounded-xl border bg-card p-3"
-            >
-              <span
-                className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-lg"
-                aria-hidden
+            <li key={ing.id}>
+              <button
+                type="button"
+                onClick={() => setSelected(ing)}
+                className="flex w-full items-center gap-3 rounded-xl border bg-card p-3 text-left transition-colors hover:border-primary"
               >
-                {INGREDIENT_PICTO[ing.category]}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-medium leading-tight">{ing.name}</div>
-                <div className="text-xs text-muted-foreground">
-                  {t(`categories.${ing.category}`)}
-                </div>
-              </div>
-              <span className="shrink-0 font-mono text-sm font-semibold text-accent-warm">
-                {t("proteinPer100g", { grams: ing.proteinPer100g })}
-              </span>
+                <span
+                  className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-xl"
+                  aria-hidden
+                >
+                  {INGREDIENT_PICTO[ing.category]}
+                </span>
+                {/* Name breathes (no truncation) with the category below; the protein is a
+                    compact badge so it can't crowd the name out on a narrow cell. */}
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium leading-tight">{ing.name}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {t(`categories.${ing.category}`)}
+                  </span>
+                </span>
+                <span
+                  className="shrink-0 rounded-full bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-accent-warm"
+                  aria-label={t("proteinPer100g", { grams: ing.proteinPer100g })}
+                >
+                  {t("proteinPer100gShort", { grams: ing.proteinPer100g })}
+                </span>
+              </button>
             </li>
           ))}
         </ul>
       )}
+
+      <IngredientRecipesModal
+        ingredient={selected}
+        canSave={canSave}
+        onClose={() => setSelected(null)}
+      />
     </div>
   );
 }
