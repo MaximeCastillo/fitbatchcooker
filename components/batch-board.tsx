@@ -20,7 +20,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Plus, Search, Trash2, X } from "lucide-react";
+import { Eye, Plus, Search, Trash2, X } from "lucide-react";
 import {
   addEntry,
   moveEntry,
@@ -37,10 +37,26 @@ import {
 } from "@/lib/nutrition";
 import { showUndoToast } from "@/components/undo-toast";
 import { ProteinGauge } from "@/components/protein-gauge";
+import { RecipeDetail } from "@/components/recipe-detail";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
-type Recipe = { id: string; title: string; proteinPerServingG: number | null };
+// Palette recipes carry the full detail so the preview modal renders without a fetch.
+type Recipe = {
+  id: string;
+  title: string;
+  proteinPerServingG: number | null;
+  summary: string | null;
+  servings: number;
+  caloriesPerServingKcal: number | null;
+  steps: string[];
+};
 type Entry = {
   id: string;
   recipeId: string;
@@ -67,6 +83,8 @@ export function BatchBoard({
   const [dayCount, setDayCount] = useState(initialDayCount);
   const [query, setQuery] = useState("");
   const [draggingKind, setDraggingKind] = useState<string | null>(null);
+  // Recipe shown in the read-only preview modal (null = closed).
+  const [preview, setPreview] = useState<Recipe | null>(null);
   // Flying clone shown under the cursor while dragging, so the source (a palette
   // recipe, or a dish being moved) stays visibly in place.
   const [overlay, setOverlay] = useState<{
@@ -311,7 +329,11 @@ export function BatchBoard({
               </p>
             ) : (
               filteredRecipes.map((recipe) => (
-                <PaletteChip key={recipe.id} recipe={recipe} />
+                <PaletteChip
+                  key={recipe.id}
+                  recipe={recipe}
+                  onPreview={() => setPreview(recipe)}
+                />
               ))
             )}
           </div>
@@ -400,6 +422,23 @@ export function BatchBoard({
           </div>
         ) : null}
       </DragOverlay>
+
+      {/* Read-only recipe preview — "what am I eating?" — without leaving the composer. */}
+      <Dialog
+        open={preview !== null}
+        onOpenChange={(open) => !open && setPreview(null)}
+      >
+        <DialogContent>
+          {preview && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{preview.title}</DialogTitle>
+              </DialogHeader>
+              <RecipeDetail recipe={preview} />
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </DndContext>
   );
 }
@@ -437,26 +476,46 @@ function PaletteZone({
   );
 }
 
-function PaletteChip({ recipe }: { recipe: Recipe }) {
+function PaletteChip({
+  recipe,
+  onPreview,
+}: {
+  recipe: Recipe;
+  onPreview: () => void;
+}) {
   // No transform / opacity on the source: the DragOverlay renders the flying clone,
   // and the recipe stays fully visible in the palette (it can be added any number of times).
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: `recipe:${recipe.id}`,
     data: { kind: "recipe", recipeId: recipe.id },
   });
+  // The draggable chip and the preview button are siblings (never nested): a nested
+  // button would be invalid HTML and the drag listeners would swallow its click.
   return (
-    <button
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      type="button"
-      className="flex cursor-grab items-center justify-between gap-2 rounded-xl border bg-card px-3 py-2 text-left hover:border-primary"
-    >
-      <span className="text-sm font-semibold leading-tight">{recipe.title}</span>
-      <span className="font-mono text-xs font-bold text-accent-warm">
-        {recipe.proteinPerServingG ?? "—"} g
-      </span>
-    </button>
+    <div className="flex items-stretch gap-1 rounded-xl border bg-card hover:border-primary">
+      <button
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        type="button"
+        className="flex flex-1 cursor-grab items-center justify-between gap-2 px-3 py-2 text-left"
+      >
+        <span className="text-sm font-semibold leading-tight">
+          {recipe.title}
+        </span>
+        <span className="font-mono text-xs font-bold text-accent-warm">
+          {recipe.proteinPerServingG ?? "—"} g
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={onPreview}
+        aria-label={strings.batch.preview}
+        className="grid w-9 shrink-0 place-items-center rounded-r-xl text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+      >
+        <Eye className="size-4" aria-hidden />
+      </button>
+    </div>
   );
 }
 

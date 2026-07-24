@@ -66,6 +66,7 @@ export const strings = {
     searchPlaceholder: "Rechercher…",
     noRecipe: "Aucune recette.",
     dragHint: "Glisse sur un jour. Maj + glisser = dupliquer.",
+    preview: "Aperçu de la recette",
     removeZone: "Relâche pour ranger cette recette",
     dropHere: "Glisse une recette ici",
   },

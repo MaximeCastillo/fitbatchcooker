@@ -42,10 +42,15 @@ export default async function BatchPage({
     title: e.recipe.title,
     proteinPerServingG: e.recipe.proteinPerServingG,
   }));
+  // Palette recipes carry enough to render the preview modal without a second fetch.
   const recipeList = recipes.map((r) => ({
     id: r.id,
     title: r.title,
     proteinPerServingG: r.proteinPerServingG,
+    summary: r.summary,
+    servings: r.servings,
+    caloriesPerServingKcal: r.caloriesPerServingKcal,
+    steps: r.steps,
   }));
 
   return (

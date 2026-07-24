@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { SaveToggle } from "@/components/save-toggle";
+import { RecipeDetail } from "@/components/recipe-detail";
 import { strings } from "@/lib/strings";
 
 // Render on each request: recipe content and per-user saved state both vary.
@@ -42,56 +43,12 @@ export default async function RecipeDetailPage({
         {strings.recipes.detail.back}
       </Link>
 
-      <div className="flex items-start justify-between gap-3">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <h1 className="text-3xl font-bold tracking-tight">{recipe.title}</h1>
-        {user && (
-          <SaveToggle recipeId={recipe.id} saved={isSaved} />
-        )}
+        {user && <SaveToggle recipeId={recipe.id} saved={isSaved} />}
       </div>
-      {recipe.summary && (
-        <p className="mt-2 text-muted-foreground">{recipe.summary}</p>
-      )}
 
-      <div className="mt-4 flex flex-wrap gap-2 text-sm">
-        {recipe.proteinPerServingG != null && (
-          <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
-            {strings.recipes.protein(recipe.proteinPerServingG)}
-          </span>
-        )}
-        <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-          {strings.recipes.servings(recipe.servings)}
-        </span>
-        {recipe.caloriesPerServingKcal != null && (
-          <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-            {strings.recipes.calories(recipe.caloriesPerServingKcal)}
-          </span>
-        )}
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        {strings.recipes.detail.approxNote}
-      </p>
-
-      <section className="mt-8">
-        <h2 className="mb-4 text-xl font-semibold tracking-tight">
-          {strings.recipes.detail.stepsTitle}
-        </h2>
-        {recipe.steps.length === 0 ? (
-          <p className="text-muted-foreground">
-            {strings.recipes.detail.stepsEmpty}
-          </p>
-        ) : (
-          <ol className="flex flex-col gap-4">
-            {recipe.steps.map((step, index) => (
-              <li key={index} className="flex gap-3">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-mono text-sm font-bold text-primary">
-                  {index + 1}
-                </span>
-                <span className="pt-0.5 leading-relaxed">{step}</span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+      <RecipeDetail recipe={recipe} />
     </main>
   );
 }
