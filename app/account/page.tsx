@@ -17,9 +17,9 @@ export const dynamic = "force-dynamic";
 const inputClasses =
   "rounded-lg border border-input bg-background px-3 py-2.5 text-base font-normal outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40";
 
-// "Mon compte" — the account hub. Kept on /profile so existing links and the login
-// redirect keep working. user.email is the authoritative Supabase-Auth address:
-// getCurrentUser realigns our column to it on every load (self-heal).
+// "Mon compte" — the account hub at /account. user.email is the authoritative
+// Supabase-Auth address: getCurrentUser realigns our column to it on every load
+// (self-heal).
 export default async function AccountPage({
   searchParams,
 }: {

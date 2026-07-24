@@ -38,7 +38,7 @@ export async function updateProfile(formData: FormData) {
     data: { firstName, proteinTargetG },
   });
 
-  redirect("/profile?saved=1");
+  redirect("/account?saved=1");
 }
 
 // Change the account email. The identity (current user + email) comes from the session,

@@ -17,7 +17,7 @@ const items = [
   { href: "/recipes", label: strings.nav.recipes, icon: UtensilsCrossed },
   { href: "/book", label: strings.nav.book, icon: BookMarked },
   { href: "/chat", label: strings.nav.chat, icon: MessageCircle },
-  { href: "/profile", label: strings.nav.account, icon: CircleUser },
+  { href: "/account", label: strings.nav.account, icon: CircleUser },
 ];
 
 // Client Component so it can highlight the active route via usePathname.

@@ -55,7 +55,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           </span>
           <div className="min-w-0 text-sm leading-tight">
             <Link
-              href="/profile"
+              href="/account"
               className="block truncate font-semibold hover:underline"
             >
               {user.firstName ?? user.email}

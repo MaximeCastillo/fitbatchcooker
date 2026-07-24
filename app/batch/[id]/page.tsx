@@ -71,7 +71,7 @@ export default async function BatchPage({
         <p className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
           {strings.batch.noTarget}
           <Link
-            href="/profile"
+            href="/account"
             className="font-semibold text-primary hover:underline"
           >
             {strings.batch.setTarget}

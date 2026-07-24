@@ -58,7 +58,7 @@ export const strings = {
     addDay: "Ajouter un jour",
     removeDayLabel: "Supprimer le jour",
     noTarget: "Définis ton objectif protéines pour activer les jauges.",
-    setTarget: "Aller au profil",
+    setTarget: "Aller à mon compte",
     toCook: "À cuisiner",
     toCookHint: "Ton lot de recettes à préparer d'avance.",
     perServing: (g: number | null) => `${g ?? "—"} g / portion`,

@@ -5,7 +5,7 @@ import {
   updateEmail,
   updatePassword,
   type FormState,
-} from "@/app/profile/actions";
+} from "@/app/account/actions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { strings } from "@/lib/strings";
