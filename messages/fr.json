@@ -125,6 +125,18 @@
     "save": "Sauvegarder",
     "saved": "Enregistré ✓",
     "remove": "Retirer",
+    "new": "Nouvelle recette",
+    "filters": {
+      "search": "Rechercher une recette…",
+      "mine": "Mes recettes"
+    },
+    "mealType": {
+      "all": "Tous",
+      "MAIN": "Plats",
+      "SNACK": "Encas",
+      "BREAKFAST": "Petit-déj"
+    },
+    "end": "Tu as tout vu !",
     "detail": {
       "back": "Toutes les recettes",
       "stepsTitle": "Préparation",

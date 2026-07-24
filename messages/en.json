@@ -125,6 +125,18 @@
     "save": "Save",
     "saved": "Saved ✓",
     "remove": "Remove",
+    "new": "New recipe",
+    "filters": {
+      "search": "Search a recipe…",
+      "mine": "My recipes"
+    },
+    "mealType": {
+      "all": "All",
+      "MAIN": "Mains",
+      "SNACK": "Snacks",
+      "BREAKFAST": "Breakfast"
+    },
+    "end": "You've seen it all!",
     "detail": {
       "back": "All recipes",
       "stepsTitle": "Preparation",
