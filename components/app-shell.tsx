@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-import { logout } from "@/app/login/actions";
-import { Button } from "@/components/ui/button";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
@@ -67,16 +65,6 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             ) : null}
           </div>
         </div>
-        <form action={logout}>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            className="w-full"
-          >
-            {strings.nav.logout}
-          </Button>
-        </form>
       </aside>
 
       {/* Content column */}
@@ -85,11 +73,14 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <div className="md:hidden">
           <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
             <BrandMark />
-            <form action={logout}>
-              <Button type="submit" variant="outline" size="sm">
-                {strings.nav.logout}
-              </Button>
-            </form>
+            {/* Account is reached by tapping the avatar (mirrors the desktop chip). */}
+            <Link
+              href="/account"
+              aria-label={strings.nav.account}
+              className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white"
+            >
+              {initial}
+            </Link>
           </header>
           <div className="border-b px-2 py-1.5">
             <SidebarNav orientation="horizontal" />
