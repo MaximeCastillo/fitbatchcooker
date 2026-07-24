@@ -97,6 +97,13 @@ export const strings = {
     save: "Sauvegarder",
     saved: "Enregistré ✓",
     remove: "Retirer",
+    detail: {
+      back: "Toutes les recettes",
+      stepsTitle: "Préparation",
+      stepsEmpty: "La procédure de cette recette arrive bientôt.",
+      // Founding principle §6: macros are assumed approximate — say so in the UI.
+      approxNote: "Valeurs approximatives — l'important, c'est la régularité.",
+    },
   },
   book: {
     title: "Mes recettes",

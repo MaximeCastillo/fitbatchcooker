@@ -39,7 +39,7 @@ export default async function BookPage() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {saved.map(({ recipe }) => (
             <li key={recipe.id}>
-              <RecipeCard recipe={recipe}>
+              <RecipeCard recipe={recipe} href={`/recipes/${recipe.id}`}>
                 <form
                   action={toggleSaveRecipe.bind(null, recipe.id)}
                   className="w-full"

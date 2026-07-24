@@ -40,7 +40,7 @@ export default async function RecipesPage() {
             const isSaved = savedRecipeIds.has(recipe.id);
             return (
               <li key={recipe.id}>
-                <RecipeCard recipe={recipe}>
+                <RecipeCard recipe={recipe} href={`/recipes/${recipe.id}`}>
                   <SaveToggle recipeId={recipe.id} saved={isSaved} />
                 </RecipeCard>
               </li>
