@@ -43,7 +43,7 @@ export function BatchList({ initialBatches }: { initialBatches: BatchCard[] }) {
             href={`/batch/${batch.id}`}
             className="flex h-full flex-col gap-3 rounded-2xl border bg-card p-5 transition-colors hover:border-primary"
           >
-            <span className="pr-8 font-display text-xl font-bold uppercase tracking-wide">
+            <span className="pr-11 font-display text-xl font-bold uppercase tracking-wide">
               {batch.name ?? strings.batch.untitled}
             </span>
             <span className="mt-auto flex items-center gap-3 text-sm text-muted-foreground">
@@ -55,11 +55,13 @@ export function BatchList({ initialBatches }: { initialBatches: BatchCard[] }) {
               <span>{strings.batch.dishes(batch.entryCount)}</span>
             </span>
           </Link>
+          {/* Always visible on touch (no hover there — tap-first, PRINCIPLES §5);
+              ghost-on-hover from md up. */}
           <button
             type="button"
             onClick={() => onDelete(batch.id)}
             aria-label={strings.batch.delete}
-            className="absolute right-3 top-3 z-10 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+            className="absolute right-2 top-2 z-10 grid size-9 place-items-center rounded-md text-muted-foreground transition-opacity hover:text-destructive focus-visible:opacity-100 md:size-8 md:opacity-0 md:group-hover:opacity-100"
           >
             <Trash2 className="size-4" aria-hidden />
           </button>

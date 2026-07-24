@@ -47,24 +47,25 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <BrandMark />
         </div>
         <SidebarNav />
-        <div className="mt-auto flex items-center gap-3 rounded-xl border p-3">
+        {/* The whole chip is the link to the account page, not just the name. */}
+        <Link
+          href="/account"
+          className="mt-auto flex items-center gap-3 rounded-xl border p-3 transition-colors hover:border-primary hover:bg-accent"
+        >
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white">
             {initial}
           </span>
           <div className="min-w-0 text-sm leading-tight">
-            <Link
-              href="/account"
-              className="block truncate font-semibold hover:underline"
-            >
+            <span className="block truncate font-semibold">
               {user.firstName ?? user.email}
-            </Link>
+            </span>
             {user.proteinTargetG ? (
               <span className="text-muted-foreground">
                 {user.proteinTargetG} g / jour
               </span>
             ) : null}
           </div>
-        </div>
+        </Link>
       </aside>
 
       {/* Content column */}

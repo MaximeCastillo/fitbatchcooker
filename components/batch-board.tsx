@@ -234,6 +234,7 @@ export function BatchBoard({
 
   function onRemoveDay(dayIndex: number) {
     if (dayCount <= 1) return;
+    const dayHasEntries = entries.some((e) => e.dayIndex === dayIndex);
     // Snapshot to restore on undo (deferred delete — nothing is persisted until commit).
     const snapshotEntries = entries;
     const snapshotDayCount = dayCount;
@@ -245,6 +246,11 @@ export function BatchBoard({
         ),
     );
     setDayCount((n) => n - 1);
+    // An empty day has nothing worth restoring — remove it straight away, no undo noise.
+    if (!dayHasEntries) {
+      startTransition(() => removeDay(planId, dayIndex));
+      return;
+    }
     showUndoToast({
       message: strings.batch.dayDeleted,
       actionLabel: strings.common.undo,

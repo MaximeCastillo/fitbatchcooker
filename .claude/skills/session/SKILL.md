@@ -46,6 +46,14 @@ et jeter un œil aux **logs du dev server**. Un `307` sur une route protégée =
 login attendue (la page a compilé). Ce qui reste **visuel** (animations, drag, rendu) →
 le demander à l'auteur, on ne peut pas le voir en curl.
 
+**Toujours vérifier le mobile / tap-first** (`PRINCIPLES.md` §5 — non négociable, l'auteur ne
+devrait pas avoir à le remonter en QA) : pour tout élément interactif ajouté/touché, se
+demander « accessible **au doigt** ? ». Piège récurrent : les **boutons ghost**
+(`opacity-0` + `group-hover`) sont **invisibles sur mobile** (pas de survol). Règle : visibles
+sur mobile, ghost seulement en `md:` (`opacity-100 … md:opacity-0 md:group-hover:opacity-100`),
+cibles **≥ 44 px**, aucune action clé réservée au drag. Au moindre doute, `grep` les motifs
+`opacity-0.*group-hover` pour balayer les régressions d'un coup.
+
 ## 4. Fin de session (tenir la doc — courte !)
 
 - **`LEARNING_LOG.md`** : ajouter un **bilan daté** (ce qu'on a construit, concepts appris,
