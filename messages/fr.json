@@ -4,6 +4,11 @@
     "changeLanguage": "Changer de langue",
     "proteinPerDay": "{grams} g / jour"
   },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Retour à l'accueil"
+  },
   "home": {
     "seeRecipes": "Voir les recettes",
     "title": "Tes repas protéinés, planifiés à l'avance.",

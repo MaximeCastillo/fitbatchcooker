@@ -4,6 +4,11 @@
     "changeLanguage": "Change language",
     "proteinPerDay": "{grams} g / day"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page doesn't exist or has moved.",
+    "home": "Back to home"
+  },
   "home": {
     "seeRecipes": "See the recipes",
     "title": "Your protein meals, planned ahead.",

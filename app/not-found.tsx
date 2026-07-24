@@ -2,7 +2,7 @@
 // middleware). It renders its own document since it lives outside `[locale]`.
 export default function NotFound() {
   return (
-    <html lang="fr">
+    <html lang="en">
       <body
         style={{
           display: "grid",
@@ -11,7 +11,7 @@ export default function NotFound() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <h1>404 — Page introuvable</h1>
+        <h1>404 — Page not found</h1>
       </body>
     </html>
   );
