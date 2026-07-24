@@ -1,16 +1,17 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "@/i18n/navigation";
 
 // Save/unsave a recipe to the current user's book. Every query is scoped to the
 // logged-in user's id — this is our authorization model (spec §7): a user can only
 // ever touch their own rows.
 export async function toggleSaveRecipe(recipeId: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
   if (!recipeId) return;
 
   const existing = await prisma.userRecipe.findUnique({

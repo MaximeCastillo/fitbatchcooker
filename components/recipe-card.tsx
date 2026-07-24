@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { strings } from "@/lib/strings";
+import { Link } from "@/i18n/navigation";
 
 // Shared recipe card: title, summary, macro badges, and an optional bookmark action
 // pinned top-right (the save/remove toggle). The card stays agnostic of the action —
@@ -30,6 +30,7 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard({ recipe, href, bookmark }: RecipeCardProps) {
+  const t = useTranslations("recipes");
   return (
     <Card
       className={cn(
@@ -58,15 +59,15 @@ export function RecipeCard({ recipe, href, bookmark }: RecipeCardProps) {
       <CardContent className="flex flex-wrap gap-2 text-sm">
         {recipe.proteinPerServingG != null && (
           <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
-            {strings.recipes.protein(recipe.proteinPerServingG)}
+            {t("protein", { grams: recipe.proteinPerServingG })}
           </span>
         )}
         <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-          {strings.recipes.servings(recipe.servings)}
+          {t("servings", { count: recipe.servings })}
         </span>
         {recipe.caloriesPerServingKcal != null && (
           <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-            {strings.recipes.calories(recipe.caloriesPerServingKcal)}
+            {t("calories", { kcal: recipe.caloriesPerServingKcal })}
           </span>
         )}
       </CardContent>

@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
 import { BatchBoard } from "@/components/batch-board";
 import { BatchTitle } from "@/components/batch-title";
-import { strings } from "@/lib/strings";
+import { Link, redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +15,13 @@ export const dynamic = "force-dynamic";
 export default async function BatchPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
   const { id } = await params;
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+
+  const t = await getTranslations("batch");
 
   const [plan, recipes] = await Promise.all([
     prisma.batch.findFirst({
@@ -60,7 +62,7 @@ export default async function BatchPage({
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="size-4" aria-hidden />
-        {strings.batch.title}
+        {t("title")}
       </Link>
 
       <div className="mb-6">
@@ -69,12 +71,12 @@ export default async function BatchPage({
 
       {targetG === null && (
         <p className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
-          {strings.batch.noTarget}
+          {t("noTarget")}
           <Link
             href="/account"
             className="font-semibold text-primary hover:underline"
           >
-            {strings.batch.setTarget}
+            {t("setTarget")}
           </Link>
         </p>
       )}

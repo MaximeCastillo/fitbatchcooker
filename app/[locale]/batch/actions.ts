@@ -1,17 +1,17 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { strings } from "@/lib/strings";
+import { redirect } from "@/i18n/navigation";
 
 // All actions are scoped to the logged-in user (authorization — spec §7): we never
 // touch a plan or entry that isn't owned by the current user.
 
 async function requireUserId() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
   return user.id;
 }
 
@@ -37,21 +37,25 @@ function revalidateBatch(planId: string) {
 
 export async function createBatch() {
   const userId = await requireUserId();
-  const label = new Date().toLocaleDateString("fr-FR", {
+  const locale = await getLocale();
+  const t = await getTranslations("batch");
+  // Format the date in the active locale (fr → "24 juil.", en → "Jul 24").
+  const label = new Date().toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US", {
     day: "2-digit",
     month: "short",
   });
   const plan = await prisma.batch.create({
-    data: { userId, name: strings.batch.defaultName(label), dayCount: 5 },
+    data: { userId, name: t("defaultName", { dateLabel: label }), dayCount: 5 },
   });
   revalidatePath("/batch");
-  redirect(`/batch/${plan.id}`);
+  redirect({ href: `/batch/${plan.id}`, locale });
 }
 
 export async function renameBatch(planId: string, name: string) {
   const userId = await requireUserId();
   if (!(await ownedPlan(planId, userId))) return;
-  const clean = name.trim().slice(0, 80) || strings.batch.untitled;
+  const t = await getTranslations("batch");
+  const clean = name.trim().slice(0, 80) || t("untitled");
   await prisma.batch.update({ where: { id: planId }, data: { name: clean } });
   revalidateBatch(planId);
 }

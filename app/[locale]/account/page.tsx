@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth";
 import { updateProfile } from "./actions";
-import { logout } from "@/app/login/actions";
+import { logout } from "@/app/[locale]/login/actions";
 import { EmailForm, PasswordForm } from "@/components/account-forms";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { strings } from "@/lib/strings";
+import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -27,19 +27,18 @@ export default async function AccountPage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
   const { saved } = await searchParams;
+  const t = await getTranslations();
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">
-        {strings.account.title}
-      </h1>
+      <h1 className="text-3xl font-bold tracking-tight">{t("account.title")}</h1>
 
       {/* Which account am I on? The reason this page exists — shown first, prominently. */}
       <div className="rounded-xl bg-muted/60 px-4 py-3">
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          {strings.account.connectedAs}
+          {t("account.connectedAs")}
         </p>
         <p className="mt-0.5 truncate text-lg font-semibold">{user.email}</p>
       </div>
@@ -47,12 +46,12 @@ export default async function AccountPage({
       {/* Profile — unchanged behaviour: server action + ?saved=1 success flag. */}
       <Card>
         <CardHeader>
-          <CardTitle>{strings.account.profileSection}</CardTitle>
+          <CardTitle>{t("account.profileSection")}</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={updateProfile} className="flex flex-col gap-4">
             <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {strings.profile.firstName}
+              {t("profile.firstName")}
               <input
                 type="text"
                 name="firstName"
@@ -63,7 +62,7 @@ export default async function AccountPage({
             </label>
 
             <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {strings.profile.proteinTarget}
+              {t("profile.proteinTarget")}
               <input
                 type="number"
                 name="proteinTargetG"
@@ -72,18 +71,18 @@ export default async function AccountPage({
                 className={inputClasses}
               />
               <span className="text-xs font-normal text-muted-foreground">
-                {strings.profile.proteinHint}
+                {t("profile.proteinHint")}
               </span>
             </label>
 
             {saved && (
               <p role="status" className="text-sm text-primary">
-                {strings.profile.saved}
+                {t("profile.saved")}
               </p>
             )}
 
             <Button type="submit" className="mt-1 h-11 w-full text-base">
-              {strings.profile.save}
+              {t("profile.save")}
             </Button>
           </form>
         </CardContent>
@@ -92,7 +91,7 @@ export default async function AccountPage({
       {/* Change email */}
       <Card>
         <CardHeader>
-          <CardTitle>{strings.account.emailSection}</CardTitle>
+          <CardTitle>{t("account.emailSection")}</CardTitle>
           <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -103,7 +102,7 @@ export default async function AccountPage({
       {/* Change password */}
       <Card>
         <CardHeader>
-          <CardTitle>{strings.account.passwordSection}</CardTitle>
+          <CardTitle>{t("account.passwordSection")}</CardTitle>
         </CardHeader>
         <CardContent>
           <PasswordForm />
@@ -113,7 +112,7 @@ export default async function AccountPage({
       {/* Logout — infrequent action, kept visually secondary at the bottom. */}
       <form action={logout} className="mt-2">
         <Button type="submit" variant="outline" className="w-full">
-          {strings.nav.logout}
+          {t("nav.logout")}
         </Button>
       </form>
     </main>

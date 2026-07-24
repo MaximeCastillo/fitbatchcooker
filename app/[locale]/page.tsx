@@ -1,17 +1,20 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CalendarPlus, Gauge, CookingPot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProteinGauge } from "@/components/protein-gauge";
 import { getCurrentUser } from "@/lib/auth";
-import { strings } from "@/lib/strings";
+import { Link, redirect } from "@/i18n/navigation";
 
 const stepIcons = [CalendarPlus, Gauge, CookingPot];
 
 // Home page. Logged-in users go straight to their space; visitors get the pitch.
 export default async function Home() {
   const user = await getCurrentUser();
-  if (user) redirect("/batch");
+  const locale = await getLocale();
+  if (user) redirect({ href: "/batch", locale });
+
+  const t = await getTranslations("home");
+  const steps = t.raw("steps") as { title: string; text: string }[];
 
   return (
     <main className="flex flex-1 flex-col">
@@ -19,10 +22,10 @@ export default async function Home() {
       <section className="mx-auto grid w-full max-w-5xl flex-1 items-center gap-10 px-6 py-14 md:grid-cols-2">
         <div className="flex flex-col items-start gap-5">
           <h1 className="text-4xl leading-[0.95] font-bold tracking-tight text-balance uppercase sm:text-5xl">
-            {strings.home.title}
+            {t("title")}
           </h1>
           <p className="max-w-md text-lg text-muted-foreground">
-            {strings.home.subtitle}
+            {t("subtitle")}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button
@@ -30,7 +33,7 @@ export default async function Home() {
               size="lg"
               nativeButton={false}
             >
-              {strings.home.ctaPrimary}
+              {t("ctaPrimary")}
             </Button>
             <Button
               render={<Link href="/recipes" />}
@@ -38,7 +41,7 @@ export default async function Home() {
               variant="outline"
               nativeButton={false}
             >
-              {strings.home.ctaSecondary}
+              {t("ctaSecondary")}
             </Button>
           </div>
         </div>
@@ -51,7 +54,7 @@ export default async function Home() {
             <ProteinGauge fill={72} className="h-28 w-20" />
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {strings.home.heroCaption}
+            {t("heroCaption")}
           </p>
         </div>
       </section>
@@ -59,7 +62,7 @@ export default async function Home() {
       {/* How it works — a real 3-step sequence */}
       <section className="border-t bg-secondary/40">
         <div className="mx-auto grid w-full max-w-5xl gap-6 px-6 py-12 sm:grid-cols-3">
-          {strings.home.steps.map((step, index) => {
+          {steps.map((step, index) => {
             const Icon = stepIcons[index];
             return (
               <div key={step.title} className="flex flex-col gap-3">

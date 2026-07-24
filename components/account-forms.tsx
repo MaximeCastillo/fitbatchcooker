@@ -1,14 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import {
   updateEmail,
   updatePassword,
   type FormState,
-} from "@/app/account/actions";
+} from "@/app/[locale]/account/actions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { strings } from "@/lib/strings";
 
 const initialFormState: FormState = { status: "idle", message: "" };
 
@@ -46,11 +46,12 @@ export function EmailForm({ currentEmail }: { currentEmail: string }) {
     updateEmail,
     initialFormState,
   );
+  const t = useTranslations("account");
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        {strings.account.newEmail}
+        {t("newEmail")}
         <input
           type="email"
           name="newEmail"
@@ -61,12 +62,12 @@ export function EmailForm({ currentEmail }: { currentEmail: string }) {
         />
       </label>
 
-      <p className="text-xs text-muted-foreground">{strings.account.emailHint}</p>
+      <p className="text-xs text-muted-foreground">{t("emailHint")}</p>
 
       <FormMessage state={state} />
 
       <Button type="submit" disabled={isPending} className={submitClasses}>
-        {strings.account.changeEmail}
+        {t("changeEmail")}
       </Button>
     </form>
   );
@@ -77,11 +78,12 @@ export function PasswordForm() {
     updatePassword,
     initialFormState,
   );
+  const t = useTranslations("account");
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        {strings.account.currentPassword}
+        {t("currentPassword")}
         <input
           type="password"
           name="currentPassword"
@@ -92,7 +94,7 @@ export function PasswordForm() {
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        {strings.account.newPassword}
+        {t("newPassword")}
         <input
           type="password"
           name="newPassword"
@@ -104,7 +106,7 @@ export function PasswordForm() {
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        {strings.account.confirmPassword}
+        {t("confirmPassword")}
         <input
           type="password"
           name="confirmPassword"
@@ -118,7 +120,7 @@ export function PasswordForm() {
       <FormMessage state={state} />
 
       <Button type="submit" disabled={isPending} className={submitClasses}>
-        {strings.account.changePassword}
+        {t("changePassword")}
       </Button>
     </form>
   );
