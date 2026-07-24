@@ -33,6 +33,7 @@ export const strings = {
     recipes: "Recettes",
     book: "Mes recettes",
     chat: "Le chef",
+    account: "Mon compte",
     login: "Se connecter",
     logout: "Se déconnecter",
   },
@@ -139,5 +140,33 @@ export const strings = {
     proteinHint: "On conseille ~2 g/kg de masse corporelle — à toi de fixer ta cible.",
     save: "Enregistrer",
     saved: "Profil enregistré ✓",
+  },
+  account: {
+    title: "Mon compte",
+    // Prominent header: which account am I on right now? (The whole point of this page.)
+    connectedAs: "Connecté en tant que",
+    // Profile section reuses strings.profile.* for its field labels.
+    profileSection: "Profil",
+    // Change email
+    emailSection: "Adresse email",
+    emailHint: "Un email de confirmation sera envoyé à la nouvelle adresse.",
+    newEmail: "Nouvelle adresse email",
+    changeEmail: "Changer d'email",
+    emailSent: "Un email de confirmation a été envoyé à ta nouvelle adresse.",
+    emailInvalid: "Cette adresse email n'est pas valide.",
+    emailSame: "C'est déjà ton adresse actuelle.",
+    emailTaken: "Cette adresse est déjà utilisée par un autre compte.",
+    emailError: "Impossible de changer l'adresse pour l'instant. Réessaie.",
+    // Change password
+    passwordSection: "Mot de passe",
+    currentPassword: "Mot de passe actuel",
+    newPassword: "Nouveau mot de passe",
+    confirmPassword: "Confirme le nouveau mot de passe",
+    changePassword: "Changer de mot de passe",
+    passwordUpdated: "Mot de passe mis à jour ✓",
+    passwordWrong: "Mot de passe actuel incorrect.",
+    passwordTooShort: "Le nouveau mot de passe doit faire au moins 8 caractères.",
+    passwordMismatch: "Les deux mots de passe ne correspondent pas.",
+    passwordError: "Impossible de changer le mot de passe pour l'instant. Réessaie.",
   },
 } as const;
