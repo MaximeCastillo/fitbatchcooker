@@ -43,12 +43,16 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
   ou notion d'`Eater` avec objectif par personne. Quand le besoin est réel.
 - **Type de plat** (`mealType` : plat principal / encas / petit-déj…) + **suggestions douces
   non bloquantes** ("3 petits-déj sur Jour 2 ?") — jamais d'enforcement rigide. Post-MVP.
-- Nommage : "Recette" = catalogue réutilisable ; "Plat" = instance posée dans un plan
-  (décidé — géré via `lib/strings.ts`, re-challengeable).
+- Nommage : **"recette" partout** dans l'UI (catalogue *et* instance posée) — un seul mot
+  pour éviter la confusion, aligné sur le menu « Recettes ». Géré via `lib/strings.ts`,
+  re-challengeable (on pourra réintroduire "plat" pour l'instance si le besoin apparaît).
 - Icônes : tester le duotone **Phosphor** (optionnel).
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Undo à la Notion** (jour + batch) : suppression différée + toast « Annuler » (10 s, barre
+  de décompte), zéro soft-delete en base. Drag & drop poli : **DragOverlay** (la recette reste
+  en place dans la palette), jauge plus vivante, nommage unifié « recette ».
 - **Home nouveau user** : pitch + CTA (motif remplissage) ; user connecté redirigé vers son espace.
 - **Écran de login soigné** (panneau valeur + formulaire, motif remplissage).
 - Redesign socle : tokens vert+orange, typo Barlow, **shell à sidebar**, motif remplissage (prototype).
