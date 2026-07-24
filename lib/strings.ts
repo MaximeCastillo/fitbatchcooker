@@ -2,6 +2,9 @@
 // One place to change wording — and the natural seam for next-intl when a 2nd
 // language becomes a real need. (App identity like APP_NAME lives in constants.ts.)
 export const strings = {
+  common: {
+    undo: "Annuler",
+  },
   home: {
     seeRecipes: "Voir les recettes",
     title: "Tes repas protéinés, planifiés à l'avance.",
@@ -44,6 +47,7 @@ export const strings = {
     dishes: (n: number) => `${n} plat${n > 1 ? "s" : ""}`,
     dayLabel: (n: number) => `Jour ${n}`,
     delete: "Supprimer le batch",
+    dayDeleted: "Jour supprimé",
     progressLabel: "Progression du batch",
     averageLabel: "g / jour en moy.",
     emptyDay: "Aucun plat",

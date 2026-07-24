@@ -27,6 +27,7 @@ import {
   isDayComplete,
   batchQuota,
 } from "@/lib/nutrition";
+import { undoableToast } from "@/lib/undo";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
@@ -164,14 +165,27 @@ export function BatchBoard({
   }
 
   function onRemoveDay(dayIndex: number) {
-    if (dayCount <= 1 || byDay[dayIndex].length > 0) return;
+    if (dayCount <= 1) return;
+    // Snapshot to restore on undo (deferred delete — nothing is persisted until commit).
+    const snapshotEntries = entries;
+    const snapshotDayCount = dayCount;
     setEntries((prev) =>
-      prev.map((e) =>
-        e.dayIndex > dayIndex ? { ...e, dayIndex: e.dayIndex - 1 } : e,
-      ),
+      prev
+        .filter((e) => e.dayIndex !== dayIndex)
+        .map((e) =>
+          e.dayIndex > dayIndex ? { ...e, dayIndex: e.dayIndex - 1 } : e,
+        ),
     );
     setDayCount((n) => n - 1);
-    startTransition(() => removeDay(planId, dayIndex));
+    undoableToast({
+      message: strings.batch.dayDeleted,
+      actionLabel: strings.common.undo,
+      onUndo: () => {
+        setEntries(snapshotEntries);
+        setDayCount(snapshotDayCount);
+      },
+      onCommit: () => startTransition(() => removeDay(planId, dayIndex)),
+    });
   }
 
   function onDragStart(event: DragStartEvent) {
@@ -283,7 +297,7 @@ export function BatchBoard({
                 dayIndex={dayIndex}
                 entries={dayEntries}
                 targetG={targetG}
-                canRemove={dayCount > 1 && dayEntries.length === 0}
+                canRemove={dayCount > 1}
                 onRemoveDay={() => onRemoveDay(dayIndex)}
                 onRemoveEntry={remove}
               />

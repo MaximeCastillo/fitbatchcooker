@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import { AppShell } from "@/components/app-shell";
@@ -39,6 +40,7 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <AppShell>{children}</AppShell>
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );

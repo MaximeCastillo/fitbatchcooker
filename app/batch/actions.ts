@@ -81,13 +81,10 @@ export async function removeDay(planId: string, dayIndex: number) {
   const plan = await ownedPlan(planId, userId);
   if (!plan || plan.dayCount <= 1) return;
 
-  // Only remove an empty day, then shift later days down to keep indexes contiguous.
-  const onThatDay = await prisma.batchEntry.count({
-    where: { batchId: planId, dayIndex },
-  });
-  if (onThatDay > 0) return;
-
+  // Delete that day's dishes, then shift later days down to keep indexes contiguous.
+  // Deleting a non-empty day is safe: the UI defers this via an undoable toast.
   await prisma.$transaction([
+    prisma.batchEntry.deleteMany({ where: { batchId: planId, dayIndex } }),
     prisma.batchEntry.updateMany({
       where: { batchId: planId, dayIndex: { gt: dayIndex } },
       data: { dayIndex: { decrement: 1 } },
