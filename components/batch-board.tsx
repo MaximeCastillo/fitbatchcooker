@@ -225,7 +225,7 @@ export function BatchBoard({
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
             <div
-              className="h-full rounded-full bg-primary transition-[width]"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-[width] duration-700 ease-out"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -457,19 +457,23 @@ function DayRow({
           {strings.batch.dayLabel(dayIndex + 1)}
         </span>
         <div className="flex items-center gap-2.5">
-          <div
-            className={cn(
-              "relative h-13 w-9 shrink-0 overflow-hidden rounded-[8px] border-2 bg-secondary",
-              done ? "border-primary" : "border-muted-foreground/50",
-            )}
-          >
+          <div className="relative h-13 w-9 shrink-0">
+            {/* Inner frame is clipped so the liquid stays inside the rounded box… */}
             <div
-              className="absolute inset-x-0 bottom-0 bg-primary transition-[height]"
-              style={{ height: `${pct}%` }}
-              aria-hidden
-            />
+              className={cn(
+                "relative h-full w-full overflow-hidden rounded-[8px] border-2 bg-secondary transition-colors",
+                done ? "border-primary" : "border-muted-foreground/50",
+              )}
+            >
+              <div
+                className="absolute inset-x-0 bottom-0 bg-primary transition-[height] duration-700 ease-out"
+                style={{ height: `${pct}%` }}
+                aria-hidden
+              />
+            </div>
+            {/* …the seal badge sits on the OUTER wrapper so it isn't clipped. */}
             {done && (
-              <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground">
+              <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-300">
                 <Check className="size-3" aria-hidden />
               </span>
             )}

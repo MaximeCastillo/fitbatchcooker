@@ -44,7 +44,7 @@ export const strings = {
     dishes: (n: number) => `${n} plat${n > 1 ? "s" : ""}`,
     dayLabel: (n: number) => `Jour ${n}`,
     delete: "Supprimer le batch",
-    progressLabel: "Jours au vert",
+    progressLabel: "Progression du batch",
     averageLabel: "g / jour en moy.",
     emptyDay: "Aucun plat",
     removeDish: "Retirer le plat",
