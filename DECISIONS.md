@@ -319,3 +319,20 @@ la logique. `userId` nullable **pour toujours** = sentinelle « bibliothèque »
 requête et non en colonne `NOT NULL`.
 **Contenu recettes en français** (la parité bilingue stricte = UI/`messages` seulement).
 **Différé :** communauté/partage, upload d'images, édition `proteinPer100g`, liste de courses.
+
+## 2026-07-25 — Affinages cœur produit (retours d'usage)
+Évolutions du socle ci-dessus après premier usage :
+- **Catalogue d'ingrédients VERROUILLÉ** (seed only) : ni le chef ni le formulaire ne créent
+  d'ingrédient — ils ne piochent que dans l'existant (un nom inconnu proposé par le chef est
+  rejeté, pas créé). On étoffe le seed (~80 ingrédients) au lieu d'ouvrir la création.
+  **Pourquoi :** l'ingrédient est partagé par tous → éviter la pollution/les doublons de la base.
+- **Catégorie `CONDIMENT`** (huile, sel, poivre, sauce soja, miel…) remplace `FAT` (supprimée) ;
+  avocat → `VEGETABLE`. Basiques = supposés dispo, rangés à part.
+- **Deux listes distinctes** : `/recipes` = **bibliothèque partagée** (découverte + bookmark,
+  non modifiable) ; `/book` (« Mes recettes ») = **livre** = recettes sauvegardées + créées
+  (auto-sauvegardées). Le bouton « Nouvelle recette » vit sur `/book`. La **palette du batch =
+  le livre**. On a retiré le filtre « mine » (propriété) devenu source de confusion.
+- **Suppression de `servings`** (Recipe + BatchEntry) : 1 entrée = 1 part. Manger à plusieurs =
+  poser le plat N fois dans un jour, **affiché groupé en ×N** (comme le bloc « à cuisiner »).
+- **Page ingrédients = recherche inversée** (façon Marmiton) : cliquer un ingrédient ouvre les
+  recettes qui l'utilisent (bookmark + scroll infini). Pas d'édition (base partagée).
