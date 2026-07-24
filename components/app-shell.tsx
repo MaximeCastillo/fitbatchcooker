@@ -1,21 +1,25 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
 import { strings } from "@/lib/strings";
 
 // Brand lockup — the mark echoes the signature protein gauge (a container filled with
-// protein), not initials. Full wordmark, never abbreviated.
-function BrandMark() {
+// protein). The wordmark is dropped on the tight mobile header (icon-only) to leave
+// room for the chrome controls.
+function BrandMark({ showWordmark = true }: { showWordmark?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2">
       <span className="relative grid size-9 shrink-0 overflow-hidden rounded-xl border-2 border-primary bg-primary/10">
         <span className="absolute inset-x-0 bottom-0 h-[58%] bg-primary" aria-hidden />
       </span>
-      <span className="font-display text-lg font-bold tracking-wide whitespace-nowrap uppercase">
-        {APP_NAME}
-      </span>
+      {showWordmark && (
+        <span className="font-display text-lg font-bold tracking-wide whitespace-nowrap uppercase">
+          {APP_NAME}
+        </span>
+      )}
     </Link>
   );
 }
@@ -47,11 +51,15 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <BrandMark />
         </div>
         <SidebarNav />
-        {/* The whole chip is the link to the account page, not just the name. */}
-        <Link
-          href="/account"
-          className="mt-auto flex items-center gap-3 rounded-xl border p-3 transition-colors hover:border-primary hover:bg-accent"
-        >
+        {/* Chrome pinned to the bottom: quick preferences (theme — language joins it
+            when i18n lands) + the account chip. Controls, not nav destinations. */}
+        <div className="mt-auto flex flex-col gap-2">
+          <ThemeToggle />
+          {/* The whole chip is the link to the account page, not just the name. */}
+          <Link
+            href="/account"
+            className="flex items-center gap-3 rounded-xl border p-3 transition-colors hover:border-primary hover:bg-accent"
+          >
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white">
             {initial}
           </span>
@@ -65,7 +73,8 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             ) : null}
           </div>
-        </Link>
+          </Link>
+        </div>
       </aside>
 
       {/* Content column */}
@@ -73,15 +82,18 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile top bar */}
         <div className="md:hidden">
           <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
-            <BrandMark />
-            {/* Account is reached by tapping the avatar (mirrors the desktop chip). */}
-            <Link
-              href="/account"
-              aria-label={strings.nav.account}
-              className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white"
-            >
-              {initial}
-            </Link>
+            <BrandMark showWordmark={false} />
+            {/* Chrome: quick theme control + account avatar (mirrors the desktop chip). */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle compact />
+              <Link
+                href="/account"
+                aria-label={strings.nav.account}
+                className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white"
+              >
+                {initial}
+              </Link>
+            </div>
           </header>
           <div className="border-b px-2 py-1.5">
             <SidebarNav orientation="horizontal" />

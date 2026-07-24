@@ -15,7 +15,9 @@ const options = [
   { value: "system", label: strings.account.themeSystem, Icon: Monitor },
 ] as const;
 
-export function ThemeToggle() {
+// `compact` = icon-only single row (for the tight mobile header); default = a labelled
+// 3-column segmented control (for the desktop sidebar footer).
+export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const { theme, setTheme } = useTheme();
 
   // The active theme is only known on the client (it lives in localStorage / the
@@ -33,7 +35,12 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label={strings.account.appearanceSection}
-      className="grid grid-cols-3 gap-1 rounded-xl bg-muted/60 p-1"
+      className={cn(
+        "bg-muted/60",
+        compact
+          ? "flex gap-0.5 rounded-lg p-0.5"
+          : "grid grid-cols-3 gap-1 rounded-xl p-1",
+      )}
     >
       {options.map(({ value, label, Icon }) => {
         const isActive = mounted && theme === value;
@@ -43,16 +50,20 @@ export function ThemeToggle() {
             type="button"
             role="radio"
             aria-checked={isActive}
+            aria-label={compact ? label : undefined}
             onClick={() => setTheme(value)}
             className={cn(
-              "flex min-h-11 flex-col items-center justify-center gap-1 rounded-lg text-xs font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              "outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
+              compact
+                ? "grid size-9 place-items-center rounded-md"
+                : "flex min-h-11 flex-col items-center justify-center gap-1 rounded-lg text-xs font-medium",
               isActive
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
             <Icon className="size-4" aria-hidden />
-            {label}
+            {!compact && label}
           </button>
         );
       })}
