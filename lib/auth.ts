@@ -24,7 +24,18 @@ export const getCurrentUser = cache(async () => {
   if (!user?.email) return null;
 
   const existing = await prisma.user.findUnique({ where: { id: user.id } });
-  if (existing) return existing;
+  if (existing) {
+    // Self-heal: Supabase Auth is the source of truth for the email. When it drifts
+    // from our column (e.g. the user confirmed an email change on Supabase's side),
+    // realign it. Still a cheap read on every load — we only write on a real mismatch.
+    if (existing.email !== user.email) {
+      return prisma.user.update({
+        where: { id: user.id },
+        data: { email: user.email },
+      });
+    }
+    return existing;
+  }
 
   return prisma.user.create({
     data: { id: user.id, email: user.email },
