@@ -8,6 +8,7 @@ import {
   loadRecipes,
   type RecipeCardData,
   type RecipeFilters,
+  type RecipeScope,
 } from "@/app/[locale]/recipes/actions";
 import { RecipeCard } from "@/components/recipe-card";
 import { SaveToggle } from "@/components/save-toggle";
@@ -15,21 +16,23 @@ import { cn } from "@/lib/utils";
 
 const MEAL_TABS: (MealType | null)[] = [null, "MAIN", "SNACK", "BREAKFAST"];
 
-// Client browse: search + mealType tabs + optional "my recipes" toggle, over cursor-
-// paginated results fed by the loadRecipes server action, with infinite scroll.
+// Client browse: search + mealType tabs over cursor-paginated results fed by the
+// loadRecipes server action, with infinite scroll. `scope` picks the list (shared
+// library vs the user's book); `canSave` shows the bookmark toggle.
 export function RecipeBrowser({
   initialRecipes,
   initialNextCursor,
-  showMine,
+  scope,
+  canSave,
 }: {
   initialRecipes: RecipeCardData[];
   initialNextCursor: string | null;
-  showMine: boolean;
+  scope: RecipeScope;
+  canSave: boolean;
 }) {
   const t = useTranslations("recipes");
   const [search, setSearch] = useState("");
   const [mealType, setMealType] = useState<MealType | null>(null);
-  const [mine, setMine] = useState(false);
   const [recipes, setRecipes] = useState(initialRecipes);
   const [cursor, setCursor] = useState(initialNextCursor);
   const [loading, setLoading] = useState(false);
@@ -38,7 +41,7 @@ export function RecipeBrowser({
   const loadingRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const filters: RecipeFilters = { search, mealType, mine };
+  const filters: RecipeFilters = { search, mealType, scope };
   const filterKey = JSON.stringify(filters);
 
   // Refetch page 1 whenever a filter changes. Skip the first render (the server already
@@ -119,16 +122,6 @@ export function RecipeBrowser({
             {mt ? t(`mealType.${mt}`) : t("mealType.all")}
           </button>
         ))}
-        {showMine && (
-          <button
-            type="button"
-            onClick={() => setMine((m) => !m)}
-            aria-pressed={mine}
-            className={chipClass(mine)}
-          >
-            {t("filters.mine")}
-          </button>
-        )}
       </div>
 
       {recipes.length === 0 ? (
@@ -141,7 +134,7 @@ export function RecipeBrowser({
                 recipe={recipe}
                 href={`/recipes/${recipe.id}`}
                 bookmark={
-                  showMine ? (
+                  canSave ? (
                     <SaveToggle recipeId={recipe.id} saved={recipe.saved} />
                   ) : undefined
                 }

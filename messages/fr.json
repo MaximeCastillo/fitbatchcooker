@@ -127,8 +127,7 @@
     "remove": "Retirer",
     "new": "Nouvelle recette",
     "filters": {
-      "search": "Rechercher une recette…",
-      "mine": "Mes recettes"
+      "search": "Rechercher une recette…"
     },
     "mealType": {
       "all": "Tous",

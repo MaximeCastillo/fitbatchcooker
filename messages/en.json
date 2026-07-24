@@ -127,8 +127,7 @@
     "remove": "Remove",
     "new": "New recipe",
     "filters": {
-      "search": "Search a recipe…",
-      "mine": "My recipes"
+      "search": "Search a recipe…"
     },
     "mealType": {
       "all": "All",

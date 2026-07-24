@@ -4,7 +4,7 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { recipeVisibilityWhere, recomputeRecipeProtein } from "@/lib/recipes";
+import { recomputeRecipeProtein } from "@/lib/recipes";
 import { redirect } from "@/i18n/navigation";
 import type { MealType } from "@/lib/generated/prisma/enums";
 
@@ -21,26 +21,34 @@ export type RecipeCardData = {
   saved: boolean;
 };
 
+// Two orthogonal lists: the shared curated LIBRARY (userId = null, read-only, what you
+// discover on /recipes) and the user's BOOK (recipes they saved — bookmarked shared ones
+// + their own auto-saved creations — shown on /book and in the batch palette).
+export type RecipeScope = "library" | "book";
+
 export type RecipeFilters = {
   search?: string;
   mealType?: MealType | null;
-  mine?: boolean;
+  scope?: RecipeScope;
 };
 
 const RECIPES_PAGE_SIZE = 12;
+// Never-matching sentinel: anonymous users have no book, and can't own a saved row.
+const NO_USER = "00000000-0000-0000-0000-000000000000";
 
-// Cursor-paginated, filtered, user-scoped recipe list — powers the browse page's
-// infinite scroll. Same query path for filtering + paging: filters build the `where`,
-// the cursor (last id of the previous page) + take(N+1) yield the page and next cursor.
+// Cursor-paginated, filtered, scoped recipe list — powers the browse + book infinite
+// scroll. Same query path for filtering + paging: filters build the `where`, the cursor
+// (last id of the previous page) + take(N+1) yield the page and next cursor.
 export async function loadRecipes(
   filters: RecipeFilters,
   cursor: string | null,
 ): Promise<{ recipes: RecipeCardData[]; nextCursor: string | null }> {
   const user = await getCurrentUser();
+  const userId = user?.id ?? NO_USER;
   const base =
-    filters.mine && user
-      ? { userId: user.id }
-      : recipeVisibilityWhere(user?.id);
+    filters.scope === "book"
+      ? { savedBy: { some: { userId } } } // my saved recipes
+      : { userId: null }; // shared curated library
 
   const rows = await prisma.recipe.findMany({
     where: {
@@ -63,10 +71,10 @@ export async function loadRecipes(
       proteinPerServingG: true,
       caloriesPerServingKcal: true,
       imageUrl: true,
-      // Empty for anonymous (the all-zero UUID never matches a real user); one row if
-      // the current user saved it.
+      // Empty for anonymous (the sentinel never matches a real user); one row if the
+      // current user saved it (always present in the "book" scope).
       savedBy: {
-        where: { userId: user?.id ?? "00000000-0000-0000-0000-000000000000" },
+        where: { userId },
         select: { id: true },
       },
     },
