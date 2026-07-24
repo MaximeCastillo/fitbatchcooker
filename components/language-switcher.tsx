@@ -3,12 +3,11 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
-// Compact FR/EN switcher for the shell chrome (next to the theme toggle). It navigates
-// to the SAME path in the other locale via next-intl's locale-aware router, which also
-// updates the NEXT_LOCALE cookie so the choice sticks. A control, not a nav item.
+// A single toggle (like the theme toggle) for the shell chrome: it shows the language
+// you'll switch TO (in French it reads "EN", in English "FR") and flips on click. For
+// two locales this is lighter and more familiar than a two-button pill.
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
@@ -16,41 +15,31 @@ export function LanguageSwitcher() {
   const t = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
-  function switchTo(nextLocale: string) {
-    if (nextLocale === locale) return;
-    // usePathname is locale-stripped, so we just re-render the current path in the
-    // target locale.
+  const nextLocale = locale === "fr" ? "en" : "fr";
+
+  function toggle() {
     startTransition(() => {
+      // localePrefix "never": the URL doesn't change, so `replace` only writes the
+      // NEXT_LOCALE cookie — Server Components (navbar, etc.) won't re-render on their
+      // own. `refresh()` forces a fresh RSC request that re-runs the middleware, which
+      // reads the new cookie and re-renders everything in the target locale.
       router.replace(pathname, { locale: nextLocale });
+      router.refresh();
     });
   }
 
   return (
-    <div
-      role="group"
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={isPending}
       aria-label={t("changeLanguage")}
-      className="flex items-center gap-0.5 rounded-md border p-0.5"
+      title={t("changeLanguage")}
+      className={cn(
+        "grid h-9 min-w-9 place-items-center rounded-md px-1.5 text-xs font-bold uppercase text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50",
+      )}
     >
-      {routing.locales.map((loc) => {
-        const active = loc === locale;
-        return (
-          <button
-            key={loc}
-            type="button"
-            onClick={() => switchTo(loc)}
-            disabled={isPending}
-            aria-pressed={active}
-            className={cn(
-              "grid h-8 min-w-8 place-items-center rounded px-1.5 text-xs font-bold uppercase transition-colors disabled:opacity-50",
-              active
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            {loc}
-          </button>
-        );
-      })}
-    </div>
+      {nextLocale}
+    </button>
   );
 }
