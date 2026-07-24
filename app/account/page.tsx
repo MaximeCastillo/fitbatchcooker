@@ -90,6 +90,17 @@ export default async function AccountPage({
         </CardContent>
       </Card>
 
+      {/* Appearance — light/dark/system theme toggle (next-themes). Kept high: it's a
+          light, frequently-tweaked preference, above the sensitive email/password. */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{strings.account.appearanceSection}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ThemeToggle />
+        </CardContent>
+      </Card>
+
       {/* Change email */}
       <Card>
         <CardHeader>
@@ -108,16 +119,6 @@ export default async function AccountPage({
         </CardHeader>
         <CardContent>
           <PasswordForm />
-        </CardContent>
-      </Card>
-
-      {/* Appearance — light/dark/system theme toggle (next-themes). */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{strings.account.appearanceSection}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ThemeToggle />
         </CardContent>
       </Card>
 
