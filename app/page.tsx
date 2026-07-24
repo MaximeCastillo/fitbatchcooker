@@ -1,36 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check, CalendarPlus, Gauge, CookingPot } from "lucide-react";
+import { CalendarPlus, Gauge, CookingPot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProteinGauge } from "@/components/protein-gauge";
 import { getCurrentUser } from "@/lib/auth";
 import { strings } from "@/lib/strings";
 
 const stepIcons = [CalendarPlus, Gauge, CookingPot];
-
-// A single "fill vessel" (the signature motif) — a container filled to `fill`% ,
-// sealed with a check when full. Pure presentational.
-function Vessel({ fill, sealed = false }: { fill: number; sealed?: boolean }) {
-  return (
-    <div className="relative flex flex-col items-center gap-2">
-      <div
-        className={`relative h-28 w-20 overflow-hidden rounded-xl border-2 bg-secondary ${
-          sealed ? "border-primary" : "border-foreground/70"
-        }`}
-      >
-        <div
-          className="absolute inset-x-0 bottom-0 bg-primary"
-          style={{ height: `${fill}%` }}
-          aria-hidden
-        />
-        {sealed && (
-          <span className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground shadow">
-            <Check className="size-3.5" aria-hidden />
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // Home page. Logged-in users go straight to their space; visitors get the pitch.
 export default async function Home() {
@@ -39,7 +15,7 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero — split: pitch left, vessels right */}
+      {/* Hero — split: pitch left, gauges right */}
       <section className="mx-auto grid w-full max-w-5xl flex-1 items-center gap-10 px-6 py-14 md:grid-cols-2">
         <div className="flex flex-col items-start gap-5">
           <h1 className="text-4xl leading-[0.95] font-bold tracking-tight text-balance uppercase sm:text-5xl">
@@ -67,15 +43,15 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Visual — a mini week of vessels filling to green */}
+        {/* Visual — a mini week of gauges filling to green */}
         <div className="rounded-3xl border bg-card p-8 shadow-xl">
           <div className="flex items-end justify-center gap-4">
-            <Vessel fill={100} sealed />
-            <Vessel fill={100} sealed />
-            <Vessel fill={72} />
+            <ProteinGauge fill={100} sealed className="h-28 w-20" />
+            <ProteinGauge fill={100} sealed className="h-28 w-20" />
+            <ProteinGauge fill={72} className="h-28 w-20" />
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Deux jours au vert, un en cours.
+            {strings.home.heroCaption}
           </p>
         </div>
       </section>

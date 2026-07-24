@@ -12,6 +12,7 @@ export const strings = {
       "Compose tes journées, remplis ta jauge de protéines, et obtiens ta liste de plats à préparer.",
     ctaPrimary: "Créer un compte",
     ctaSecondary: "Voir les recettes",
+    heroCaption: "Deux jours au vert, un en cours.",
     steps: [
       {
         title: "Compose ta semaine",

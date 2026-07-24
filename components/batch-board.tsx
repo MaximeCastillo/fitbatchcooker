@@ -19,7 +19,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Check, Plus, Search, Trash2, X } from "lucide-react";
+import { Plus, Search, Trash2, X } from "lucide-react";
 import {
   addEntry,
   moveEntry,
@@ -35,6 +35,7 @@ import {
   batchQuota,
 } from "@/lib/nutrition";
 import { showUndoToast } from "@/components/undo-toast";
+import { ProteinGauge } from "@/components/protein-gauge";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
@@ -476,43 +477,13 @@ function DayRow({
         </button>
       )}
 
-      {/* Left: label + vessel gauge */}
+      {/* Left: label + protein gauge */}
       <div className="flex w-37.5 shrink-0 flex-col gap-2">
         <span className="font-display text-lg font-bold uppercase tracking-wide">
           {strings.batch.dayLabel(dayIndex + 1)}
         </span>
         <div className="flex items-center gap-2.5">
-          <div className="relative h-13 w-9 shrink-0">
-            {/* Inner frame is clipped so the liquid stays inside the rounded box… */}
-            <div
-              className={cn(
-                "relative h-full w-full overflow-hidden rounded-[8px] border-2 bg-secondary transition-colors",
-                done ? "border-primary" : "border-muted-foreground/50",
-              )}
-            >
-              <div
-                className="absolute inset-x-0 bottom-0 bg-primary transition-[height] duration-700 ease-out"
-                style={{ height: `${pct}%` }}
-                aria-hidden
-              >
-                {pct > 0 && (
-                  <>
-                    <span className="cauldron-bubble" style={{ left: "28%" }} />
-                    <span
-                      className="cauldron-bubble"
-                      style={{ left: "62%", animationDelay: "0.9s" }}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-            {/* …the seal badge sits on the OUTER wrapper so it isn't clipped. */}
-            {done && (
-              <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-300">
-                <Check className="size-3" aria-hidden />
-              </span>
-            )}
-          </div>
+          <ProteinGauge fill={pct} sealed={done} />
           <div className="flex flex-col leading-none">
             <b className="font-display text-2xl">{total}</b>
             <span className="mt-0.5 text-xs text-muted-foreground">

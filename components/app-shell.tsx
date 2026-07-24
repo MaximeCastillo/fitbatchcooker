@@ -7,7 +7,7 @@ import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
 import { strings } from "@/lib/strings";
 
-// Brand lockup — the mark IS the signature "fill vessel" (a container filled with
+// Brand lockup — the mark echoes the signature protein gauge (a container filled with
 // protein), not initials. Full wordmark, never abbreviated.
 function BrandMark() {
   return (
