@@ -1,10 +1,10 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { strings } from "@/lib/strings";
+import { redirect } from "@/i18n/navigation";
 
 // Shape shared by the email/password forms (React 19 useActionState). "idle" is the
 // untouched state; the client renders the message with the right tone for the status.
@@ -21,8 +21,9 @@ const MIN_PASSWORD_LENGTH = 8;
 // Updates the current user's profile. Scoped to the session user (spec §7) — the id
 // never comes from the form.
 export async function updateProfile(formData: FormData) {
+  const locale = await getLocale();
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale });
 
   const firstName = String(formData.get("firstName") ?? "").trim() || null;
 
@@ -38,7 +39,7 @@ export async function updateProfile(formData: FormData) {
     data: { firstName, proteinTargetG },
   });
 
-  redirect("/account?saved=1");
+  redirect({ href: { pathname: "/account", query: { saved: "1" } }, locale });
 }
 
 // Change the account email. The identity (current user + email) comes from the session,
@@ -50,17 +51,18 @@ export async function updateEmail(
   formData: FormData,
 ): Promise<FormState> {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+  const t = await getTranslations("account");
 
   const newEmail = String(formData.get("newEmail") ?? "")
     .trim()
     .toLowerCase();
 
   if (!EMAIL_RE.test(newEmail)) {
-    return { status: "error", message: strings.account.emailInvalid };
+    return { status: "error", message: t("emailInvalid") };
   }
   if (newEmail === user.email.toLowerCase()) {
-    return { status: "error", message: strings.account.emailSame };
+    return { status: "error", message: t("emailSame") };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -70,11 +72,11 @@ export async function updateEmail(
     const taken = /registered|already|exists|taken/i.test(error.message);
     return {
       status: "error",
-      message: taken ? strings.account.emailTaken : strings.account.emailError,
+      message: taken ? t("emailTaken") : t("emailError"),
     };
   }
 
-  return { status: "success", message: strings.account.emailSent };
+  return { status: "success", message: t("emailSent") };
 }
 
 // Change the account password. Security requirement: re-verify the CURRENT password
@@ -85,17 +87,18 @@ export async function updatePassword(
   formData: FormData,
 ): Promise<FormState> {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+  const t = await getTranslations("account");
 
   const currentPassword = String(formData.get("currentPassword") ?? "");
   const newPassword = String(formData.get("newPassword") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
   if (newPassword.length < MIN_PASSWORD_LENGTH) {
-    return { status: "error", message: strings.account.passwordTooShort };
+    return { status: "error", message: t("passwordTooShort") };
   }
   if (newPassword !== confirmPassword) {
-    return { status: "error", message: strings.account.passwordMismatch };
+    return { status: "error", message: t("passwordMismatch") };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -107,15 +110,15 @@ export async function updatePassword(
     password: currentPassword,
   });
   if (signInError) {
-    return { status: "error", message: strings.account.passwordWrong };
+    return { status: "error", message: t("passwordWrong") };
   }
 
   const { error: updateError } = await supabase.auth.updateUser({
     password: newPassword,
   });
   if (updateError) {
-    return { status: "error", message: strings.account.passwordError };
+    return { status: "error", message: t("passwordError") };
   }
 
-  return { status: "success", message: strings.account.passwordUpdated };
+  return { status: "success", message: t("passwordUpdated") };
 }

@@ -277,3 +277,23 @@ depuis Supabase Auth (source de vérité) en cas de drift.
 compte) a montré le besoin de voir clairement son compte et de gérer ses identifiants. La
 re-auth avant changement de mot de passe évite qu'une session laissée ouverte le change.
 **Différé :** **suppression de compte** (destructif + nécessite la service-role key serveur).
+
+## 2026-07-24 — App multilingue (FR/EN) via next-intl, sans préfixe d'URL
+**Décision :** internationaliser l'app avec **`next-intl`**, **sans préfixe de locale dans
+l'URL** (`localePrefix: "never"`, à la YouTube) : **défaut anglais** (langue pivot), et la
+langue est déduite du cookie `NEXT_LOCALE` puis de l'`Accept-Language` du device (détection
+auto → un device FR tombe en français **aux mêmes URLs propres**). Précédence : choix
+explicite (cookie) > device > défaut. Routes sous **`app/[locale]/`** (segment rewrité en
+interne par le middleware, invisible dans l'URL), textes migrés de `lib/strings.ts`
+(supprimé) vers des **catalogues ICU** `messages/fr.json` + `en.json`. **Sélecteur de langue**
+dans le chrome (à côté du thème). **Middleware** = next-intl **puis** refresh de session
+Supabase (cookies greffés sur la même réponse). **404 localisé** via catch-all `[locale]/
+[...rest]` → `notFound()`. Le **chef IA** répond dans la langue active (cookie `NEXT_LOCALE`).
+**Pourquoi :** URLs propres façon app grand public (choix assumé après avoir comparé à la
+voie « URLs par langue »). Le socle `lib/strings.ts` centralisé rendait la bascule peu
+coûteuse. Livré en **branche + PR** (première PR du projet).
+**Trade-off assumé (réversible) :** SEO par langue faible + pas de lien partageable par
+langue — non pertinent maintenant (app perso, derrière auth). Le jour où le SEO comptera
+(une **landing**), on repassera en `as-needed` **sélectivement** sur ces pages (juste un flag).
+**À revoir :** renommer `middleware.ts` → `proxy.ts` (déprécation Next 16) ; métadonnées
+`title`/`description` non encore localisées.

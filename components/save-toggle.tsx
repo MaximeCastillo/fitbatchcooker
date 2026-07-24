@@ -2,9 +2,9 @@
 
 import { useOptimistic, useTransition } from "react";
 import { Bookmark } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { toggleSaveRecipe } from "@/app/recipes/actions";
-import { strings } from "@/lib/strings";
+import { toggleSaveRecipe } from "@/app/[locale]/recipes/actions";
 
 // Optimistic save toggle, rendered as a bookmark icon. The bookmark fills INSTANTLY on
 // click (useOptimistic), before the server responds — so it feels immediate despite the
@@ -20,11 +20,12 @@ export function SaveToggle({
 }) {
   const [optimisticSaved, setOptimisticSaved] = useOptimistic(saved);
   const [pending, startTransition] = useTransition();
+  const t = useTranslations("recipes");
 
   return (
     <button
       type="button"
-      aria-label={optimisticSaved ? strings.recipes.remove : strings.recipes.save}
+      aria-label={optimisticSaved ? t("remove") : t("save")}
       aria-pressed={optimisticSaved}
       disabled={pending}
       onClick={() =>

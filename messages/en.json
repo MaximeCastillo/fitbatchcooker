@@ -1,0 +1,165 @@
+{
+  "common": {
+    "undo": "Undo",
+    "changeLanguage": "Change language",
+    "proteinPerDay": "{grams} g / day"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page doesn't exist or has moved.",
+    "home": "Back to home"
+  },
+  "home": {
+    "seeRecipes": "See the recipes",
+    "title": "Your protein meals, planned ahead.",
+    "subtitle": "Build your days, fill your protein gauge, and get your list of recipes to prep.",
+    "ctaPrimary": "Create an account",
+    "ctaSecondary": "See the recipes",
+    "heroCaption": "Two days in the green, one in progress.",
+    "steps": [
+      {
+        "title": "Build your week",
+        "text": "Pick your recipes day by day."
+      },
+      {
+        "title": "Fill your gauge",
+        "text": "Each day turns green when you hit your protein goal."
+      },
+      {
+        "title": "Cook your batch",
+        "text": "Your list of recipes to prep ahead, by number of servings."
+      }
+    ]
+  },
+  "nav": {
+    "batch": "My batches",
+    "recipes": "Recipes",
+    "book": "My recipes",
+    "chat": "The chef",
+    "account": "My account",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "batch": {
+    "defaultName": "Batch of {dateLabel}",
+    "untitled": "Untitled",
+    "title": "My batches",
+    "subtitle": "Your batches of recipes to cook ahead.",
+    "new": "New batch",
+    "empty": "You don't have any batch yet. Create your first batch of recipes!",
+    "nameLabel": "Batch name",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "dishes": "{count, plural, one {# recipe} other {# recipes}}",
+    "dayLabel": "Day {number}",
+    "delete": "Delete batch",
+    "dayDeleted": "Day deleted",
+    "deleted": "Batch deleted",
+    "progressLabel": "Batch progress",
+    "averageLabel": "g / day avg.",
+    "emptyDay": "No recipe",
+    "removeDish": "Remove recipe",
+    "addDay": "Add a day",
+    "removeDayLabel": "Delete day",
+    "noTarget": "Set your protein goal to activate the gauges.",
+    "setTarget": "Go to my account",
+    "toCook": "To cook",
+    "toCookHint": "Your batch of recipes to prep ahead.",
+    "perServing": "{grams} g / serving",
+    "times": "×{count}",
+    "recipes": "Recipes",
+    "searchPlaceholder": "Search…",
+    "noRecipe": "No recipe.",
+    "dragHint": "Drag a recipe onto a day (Shift = duplicate), or tap +.",
+    "tapHint": "Tap + to add a recipe to a day.",
+    "preview": "Recipe preview",
+    "add": "Add recipe",
+    "addToDay": "Add “{title}” to…",
+    "removeZone": "Release to put this recipe back",
+    "dropHere": "Drop a recipe here"
+  },
+  "login": {
+    "title": "Sign in",
+    "titleSignup": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUp": "Create an account",
+    "missingFields": "Enter an email and a password.",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "panelTitle": "Your protein meals, planned ahead.",
+    "panelSubtitle": "Build your week, fill your protein gauge, and get your list of recipes to prep.",
+    "benefits": [
+      "A protein goal per day, at your own pace",
+      "Each day turning green",
+      "A chef who learns your tastes"
+    ]
+  },
+  "recipes": {
+    "title": "Recipes",
+    "empty": "No recipe yet.",
+    "protein": "{grams} g of protein / serving",
+    "servings": "{count, plural, one {# serving} other {# servings}}",
+    "calories": "{kcal} kcal / serving",
+    "save": "Save",
+    "saved": "Saved ✓",
+    "remove": "Remove",
+    "detail": {
+      "back": "All recipes",
+      "stepsTitle": "Preparation",
+      "stepsEmpty": "The steps for this recipe are coming soon.",
+      "approxNote": "Approximate values — what matters is consistency."
+    }
+  },
+  "book": {
+    "title": "My recipes",
+    "empty": "You haven't saved any recipe yet.",
+    "browse": "Browse recipes"
+  },
+  "chat": {
+    "title": "The chef",
+    "greetings": [
+      "{hasName, select, yes {Hello {name}} other {Hello}} 👋 What are we cooking today?",
+      "{hasName, select, yes {Hi {name}} other {Hi}} 💪 Ready to load up on protein?",
+      "{hasName, select, yes {Hey {name}} other {Hey}} 👨‍🍳 What good stuff are we prepping for the week?",
+      "{hasName, select, yes {Great to see you again, {name}} other {Great to see you again}}! 🍗 Shall we get into some batch cooking?",
+      "{hasName, select, yes {Hiya {name}} other {Hiya}} 🥗 Something specific in mind, or shall I surprise you?"
+    ],
+    "placeholder": "Ask for a recipe, a meal idea…",
+    "send": "Send"
+  },
+  "profile": {
+    "title": "Profile",
+    "firstName": "First name",
+    "proteinTarget": "Protein goal (g/day)",
+    "proteinHint": "We suggest ~2 g/kg of body weight — it's up to you to set your target.",
+    "save": "Save",
+    "saved": "Profile saved ✓"
+  },
+  "account": {
+    "title": "My account",
+    "connectedAs": "Signed in as",
+    "profileSection": "Profile",
+    "themeToDark": "Switch to dark mode",
+    "themeToLight": "Switch to light mode",
+    "emailSection": "Email address",
+    "emailHint": "A confirmation email will be sent to the new address.",
+    "newEmail": "New email address",
+    "changeEmail": "Change email",
+    "emailSent": "A confirmation email has been sent to your new address.",
+    "emailInvalid": "This email address isn't valid.",
+    "emailSame": "That's already your current address.",
+    "emailTaken": "This address is already used by another account.",
+    "emailError": "Can't change the address right now. Try again.",
+    "passwordSection": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm the new password",
+    "changePassword": "Change password",
+    "passwordUpdated": "Password updated ✓",
+    "passwordWrong": "Current password is incorrect.",
+    "passwordTooShort": "The new password must be at least 8 characters.",
+    "passwordMismatch": "The two passwords don't match.",
+    "passwordError": "Can't change the password right now. Try again."
+  }
+}

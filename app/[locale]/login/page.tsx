@@ -1,8 +1,8 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { login, signup } from "./actions";
 import { Button } from "@/components/ui/button";
-import { strings } from "@/lib/strings";
+import { Link } from "@/i18n/navigation";
 
 // One auth screen, one mode at a time (driven by ?mode=signup) → a single primary
 // action, no ambiguous double button. Stays a Server Component: no client JS needed.
@@ -13,6 +13,8 @@ export default async function LoginPage({
 }) {
   const { error, mode } = await searchParams;
   const isSignup = mode === "signup";
+  const t = await getTranslations("login");
+  const benefits = t.raw("benefits") as string[];
 
   return (
     <main className="flex flex-1 items-center justify-center p-4 sm:p-6">
@@ -30,13 +32,11 @@ export default async function LoginPage({
 
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-3xl leading-none font-bold uppercase text-balance">
-              {strings.login.panelTitle}
+              {t("panelTitle")}
             </h2>
-            <p className="text-primary-foreground/85">
-              {strings.login.panelSubtitle}
-            </p>
+            <p className="text-primary-foreground/85">{t("panelSubtitle")}</p>
             <ul className="mt-2 flex flex-col gap-2.5">
-              {strings.login.benefits.map((benefit) => (
+              {benefits.map((benefit) => (
                 <li key={benefit} className="flex items-center gap-2.5 text-sm">
                   <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary-foreground/20">
                     <Check className="size-3" aria-hidden />
@@ -51,12 +51,12 @@ export default async function LoginPage({
         {/* Form — single mode */}
         <div className="flex flex-col justify-center gap-6 p-8">
           <h1 className="text-2xl font-bold tracking-tight">
-            {isSignup ? strings.login.titleSignup : strings.login.title}
+            {isSignup ? t("titleSignup") : t("title")}
           </h1>
 
           <form className="flex flex-col gap-4">
             <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {strings.login.email}
+              {t("email")}
               <input
                 type="email"
                 name="email"
@@ -66,7 +66,7 @@ export default async function LoginPage({
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {strings.login.password}
+              {t("password")}
               <input
                 type="password"
                 name="password"
@@ -84,18 +84,18 @@ export default async function LoginPage({
               formAction={isSignup ? signup : login}
               className="mt-1"
             >
-              {isSignup ? strings.login.signUp : strings.login.signIn}
+              {isSignup ? t("signUp") : t("signIn")}
             </Button>
           </form>
 
           {/* Switch mode */}
           <p className="text-sm text-muted-foreground">
-            {isSignup ? strings.login.haveAccount : strings.login.noAccount}{" "}
+            {isSignup ? t("haveAccount") : t("noAccount")}{" "}
             <Link
               href={isSignup ? "/login" : "/login?mode=signup"}
               className="font-semibold text-primary hover:underline"
             >
-              {isSignup ? strings.login.signIn : strings.login.signUp}
+              {isSignup ? t("signIn") : t("signUp")}
             </Link>
           </p>
         </div>

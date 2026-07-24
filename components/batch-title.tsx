@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { renameBatch } from "@/app/batch/actions";
-import { strings } from "@/lib/strings";
+import { useTranslations } from "next-intl";
+import { renameBatch } from "@/app/[locale]/batch/actions";
 
 // Inline-editable batch title (Notion-style): saves on blur / Enter, no separate
 // button. Full width so long names aren't cut off.
@@ -15,6 +15,7 @@ export function BatchTitle({
 }) {
   const [name, setName] = useState(initialName);
   const [, startTransition] = useTransition();
+  const t = useTranslations("batch");
 
   function save() {
     const clean = name.trim();
@@ -34,7 +35,7 @@ export function BatchTitle({
           e.currentTarget.blur();
         }
       }}
-      aria-label={strings.batch.nameLabel}
+      aria-label={t("nameLabel")}
       className="w-full border-b-2 border-transparent bg-transparent font-display text-3xl font-bold uppercase tracking-wide outline-none hover:border-border focus:border-primary"
     />
   );

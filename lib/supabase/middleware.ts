@@ -1,11 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextResponse, type NextRequest } from "next/server";
 
-// Refreshes the Supabase session on every request and writes any refreshed auth
-// cookies back onto the response. Call this from the root middleware.ts.
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
-
+// Refreshes the Supabase session on every request and writes any refreshed auth cookies
+// back onto the response we were handed. We DON'T create the response here: the caller
+// passes the response produced by the next-intl middleware (which may carry a locale
+// redirect/rewrite + the alternate-language `Link` header), and we only add cookies to
+// it — so neither middleware discards the other's work.
+export async function updateSession(
+  request: NextRequest,
+  response: NextResponse,
+) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,16 +23,17 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.next({ request });
-          // …and send them back on the response.
+          // …and send them back on the (next-intl) response.
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );
           // Mandatory: stop CDNs/proxies from caching a response that sets auth
           // cookies — otherwise one user's session token could leak to another.
-          Object.entries(headers).forEach(([key, value]) =>
-            response.headers.set(key, value),
-          );
+          if (headers) {
+            Object.entries(headers).forEach(([key, value]) =>
+              response.headers.set(key, value),
+            );
+          }
         },
       },
     },

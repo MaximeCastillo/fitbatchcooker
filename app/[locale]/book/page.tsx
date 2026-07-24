@@ -1,11 +1,10 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { RecipeCard } from "@/components/recipe-card";
 import { SaveToggle } from "@/components/save-toggle";
-import { strings } from "@/lib/strings";
+import { Link, redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +12,9 @@ export const dynamic = "force-dynamic";
 // to their own saved recipes (spec §7).
 export default async function BookPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+
+  const t = await getTranslations("book");
 
   const saved = await prisma.userRecipe.findMany({
     where: { userId: user.id },
@@ -23,15 +24,13 @@ export default async function BookPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
-      <h1 className="mb-6 text-3xl font-bold tracking-tight">
-        {strings.book.title}
-      </h1>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight">{t("title")}</h1>
 
       {saved.length === 0 ? (
         <div className="flex flex-col items-start gap-4">
-          <p className="text-muted-foreground">{strings.book.empty}</p>
+          <p className="text-muted-foreground">{t("empty")}</p>
           <Button render={<Link href="/recipes" />} nativeButton={false}>
-            {strings.book.browse}
+            {t("browse")}
           </Button>
         </div>
       ) : (

@@ -2,14 +2,15 @@
 
 import { useState, type FormEvent } from "react";
 import { useChat } from "@ai-sdk/react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { strings } from "@/lib/strings";
 
 // Client Component: manages the chat state and streams the chef's replies.
 // It POSTs to /api/chat by default (our route handler).
 export function ChatBox({ greeting }: { greeting: string }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat();
+  const t = useTranslations("chat");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,11 +46,11 @@ export function ChatBox({ greeting }: { greeting: string }) {
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder={strings.chat.placeholder}
+          placeholder={t("placeholder")}
           className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
         />
         <Button type="submit" disabled={status !== "ready"}>
-          {strings.chat.send}
+          {t("send")}
         </Button>
       </form>
     </div>

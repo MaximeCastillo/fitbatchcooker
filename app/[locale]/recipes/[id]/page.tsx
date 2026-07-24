@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { SaveToggle } from "@/components/save-toggle";
 import { RecipeDetail } from "@/components/recipe-detail";
-import { strings } from "@/lib/strings";
+import { Link } from "@/i18n/navigation";
 
 // Render on each request: recipe content and per-user saved state both vary.
 export const dynamic = "force-dynamic";
@@ -16,9 +16,10 @@ export const dynamic = "force-dynamic";
 export default async function RecipeDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("recipes");
   const [recipe, user] = await Promise.all([
     prisma.recipe.findUnique({ where: { id } }),
     getCurrentUser(),
@@ -40,7 +41,7 @@ export default async function RecipeDetailPage({
         className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ChevronLeft className="size-4" />
-        {strings.recipes.detail.back}
+        {t("detail.back")}
       </Link>
 
       <div className="mb-4 flex items-start justify-between gap-3">

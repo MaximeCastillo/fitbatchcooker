@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
-import { strings } from "@/lib/strings";
+import { Link } from "@/i18n/navigation";
 
 // Brand lockup — the mark echoes the signature protein gauge (a container filled with
 // protein). The wordmark is dropped on the tight mobile header (icon-only) to leave
@@ -28,13 +29,17 @@ function BrandMark({ showWordmark = true }: { showWordmark?: boolean }) {
 // logged-in users get the sidebar (desktop) + a compact top bar (mobile).
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
+  const t = await getTranslations();
 
   if (!user) {
     return (
       <div className="flex min-h-dvh flex-col">
         <header className="flex items-center justify-between border-b px-6 py-3">
           <BrandMark />
-          <AuthTopbarAction />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <AuthTopbarAction />
+          </div>
         </header>
         {children}
       </div>
@@ -51,10 +56,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <BrandMark />
         </div>
         <SidebarNav />
-        {/* Chrome pinned to the bottom: quick preferences (theme — language joins it
-            when i18n lands) + the account chip. Controls, not nav destinations. */}
+        {/* Chrome pinned to the bottom: quick preferences (theme + language) + the
+            account chip. Controls, not nav destinations. */}
         <div className="mt-auto flex flex-col gap-2">
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
           {/* The whole chip is the link to the account page, not just the name. */}
           <Link
             href="/account"
@@ -69,7 +77,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             </span>
             {user.proteinTargetG ? (
               <span className="text-muted-foreground">
-                {user.proteinTargetG} g / jour
+                {t("common.proteinPerDay", { grams: user.proteinTargetG })}
               </span>
             ) : null}
           </div>
@@ -83,12 +91,14 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <div className="md:hidden">
           <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
             <BrandMark showWordmark={false} />
-            {/* Chrome: quick theme control + account avatar (mirrors the desktop chip). */}
+            {/* Chrome: quick theme + language controls + account avatar (mirrors the
+                desktop chip). */}
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <LanguageSwitcher />
               <Link
                 href="/account"
-                aria-label={strings.nav.account}
+                aria-label={t("nav.account")}
                 className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-warm font-bold text-white"
               >
                 {initial}

@@ -23,6 +23,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { Eye, Plus, Search, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   addEntry,
   moveEntry,
@@ -30,7 +31,7 @@ import {
   removeEntry,
   addDay,
   removeDay,
-} from "@/app/batch/actions";
+} from "@/app/[locale]/batch/actions";
 import {
   dayProteinG,
   dayProgressPct,
@@ -46,7 +47,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
 // Palette recipes carry the full detail so the preview modal renders without a fetch.
@@ -103,6 +103,8 @@ export function BatchBoard({
   const [, startTransition] = useTransition();
   const shiftRef = useRef(false);
   const tempId = useRef(0);
+  // Root namespace: this component needs both `batch.*` and `common.*` messages.
+  const t = useTranslations();
   const recipeById = useMemo(
     () => new Map(recipes.map((r) => [r.id, r])),
     [recipes],
@@ -252,8 +254,8 @@ export function BatchBoard({
       return;
     }
     showUndoToast({
-      message: strings.batch.dayDeleted,
-      actionLabel: strings.common.undo,
+      message: t("batch.dayDeleted"),
+      actionLabel: t("common.undo"),
       onUndo: () => {
         setEntries(snapshotEntries);
         setDayCount(snapshotDayCount);
@@ -322,7 +324,7 @@ export function BatchBoard({
       <div className="mb-5 flex flex-wrap items-center gap-5 rounded-2xl border bg-card p-4 max-md:sticky max-md:top-0 max-md:z-20 max-md:shadow-sm">
         <div className="min-w-45 flex-1">
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
-            <span className="font-semibold">{strings.batch.progressLabel}</span>
+            <span className="font-semibold">{t("batch.progressLabel")}</span>
             <span className="font-mono text-muted-foreground">
               {greenDays}/{dayCount}
             </span>
@@ -337,7 +339,7 @@ export function BatchBoard({
         <div className="text-center">
           <div className="font-display text-2xl leading-none">{avgPerDay}</div>
           <div className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-            {strings.batch.averageLabel}
+            {t("batch.averageLabel")}
           </div>
         </div>
       </div>
@@ -346,7 +348,7 @@ export function BatchBoard({
         {/* Palette (also the "range/remove" drop zone while dragging a dish) */}
         <PaletteZone active={draggingKind === "entry"}>
           <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
-            {strings.batch.recipes}
+            {t("batch.recipes")}
           </h2>
           <div className="relative mb-2">
             <Search
@@ -357,15 +359,15 @@ export function BatchBoard({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={strings.batch.searchPlaceholder}
-              aria-label={strings.batch.searchPlaceholder}
+              placeholder={t("batch.searchPlaceholder")}
+              aria-label={t("batch.searchPlaceholder")}
               className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
             />
           </div>
           <div className="flex flex-col gap-2">
             {filteredRecipes.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {strings.batch.noRecipe}
+                {t("batch.noRecipe")}
               </p>
             ) : (
               filteredRecipes.map((recipe) => (
@@ -382,8 +384,8 @@ export function BatchBoard({
             )}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            <span className="md:hidden">{strings.batch.tapHint}</span>
-            <span className="hidden md:inline">{strings.batch.dragHint}</span>
+            <span className="md:hidden">{t("batch.tapHint")}</span>
+            <span className="hidden md:inline">{t("batch.dragHint")}</span>
           </p>
         </PaletteZone>
 
@@ -410,19 +412,19 @@ export function BatchBoard({
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary"
           >
             <Plus className="size-4" aria-hidden />
-            {strings.batch.addDay}
+            {t("batch.addDay")}
           </button>
 
           <section className="mt-8 rounded-2xl border bg-card p-5">
             <h2 className="font-display text-xl font-bold uppercase tracking-wide">
-              {strings.batch.toCook}
+              {t("batch.toCook")}
             </h2>
             <p className="mb-4 text-sm text-muted-foreground">
-              {strings.batch.toCookHint}
+              {t("batch.toCookHint")}
             </p>
             {Object.keys(quota).length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {strings.batch.emptyDay}
+                {t("batch.emptyDay")}
               </p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
@@ -438,13 +440,13 @@ export function BatchBoard({
                           {recipe?.title ?? "—"}
                         </span>
                         <span className="font-mono text-xs text-muted-foreground">
-                          {strings.batch.perServing(
-                            recipe?.proteinPerServingG ?? null,
-                          )}
+                          {t("batch.perServing", {
+                            grams: recipe?.proteinPerServingG ?? "—",
+                          })}
                         </span>
                       </span>
                       <span className="font-display text-2xl text-accent-warm">
-                        {strings.batch.times(portions)}
+                        {t("batch.times", { count: portions })}
                       </span>
                     </li>
                   );
@@ -499,7 +501,9 @@ export function BatchBoard({
           {addFor && (
             <>
               <DialogHeader>
-                <DialogTitle>{strings.batch.addToDay(addFor.title)}</DialogTitle>
+                <DialogTitle>
+                  {t("batch.addToDay", { title: addFor.title })}
+                </DialogTitle>
               </DialogHeader>
               <div className="grid grid-cols-2 gap-2">
                 {byDay.map((dayEntries, dayIndex) => (
@@ -513,7 +517,7 @@ export function BatchBoard({
                     className="flex min-h-11 flex-col items-start justify-center rounded-xl border bg-secondary px-3 py-2 text-left transition-colors hover:border-primary"
                   >
                     <span className="font-display text-sm font-bold uppercase tracking-wide">
-                      {strings.batch.dayLabel(dayIndex + 1)}
+                      {t("batch.dayLabel", { number: dayIndex + 1 })}
                     </span>
                     <span className="font-mono text-xs text-muted-foreground">
                       {dayProteinG(dayEntries)} / {targetG ?? "—"} g
@@ -538,6 +542,7 @@ function PaletteZone({
   active: boolean;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("batch");
   const { setNodeRef, isOver } = useDroppable({
     id: "remove",
     data: { kind: "remove" },
@@ -554,7 +559,7 @@ function PaletteZone({
       {active ? (
         <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-destructive">
           <Trash2 className="size-4" aria-hidden />
-          {strings.batch.removeZone}
+          {t("removeZone")}
         </p>
       ) : null}
       <div className={active ? "opacity-40" : ""}>{children}</div>
@@ -616,6 +621,7 @@ function RecipeChip({
   onRemove?: () => void;
   fadeWhenDragging?: boolean;
 }) {
+  const t = useTranslations("batch");
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: draggableId,
     data: draggableData,
@@ -640,7 +646,7 @@ function RecipeChip({
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onAdd}
-            aria-label={strings.batch.add}
+            aria-label={t("add")}
             className={cn(actionClass, "hover:text-primary")}
           >
             <Plus className="size-4 md:size-3.5" aria-hidden />
@@ -650,7 +656,7 @@ function RecipeChip({
           type="button"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => onPreview(e.currentTarget)}
-          aria-label={strings.batch.preview}
+          aria-label={t("preview")}
           className={cn(actionClass, "hover:text-primary")}
         >
           <Eye className="size-4 md:size-3.5" aria-hidden />
@@ -660,7 +666,7 @@ function RecipeChip({
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onRemove}
-            aria-label={strings.batch.removeDish}
+            aria-label={t("removeDish")}
             className={cn(actionClass, "hover:text-destructive")}
           >
             <Trash2 className="size-4 md:size-3.5" aria-hidden />
@@ -688,6 +694,7 @@ function DayRow({
   onRemoveEntry: (entryId: string) => void;
   onPreviewRecipe: (recipeId: string, source: HTMLElement) => void;
 }) {
+  const t = useTranslations("batch");
   const { setNodeRef, isOver } = useDroppable({
     id: `day:${dayIndex}`,
     data: { kind: "day", dayIndex },
@@ -711,7 +718,7 @@ function DayRow({
         <button
           type="button"
           onClick={onRemoveDay}
-          aria-label={strings.batch.removeDayLabel}
+          aria-label={t("removeDayLabel")}
           className="absolute right-2 top-2 z-10 grid size-8 place-items-center rounded-md text-muted-foreground transition-opacity hover:text-destructive focus-visible:opacity-100 md:size-7 md:opacity-0 md:group-hover:opacity-100"
         >
           <Trash2 className="size-4" aria-hidden />
@@ -721,7 +728,7 @@ function DayRow({
       {/* Left: label + protein gauge */}
       <div className="flex w-37.5 shrink-0 flex-col gap-2">
         <span className="font-display text-lg font-bold uppercase tracking-wide">
-          {strings.batch.dayLabel(dayIndex + 1)}
+          {t("dayLabel", { number: dayIndex + 1 })}
         </span>
         <div className="flex items-center gap-2.5">
           <ProteinGauge fill={pct} sealed={done} />
@@ -737,7 +744,7 @@ function DayRow({
       {/* Right: dishes */}
       <div className="flex-1">
         {entries.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{strings.batch.dropHere}</p>
+          <p className="text-sm text-muted-foreground">{t("dropHere")}</p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
             {entries.map((entry) => (
@@ -758,4 +765,3 @@ function DayRow({
     </div>
   );
 }
-
