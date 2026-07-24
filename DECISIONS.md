@@ -242,3 +242,15 @@ couche ingrédients (différée). Détail dans `ROADMAP.md`.
 n'a besoin que de **protéines/part** — la couche ingrédients ne fait que *dériver* ce nombre.
 **Alternatives :** table `Snack` séparée (duplication inutile) ; couche ingrédients tout de
 suite (sur-ingénierie avant que la précision/les courses soient un besoin réel).
+
+## 2026-07-24 — Mobile-first / tap-first élevé au rang de principe
+**Décision :** l'usage **mobile** (composer sa semaine depuis le canapé) est un objectif de
+base, pas une option. Élevé en principe (`PRINCIPLES.md` §5) : **mobile-first + tap-first**
+(aucune action clé réservée au drag & drop ; drag = confort desktop). Reste **web** :
+responsive maintenant → PWA possible → natif seulement si ça décolle (backend Supabase
+réutilisable dans tous les cas).
+**Pourquoi :** c'est le contexte d'usage réel visé ; web responsive + PWA couvre le « sors
+ton tél et joue » sans le coût/réécriture d'un natif. Confirme et hausse la §7bis de la spec
+et la décision mobile du 2026-07-17.
+**Risque surveillé :** drag & drop tactile fragile → garantir un chemin **tap** pour chaque
+action (suivi dans `ROADMAP.md`).

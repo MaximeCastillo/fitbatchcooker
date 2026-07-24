@@ -242,6 +242,9 @@ programmatique — il faut une **clé API développeur**, facturée à l'usage. 
 
 ## 7bis. Stratégie mobile (anticipation légère)
 
+> Le *pourquoi produit* — « utilisable depuis le canapé », mobile-first + **tap-first** —
+> est un **principe de base** : voir `PRINCIPLES.md` §5. Ci-dessous, la *stratégie technique*.
+
 Ordre de coût croissant :
 - **Responsive (gratuit, maintenant) :** codé mobile-first avec Tailwind → l'app est
   utilisable sur téléphone dès le départ. Couvre l'essentiel du besoin.

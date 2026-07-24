@@ -18,7 +18,9 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - [x] **Drag & drop** (`@dnd-kit`) : palette→jour, jour→jour, **Maj = dupliquer**,
       palette = zone « ranger », **optimistic UI** + fallback select. ✅
 - [ ] **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
-- [ ] **Polish mobile tap-first.**
+- [ ] **Mobile tap-first** (principe de base, cf. `PRINCIPLES.md` §5) : tout faisable au
+      doigt (chemin **tap** pour ajouter/déplacer/retirer, pas seulement le drag), cibles
+      ≥ 44 px, drag tactile fluide (résoudre scroll vs drag).
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## 🍳 Prochain chantier — Recettes riches (détail · encas · images · ingrédients)

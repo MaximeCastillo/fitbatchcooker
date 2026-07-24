@@ -43,6 +43,14 @@ Changer l'identité = éditer ces variables (**reskin complet piloté par tokens
   (Batchs, Recettes, Mes recettes, Le chef).
 - Conteneurs `max-w`, **mobile-first** (Tailwind) → responsive gratuit.
 
+## Mobile & tactile (mobile-first — cf. `PRINCIPLES.md` §5)
+
+- Chaque écran **pensé petit écran d'abord**, testé au pouce.
+- **Tap-first** : une action clé n'est jamais *drag-only* — toujours un chemin au tap
+  (ex. « Ajouter au batch » depuis la carte). Le drag & drop est un confort desktop,
+  pas la dépendance mobile.
+- **Cibles ≥ 44 px**, pas d'action réservée au hover, safe-areas respectées.
+
 ## Motif signature : la jauge de protéines (`components/protein-gauge.tsx`)
 
 **LE** symbole du produit : un **contenant qui se remplit** de protéines et se

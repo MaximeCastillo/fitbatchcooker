@@ -55,7 +55,25 @@ quantités sont fausses, l'app perd tout intérêt. Avant de le construire en du
 sur : l'ergonomie de saisie, la qualité du pré-remplissage IA, et le juste niveau
 d'approximation. Simple — mais validé à deux.
 
-## 5. Ce que le produit ne fait PAS (garde-fous)
+## 5. Utilisable depuis le canapé (mobile-first)
+
+FitBatchCooker se vit **d'abord sur téléphone** : avachi dans le canapé, tu sors ton
+tél et tu composes tes 3 jours / ta semaine en t'amusant — **sans allumer le PC**.
+C'est un objectif de base, pas une option.
+
+Conséquences **non négociables** :
+- **Mobile-first** : chaque écran est pensé et testé **sur petit écran d'abord**.
+- **Tap-first** : toute action clé (ajouter / déplacer / retirer une recette) doit être
+  faisable **au doigt, sans drag & drop**. Le drag est un *confort* (desktop, tap-and-
+  hold), **jamais l'unique chemin** — le glisser au doigt est trop fragile pour en
+  dépendre.
+- **Cibles tactiles ≥ 44 px**, pas d'action réservée au survol (hover).
+
+**Pas besoin d'app native pour ça.** Échelle sans cul-de-sac : responsive (déjà là) →
+PWA (installable, coût faible) → natif *seulement si ça décolle* — et même là, le
+backend Supabase reste réutilisable. Détail technique : `PROJECT_SPEC.md` §7bis.
+
+## 6. Ce que le produit ne fait PAS (garde-fous)
 
 - Pas de **tracker quotidien** — le plaisir est dans la planification en amont
   (cf. `PROJECT_SPEC.md` §1).
