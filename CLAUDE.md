@@ -124,6 +124,13 @@ but central du projet. Enseigne-le de façon progressive :
 Explique le "comment ça marche" de chaque brique quand elle arrive — c'est
 exactement ce qu'il veut maîtriser pour être à la page.
 
+## Déroulé d'une session
+
+Le **runbook opérationnel** d'une session (rituel début / boucle de travail / vérif / fin)
+vit dans le skill **`/session`** (`.claude/skills/session/`). L'invoquer au début d'une
+session pour retrouver le rythme. Ce `CLAUDE.md` reste la constitution ; le skill est la
+procédure.
+
 ## Tenue de la doc (courte !)
 
 - Mets à jour `PROJECT_SPEC.md` quand le *cœur* du produit/archi change.
