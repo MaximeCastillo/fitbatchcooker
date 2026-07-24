@@ -297,3 +297,25 @@ langue — non pertinent maintenant (app perso, derrière auth). Le jour où le 
 (une **landing**), on repassera en `as-needed` **sélectivement** sur ces pages (juste un flag).
 **À revoir :** renommer `middleware.ts` → `proxy.ts` (déprécation Next 16) ; métadonnées
 `title`/`description` non encore localisées.
+
+## 2026-07-25 — Cœur produit : ingrédients partagés + recettes per-user
+**Décision :** deux couches distinctes. **Ingrédients GLOBAUX** (un catalogue unique : nom,
+catégorie+picto, `proteinPer100g` ~objectif, dédupliqués par `normalizedName`), réutilisés
+par toutes les recettes et tous les users ; le chef lit l'existant avant d'en créer.
+**Recettes PER-USER** via `Recipe.userId` **nullable** : `NULL` = **bibliothèque partagée**
+(contenu curé qui peut grandir), non-null = recette de l'user ; navigation =
+`where OR [userId=moi, null]`. **2 axes orthogonaux** : `Recipe.userId` = propriété ;
+`UserRecipe` = sauvegardé/favori (« mon livre ») — on garde les deux. **1 recette = 1 part**
+(pas de `servings` ; pour manger plus, poser le plat plusieurs fois dans un jour).
+**Protéines/part dérivées** des ingrédients mais **mises en cache** dans
+`Recipe.proteinPerServingG` (recalculées à chaque write via `recomputeRecipeProtein`) → le
+composeur de batch (chemin chaud) lit la colonne, inchangé. Création : **manuelle**
+(`/recipes/new`) **et par le chef** (`create_recipe`, confirmation explicite). Navigation :
+filtres + **scroll infini** (curseur). **Seed recherché** (44 ingrédients + 19 recettes,
+protéines croisées Ciqual/USDA).
+**Pourquoi :** réconcilie partage (protéine ~objective → globale) et personnalisation
+(recettes = mienne vs bibliothèque). Le cache protéine garde la jauge rapide sans dupliquer
+la logique. `userId` nullable **pour toujours** = sentinelle « bibliothèque », visibilité en
+requête et non en colonne `NOT NULL`.
+**Contenu recettes en français** (la parité bilingue stricte = UI/`messages` seulement).
+**Différé :** communauté/partage, upload d'images, édition `proteinPer100g`, liste de courses.
