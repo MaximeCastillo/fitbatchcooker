@@ -12,7 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Check, Plus, Search, Trash2 } from "lucide-react";
+import { Check, Plus, Search, Trash2, X } from "lucide-react";
 import {
   addEntry,
   moveEntry,
@@ -27,7 +27,6 @@ import {
   isDayComplete,
   batchQuota,
 } from "@/lib/nutrition";
-import { Button } from "@/components/ui/button";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
@@ -66,7 +65,6 @@ export function BatchBoard({
     [recipes],
   );
 
-  // Track Shift to switch move → duplicate on drop.
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "Shift") shiftRef.current = true;
@@ -98,6 +96,14 @@ export function BatchBoard({
   const greenDays = byDay.filter((dayEntries) =>
     isDayComplete(dayProteinG(dayEntries), targetG),
   ).length;
+  const avgPerDay = dayCount
+    ? Math.round(
+        entries.reduce(
+          (s, e) => s + (e.proteinPerServingG ?? 0) * e.servings,
+          0,
+        ) / dayCount,
+      )
+    : 0;
 
   // --- Mutations (optimistic local state + persisted Server Action) ---
   function addRecipeToDay(recipeId: string, dayIndex: number) {
@@ -199,6 +205,7 @@ export function BatchBoard({
     r.title.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const quota = batchQuota(entries);
+  const progressPct = dayCount ? Math.round((greenDays / dayCount) * 100) : 0;
 
   return (
     <DndContext
@@ -207,10 +214,28 @@ export function BatchBoard({
       onDragEnd={onDragEnd}
       onDragCancel={() => setDraggingKind(null)}
     >
-      <div className="mb-4 flex justify-end">
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-          {strings.batch.greenDays(greenDays)}
-        </span>
+      {/* Batch summary */}
+      <div className="mb-5 flex flex-wrap items-center gap-5 rounded-2xl border bg-card p-4">
+        <div className="min-w-45 flex-1">
+          <div className="mb-1.5 flex items-baseline justify-between text-sm">
+            <span className="font-semibold">{strings.batch.progressLabel}</span>
+            <span className="font-mono text-muted-foreground">
+              {greenDays}/{dayCount}
+            </span>
+          </div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-primary transition-[width]"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="font-display text-2xl leading-none">{avgPerDay}</div>
+          <div className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+            {strings.batch.averageLabel}
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-[220px_1fr]">
@@ -259,10 +284,8 @@ export function BatchBoard({
                 entries={dayEntries}
                 targetG={targetG}
                 canRemove={dayCount > 1 && dayEntries.length === 0}
-                recipes={recipes}
                 onRemoveDay={() => onRemoveDay(dayIndex)}
                 onRemoveEntry={remove}
-                onAddRecipe={(recipeId) => addRecipeToDay(recipeId, dayIndex)}
               />
             ))}
           </div>
@@ -330,13 +353,16 @@ function PaletteZone({
   active: boolean;
   children: React.ReactNode;
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: "remove", data: { kind: "remove" } });
+  const { setNodeRef, isOver } = useDroppable({
+    id: "remove",
+    data: { kind: "remove" },
+  });
   return (
     <aside
       ref={setNodeRef}
       className={cn(
         "sticky top-4 self-start rounded-2xl border bg-card p-4 transition-colors",
-        active && "border-destructive border-dashed",
+        active && "border-dashed border-destructive",
         active && isOver && "bg-destructive/10",
       )}
     >
@@ -363,7 +389,11 @@ function PaletteChip({ recipe }: { recipe: Recipe }) {
       {...listeners}
       {...attributes}
       type="button"
-      style={transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined}
+      style={
+        transform
+          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+          : undefined
+      }
       className={cn(
         "flex cursor-grab items-center justify-between gap-2 rounded-xl border bg-card px-3 py-2 text-left hover:border-primary",
         isDragging && "opacity-50",
@@ -382,19 +412,15 @@ function DayRow({
   entries,
   targetG,
   canRemove,
-  recipes,
   onRemoveDay,
   onRemoveEntry,
-  onAddRecipe,
 }: {
   dayIndex: number;
   entries: Entry[];
   targetG: number | null;
   canRemove: boolean;
-  recipes: Recipe[];
   onRemoveDay: () => void;
   onRemoveEntry: (entryId: string) => void;
-  onAddRecipe: (recipeId: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `day:${dayIndex}`,
@@ -408,28 +434,28 @@ function DayRow({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-wrap gap-4 rounded-2xl border bg-card p-4 transition-colors",
+        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 transition-colors",
         done && "border-primary/55",
         isOver && "border-primary bg-primary/5",
       )}
     >
+      {/* Ghost delete-day, top-right, appears on hover/focus */}
+      {canRemove && (
+        <button
+          type="button"
+          onClick={onRemoveDay}
+          aria-label={strings.batch.removeDayLabel}
+          className="absolute right-2 top-2 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+        >
+          <Trash2 className="size-4" aria-hidden />
+        </button>
+      )}
+
       {/* Left: label + vessel gauge */}
-      <div className="flex w-[150px] shrink-0 flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <span className="font-display text-lg font-bold uppercase tracking-wide">
-            {strings.batch.dayLabel(dayIndex + 1)}
-          </span>
-          {canRemove && (
-            <button
-              type="button"
-              onClick={onRemoveDay}
-              aria-label={strings.batch.removeDayLabel}
-              className="ml-auto text-muted-foreground hover:text-destructive"
-            >
-              ×
-            </button>
-          )}
-        </div>
+      <div className="flex w-37.5 shrink-0 flex-col gap-2">
+        <span className="font-display text-lg font-bold uppercase tracking-wide">
+          {strings.batch.dayLabel(dayIndex + 1)}
+        </span>
         <div className="flex items-center gap-2.5">
           <div
             className={cn(
@@ -457,8 +483,8 @@ function DayRow({
         </div>
       </div>
 
-      {/* Right: dishes + tap fallback add */}
-      <div className="flex flex-1 flex-col gap-2">
+      {/* Right: dishes */}
+      <div className="flex-1">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">{strings.batch.dropHere}</p>
         ) : (
@@ -468,23 +494,6 @@ function DayRow({
             ))}
           </ul>
         )}
-
-        {/* Tap fallback (mobile / keyboard) */}
-        <select
-          value=""
-          onChange={(e) => {
-            if (e.target.value) onAddRecipe(e.target.value);
-          }}
-          aria-label={strings.batch.pickRecipe}
-          className="mt-1 max-w-xs rounded-lg border border-input bg-background px-2 py-1.5 text-sm outline-none focus-visible:border-ring"
-        >
-          <option value="">{strings.batch.pickRecipe}</option>
-          {recipes.map((recipe) => (
-            <option key={recipe.id} value={recipe.id}>
-              {recipe.title}
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );
@@ -505,9 +514,13 @@ function Dish({
   return (
     <li
       ref={setNodeRef}
-      style={transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined}
+      style={
+        transform
+          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+          : undefined
+      }
       className={cn(
-        "relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2 pr-6",
+        "group/dish relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2.5 pr-7",
         isDragging && "opacity-50",
       )}
       {...listeners}
@@ -524,9 +537,9 @@ function Dish({
         onPointerDown={(e) => e.stopPropagation()}
         onClick={() => onRemove(entry.id)}
         aria-label={strings.batch.removeDish}
-        className="absolute right-0.5 top-0.5 text-muted-foreground hover:text-accent-warm"
+        className="absolute right-1 top-1 rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-accent-warm focus-visible:opacity-100 group-hover/dish:opacity-100"
       >
-        ×
+        <X className="size-3.5" aria-hidden />
       </button>
     </li>
   );

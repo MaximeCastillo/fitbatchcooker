@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { ChatBox } from "@/components/chat-box";
@@ -8,11 +9,10 @@ export default async function ChatPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  // Pick a greeting server-side (no LLM call; server-side avoids hydration mismatch).
+  // Vary the greeting per request, server-side (no client randomness → no hydration
+  // mismatch; randomInt keeps the render free of Math.random impurity).
   const { greetings } = strings.chat;
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)](
-    user.firstName,
-  );
+  const greeting = greetings[randomInt(greetings.length)](user.firstName);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 py-10">

@@ -4,8 +4,9 @@ import { ChevronLeft, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
-import { renameBatch, deleteBatch } from "../actions";
+import { deleteBatch } from "../actions";
 import { BatchBoard } from "@/components/batch-board";
+import { BatchTitle } from "@/components/batch-title";
 import { Button } from "@/components/ui/button";
 import { strings } from "@/lib/strings";
 
@@ -49,11 +50,6 @@ export default async function BatchPage({
     proteinPerServingG: r.proteinPerServingG,
   }));
 
-  async function rename(formData: FormData) {
-    "use server";
-    await renameBatch(id, String(formData.get("name") ?? ""));
-  }
-
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
       <Link
@@ -64,18 +60,8 @@ export default async function BatchPage({
         {strings.batch.title}
       </Link>
 
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <form action={rename} className="flex items-center gap-2">
-          <input
-            name="name"
-            defaultValue={plan.name ?? ""}
-            aria-label={strings.batch.nameLabel}
-            className="min-w-0 border-b-2 border-transparent bg-transparent font-display text-3xl font-bold uppercase tracking-wide outline-none hover:border-border focus:border-primary"
-          />
-          <Button type="submit" variant="outline" size="sm">
-            {strings.batch.rename}
-          </Button>
-        </form>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <BatchTitle planId={plan.id} initialName={plan.name ?? ""} />
         <form action={deleteBatch.bind(null, plan.id)}>
           <Button
             type="submit"
