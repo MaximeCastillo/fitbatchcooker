@@ -11,7 +11,7 @@ const stepIcons = [CalendarPlus, Gauge, CookingPot];
 // Home page. Logged-in users go straight to their space; visitors get the pitch.
 export default async function Home() {
   const user = await getCurrentUser();
-  if (user) redirect("/recipes");
+  if (user) redirect("/batch");
 
   return (
     <main className="flex flex-1 flex-col">
