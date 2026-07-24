@@ -277,3 +277,18 @@ depuis Supabase Auth (source de vérité) en cas de drift.
 compte) a montré le besoin de voir clairement son compte et de gérer ses identifiants. La
 re-auth avant changement de mot de passe évite qu'une session laissée ouverte le change.
 **Différé :** **suppression de compte** (destructif + nécessite la service-role key serveur).
+
+## 2026-07-24 — App multilingue (FR/EN) via next-intl, routing par URL
+**Décision :** internationaliser l'app avec **`next-intl`** et un **routing par URL** :
+`localePrefix: "as-needed"` (défaut **fr** → URLs propres `/batch` ; anglais préfixé
+`/en/batch`), routes déplacées sous **`app/[locale]/`**, textes migrés de `lib/strings.ts`
+(supprimé) vers des **catalogues ICU** `messages/fr.json` + `en.json`. **Sélecteur de langue**
+dans le chrome (à côté du thème). Le **middleware** compose next-intl (routing locale +
+header `Link` hreflang) **puis** le refresh de session Supabase (cookies greffés sur la même
+réponse). Le **chef IA** répond dans la langue active (lu via cookie `NEXT_LOCALE`).
+**Pourquoi :** version « pro » choisie sciemment pour l'apprentissage et l'avenir public —
+URLs partageables, **SEO** (hreflang, une URL = une langue), cache/CDN par langue, et on suit
+le grain du framework (patterns standards). Le socle `lib/strings.ts` centralisé rendait la
+bascule peu coûteuse. Livré en **branche + PR** (première PR du projet).
+**À revoir :** renommer `middleware.ts` → `proxy.ts` (déprécation Next 16) ; métadonnées
+`title`/`description` non encore localisées.
