@@ -21,7 +21,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Eye, Plus, Search, Trash2, X } from "lucide-react";
+import { Eye, Plus, Search, Trash2 } from "lucide-react";
 import {
   addEntry,
   moveEntry,
@@ -491,7 +491,7 @@ function PaletteZone({
     <aside
       ref={setNodeRef}
       className={cn(
-        "sticky top-4 self-start rounded-2xl border bg-card p-4 transition-colors",
+        "sticky top-4 self-start rounded-2xl border bg-muted p-4 transition-colors",
         active && "border-dashed border-destructive",
         active && isOver && "bg-destructive/10",
       )}
@@ -508,8 +508,8 @@ function PaletteZone({
 }
 
 // A single recipe card, used both in the left palette and inside a day. Same design
-// everywhere; the difference is the corner actions: an eye (preview) always, plus an
-// X (remove) only when `onRemove` is given — so a palette recipe can't be deleted.
+// everywhere; the difference is the corner actions: an eye (preview) always, plus a
+// trash (remove) only when `onRemove` is given — so a palette recipe can't be deleted.
 // The whole card is the drag handle; the corner buttons stop the pointer from starting
 // a drag so their clicks land. `fadeWhenDragging` ghosts the source on a real move
 // (a placed dish); the palette source stays visible (the DragOverlay shows the clone).
@@ -540,7 +540,7 @@ function RecipeChip({
       {...listeners}
       {...attributes}
       className={cn(
-        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2.5 pr-11 text-left transition-colors hover:border-primary",
+        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-card p-2.5 pr-11 text-left shadow-sm transition-colors hover:border-primary",
         fadeWhenDragging && isDragging && "opacity-40",
       )}
     >
@@ -566,9 +566,9 @@ function RecipeChip({
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onRemove}
             aria-label={strings.batch.removeDish}
-            className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-accent-warm focus-visible:opacity-100 group-hover/chip:opacity-100"
+            className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover/chip:opacity-100"
           >
-            <X className="size-3.5" aria-hidden />
+            <Trash2 className="size-3.5" aria-hidden />
           </button>
         )}
       </div>
@@ -605,7 +605,7 @@ function DayRow({
     <div
       ref={setNodeRef}
       className={cn(
-        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 pr-9 transition-colors",
+        "group relative flex flex-wrap gap-4 rounded-2xl border bg-muted p-4 pr-9 transition-colors",
         done && "border-primary/55",
         isOver && "border-primary bg-primary/5",
       )}
