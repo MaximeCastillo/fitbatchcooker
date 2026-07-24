@@ -1,0 +1,160 @@
+{
+  "common": {
+    "undo": "Annuler",
+    "changeLanguage": "Changer de langue",
+    "proteinPerDay": "{grams} g / jour"
+  },
+  "home": {
+    "seeRecipes": "Voir les recettes",
+    "title": "Tes repas protéinés, planifiés à l'avance.",
+    "subtitle": "Compose tes journées, remplis ta jauge de protéines, et obtiens ta liste de recettes à préparer.",
+    "ctaPrimary": "Créer un compte",
+    "ctaSecondary": "Voir les recettes",
+    "heroCaption": "Deux jours au vert, un en cours.",
+    "steps": [
+      {
+        "title": "Compose ta semaine",
+        "text": "Choisis tes recettes jour par jour."
+      },
+      {
+        "title": "Remplis ta jauge",
+        "text": "Chaque journée passe au vert quand tu atteins ton objectif protéines."
+      },
+      {
+        "title": "Cuisine ton batch",
+        "text": "Ta liste de recettes à préparer d'avance, en nombre de parts."
+      }
+    ]
+  },
+  "nav": {
+    "batch": "Mes batchs",
+    "recipes": "Recettes",
+    "book": "Mes recettes",
+    "chat": "Le chef",
+    "account": "Mon compte",
+    "login": "Se connecter",
+    "logout": "Se déconnecter"
+  },
+  "batch": {
+    "defaultName": "Batch du {dateLabel}",
+    "untitled": "Sans titre",
+    "title": "Mes batchs",
+    "subtitle": "Tes lots de recettes à cuisiner d'avance.",
+    "new": "Nouveau batch",
+    "empty": "Tu n'as pas encore de batch. Crée ton premier lot de recettes !",
+    "nameLabel": "Nom du batch",
+    "days": "{count, plural, one {# jour} other {# jours}}",
+    "dishes": "{count, plural, one {# recette} other {# recettes}}",
+    "dayLabel": "Jour {number}",
+    "delete": "Supprimer le batch",
+    "dayDeleted": "Jour supprimé",
+    "deleted": "Batch supprimé",
+    "progressLabel": "Progression du batch",
+    "averageLabel": "g / jour en moy.",
+    "emptyDay": "Aucune recette",
+    "removeDish": "Retirer la recette",
+    "addDay": "Ajouter un jour",
+    "removeDayLabel": "Supprimer le jour",
+    "noTarget": "Définis ton objectif protéines pour activer les jauges.",
+    "setTarget": "Aller à mon compte",
+    "toCook": "À cuisiner",
+    "toCookHint": "Ton lot de recettes à préparer d'avance.",
+    "perServing": "{grams} g / portion",
+    "times": "×{count}",
+    "recipes": "Recettes",
+    "searchPlaceholder": "Rechercher…",
+    "noRecipe": "Aucune recette.",
+    "dragHint": "Glisse une recette sur un jour (Maj = dupliquer), ou touche +.",
+    "tapHint": "Touche + pour ajouter une recette à un jour.",
+    "preview": "Aperçu de la recette",
+    "add": "Ajouter la recette",
+    "addToDay": "Ajouter « {title} » à…",
+    "removeZone": "Relâche pour ranger cette recette",
+    "dropHere": "Glisse une recette ici"
+  },
+  "login": {
+    "title": "Connexion",
+    "titleSignup": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "missingFields": "Renseigne un email et un mot de passe.",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "panelTitle": "Tes repas protéinés, planifiés à l'avance.",
+    "panelSubtitle": "Compose ta semaine, remplis ta jauge de protéines, et obtiens ta liste de recettes à préparer.",
+    "benefits": [
+      "Un objectif protéines par jour, à ton rythme",
+      "Chaque journée qui passe au vert",
+      "Un chef qui apprend tes goûts"
+    ]
+  },
+  "recipes": {
+    "title": "Recettes",
+    "empty": "Aucune recette pour l'instant.",
+    "protein": "{grams} g de protéines / portion",
+    "servings": "{count, plural, one {# portion} other {# portions}}",
+    "calories": "{kcal} kcal / portion",
+    "save": "Sauvegarder",
+    "saved": "Enregistré ✓",
+    "remove": "Retirer",
+    "detail": {
+      "back": "Toutes les recettes",
+      "stepsTitle": "Préparation",
+      "stepsEmpty": "La procédure de cette recette arrive bientôt.",
+      "approxNote": "Valeurs approximatives — l'important, c'est la régularité."
+    }
+  },
+  "book": {
+    "title": "Mes recettes",
+    "empty": "Tu n'as pas encore sauvegardé de recette.",
+    "browse": "Parcourir les recettes"
+  },
+  "chat": {
+    "title": "Le chef",
+    "greetings": [
+      "{hasName, select, yes {Bonjour {name}} other {Bonjour}} 👋 Qu'est-ce qu'on cuisine aujourd'hui ?",
+      "{hasName, select, yes {Salut {name}} other {Salut}} 💪 Prêt à faire le plein de protéines ?",
+      "{hasName, select, yes {Hello {name}} other {Hello}} 👨‍🍳 On prépare quoi de bon pour la semaine ?",
+      "{hasName, select, yes {Ravi de te revoir, {name}} other {Ravi de te revoir}} ! 🍗 On attaque le batch cooking ?",
+      "{hasName, select, yes {Coucou {name}} other {Coucou}} 🥗 Une envie précise, ou je te surprends ?"
+    ],
+    "placeholder": "Demande une recette, une idée de repas…",
+    "send": "Envoyer"
+  },
+  "profile": {
+    "title": "Profil",
+    "firstName": "Prénom",
+    "proteinTarget": "Objectif protéines (g/jour)",
+    "proteinHint": "On conseille ~2 g/kg de masse corporelle — à toi de fixer ta cible.",
+    "save": "Enregistrer",
+    "saved": "Profil enregistré ✓"
+  },
+  "account": {
+    "title": "Mon compte",
+    "connectedAs": "Connecté en tant que",
+    "profileSection": "Profil",
+    "themeToDark": "Passer en mode sombre",
+    "themeToLight": "Passer en mode clair",
+    "emailSection": "Adresse email",
+    "emailHint": "Un email de confirmation sera envoyé à la nouvelle adresse.",
+    "newEmail": "Nouvelle adresse email",
+    "changeEmail": "Changer d'email",
+    "emailSent": "Un email de confirmation a été envoyé à ta nouvelle adresse.",
+    "emailInvalid": "Cette adresse email n'est pas valide.",
+    "emailSame": "C'est déjà ton adresse actuelle.",
+    "emailTaken": "Cette adresse est déjà utilisée par un autre compte.",
+    "emailError": "Impossible de changer l'adresse pour l'instant. Réessaie.",
+    "passwordSection": "Mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirme le nouveau mot de passe",
+    "changePassword": "Changer de mot de passe",
+    "passwordUpdated": "Mot de passe mis à jour ✓",
+    "passwordWrong": "Mot de passe actuel incorrect.",
+    "passwordTooShort": "Le nouveau mot de passe doit faire au moins 8 caractères.",
+    "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
+    "passwordError": "Impossible de changer le mot de passe pour l'instant. Réessaie."
+  }
+}
