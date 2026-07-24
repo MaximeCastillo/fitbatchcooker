@@ -57,3 +57,21 @@ export function batchQuota(
 export function totalPortions(entries: { servings: number }[]): number {
   return entries.reduce((sum, entry) => sum + entry.servings, 0);
 }
+
+export type RecipeIngredientAmount = {
+  proteinPer100g: number;
+  quantityG: number;
+};
+
+// Protein (g) of ONE part of a recipe = sum of each ingredient's contribution
+// (proteinPer100g × quantityG / 100). A recipe is one part in the MVP — to eat more,
+// place it several times in the batch (no per-recipe servings). Rounded to whole grams
+// to match the cached Recipe.proteinPerServingG column and the "g protéines" UI. This
+// is deliberately "à la louche" (PRINCIPLES §1) — regularity over precision.
+export function recipeProteinG(ingredients: RecipeIngredientAmount[]): number {
+  const total = ingredients.reduce(
+    (sum, ing) => sum + (ing.proteinPer100g * ing.quantityG) / 100,
+    0,
+  );
+  return Math.round(total);
+}

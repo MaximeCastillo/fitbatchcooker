@@ -6,6 +6,7 @@ import {
   dayProgressPct,
   batchQuota,
   totalPortions,
+  recipeProteinG,
 } from "./nutrition";
 
 describe("dayProteinG", () => {
@@ -98,5 +99,32 @@ describe("totalPortions", () => {
     expect(
       totalPortions([{ servings: 1 }, { servings: 2 }, { servings: 1 }]),
     ).toBe(4);
+  });
+});
+
+describe("recipeProteinG", () => {
+  it("derives one ingredient's part protein (chicken 120g @21g/100g ≈ 25g)", () => {
+    expect(
+      recipeProteinG([{ proteinPer100g: 21, quantityG: 120 }]),
+    ).toBe(25);
+  });
+
+  it("sums several ingredients", () => {
+    // 120g chicken @21 (25.2) + 80g rice @2.7 (2.16) + 100g broccoli @2.8 (2.8) ≈ 30
+    expect(
+      recipeProteinG([
+        { proteinPer100g: 21, quantityG: 120 },
+        { proteinPer100g: 2.7, quantityG: 80 },
+        { proteinPer100g: 2.8, quantityG: 100 },
+      ]),
+    ).toBe(30);
+  });
+
+  it("is 0 for a recipe with no ingredients", () => {
+    expect(recipeProteinG([])).toBe(0);
+  });
+
+  it("rounds to whole grams", () => {
+    expect(recipeProteinG([{ proteinPer100g: 10, quantityG: 55 }])).toBe(6); // 5.5 → 6
   });
 });
