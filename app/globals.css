@@ -154,3 +154,43 @@
     @apply font-display;
   }
 }
+
+/* Undo toast: depleting countdown bar so users see the window closing. */
+@keyframes undo-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Cauldron: gentle bubbles rising inside a filled gauge, for a bit of life. */
+@keyframes cauldron-bubble {
+  0% {
+    transform: translateY(2px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-160%) scale(1);
+    opacity: 0;
+  }
+}
+.cauldron-bubble {
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, white 50%, transparent);
+  animation: cauldron-bubble 2.6s ease-in infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cauldron-bubble {
+    animation: none;
+    opacity: 0;
+  }
+}

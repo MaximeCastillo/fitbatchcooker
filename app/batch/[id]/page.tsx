@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { ChevronLeft, Trash2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
-import { deleteBatch } from "../actions";
 import { BatchBoard } from "@/components/batch-board";
 import { BatchTitle } from "@/components/batch-title";
-import { Button } from "@/components/ui/button";
 import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
@@ -60,18 +58,8 @@ export default async function BatchPage({
         {strings.batch.title}
       </Link>
 
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6">
         <BatchTitle planId={plan.id} initialName={plan.name ?? ""} />
-        <form action={deleteBatch.bind(null, plan.id)}>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            aria-label={strings.batch.delete}
-          >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
-        </form>
       </div>
 
       {targetG === null && (

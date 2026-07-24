@@ -61,7 +61,6 @@ export async function deleteBatch(planId: string) {
   if (!(await ownedPlan(planId, userId))) return;
   await prisma.batch.delete({ where: { id: planId } }); // cascades to entries
   revalidatePath("/batch");
-  redirect("/batch");
 }
 
 // --- Days -------------------------------------------------------------------

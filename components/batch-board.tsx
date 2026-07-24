@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import {
   DndContext,
   useDraggable,
@@ -27,7 +34,7 @@ import {
   isDayComplete,
   batchQuota,
 } from "@/lib/nutrition";
-import { undoableToast } from "@/lib/undo";
+import { showUndoToast } from "@/components/undo-toast";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
@@ -81,6 +88,9 @@ export function BatchBoard({
     };
   }, []);
 
+  // Stable id for the DndContext so dnd-kit's generated aria ids match between server
+  // and client render (avoids a hydration mismatch on aria-describedby).
+  const dndId = useId();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor),
@@ -177,7 +187,7 @@ export function BatchBoard({
         ),
     );
     setDayCount((n) => n - 1);
-    undoableToast({
+    showUndoToast({
       message: strings.batch.dayDeleted,
       actionLabel: strings.common.undo,
       onUndo: () => {
@@ -223,6 +233,7 @@ export function BatchBoard({
 
   return (
     <DndContext
+      id={dndId}
       sensors={sensors}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
@@ -448,7 +459,7 @@ function DayRow({
     <div
       ref={setNodeRef}
       className={cn(
-        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 transition-colors",
+        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 pr-9 transition-colors",
         done && "border-primary/55",
         isOver && "border-primary bg-primary/5",
       )}
@@ -459,7 +470,7 @@ function DayRow({
           type="button"
           onClick={onRemoveDay}
           aria-label={strings.batch.removeDayLabel}
-          className="absolute right-2 top-2 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+          className="absolute right-2 top-2 z-10 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
         >
           <Trash2 className="size-4" aria-hidden />
         </button>
@@ -483,7 +494,17 @@ function DayRow({
                 className="absolute inset-x-0 bottom-0 bg-primary transition-[height] duration-700 ease-out"
                 style={{ height: `${pct}%` }}
                 aria-hidden
-              />
+              >
+                {pct > 0 && (
+                  <>
+                    <span className="cauldron-bubble" style={{ left: "28%" }} />
+                    <span
+                      className="cauldron-bubble"
+                      style={{ left: "62%", animationDelay: "0.9s" }}
+                    />
+                  </>
+                )}
+              </div>
             </div>
             {/* …the seal badge sits on the OUTER wrapper so it isn't clipped. */}
             {done && (

@@ -48,6 +48,7 @@ export const strings = {
     dayLabel: (n: number) => `Jour ${n}`,
     delete: "Supprimer le batch",
     dayDeleted: "Jour supprimé",
+    deleted: "Batch supprimé",
     progressLabel: "Progression du batch",
     averageLabel: "g / jour en moy.",
     emptyDay: "Aucun plat",
