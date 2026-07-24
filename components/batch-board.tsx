@@ -449,13 +449,11 @@ export function BatchBoard({
       {/* The flying clone that follows the cursor (source stays in place). */}
       <DragOverlay dropAnimation={null}>
         {overlay ? (
-          <div className="flex cursor-grabbing items-center justify-between gap-2 rounded-xl border border-primary bg-card px-3 py-2 shadow-xl">
-            <span className="text-sm font-semibold leading-tight">
-              {overlay.title}
-            </span>
-            <span className="font-mono text-xs font-bold text-accent-warm">
-              {overlay.proteinPerServingG ?? "—"} g
-            </span>
+          <div className={cn(chipCardClass, "cursor-grabbing border-primary shadow-xl")}>
+            <ChipBody
+              title={overlay.title}
+              proteinPerServingG={overlay.proteinPerServingG}
+            />
           </div>
         ) : null}
       </DragOverlay>
@@ -539,7 +537,7 @@ function PaletteZone({
     <aside
       ref={setNodeRef}
       className={cn(
-        "self-start rounded-2xl border bg-muted p-4 transition-colors md:sticky md:top-4",
+        "self-start rounded-2xl border bg-card p-4 transition-colors md:sticky md:top-4",
         active && "border-dashed border-destructive",
         active && isOver && "bg-destructive/10",
       )}
@@ -552,6 +550,31 @@ function PaletteZone({
       ) : null}
       <div className={active ? "opacity-40" : ""}>{children}</div>
     </aside>
+  );
+}
+
+// Shared visual for a recipe chip — used by the palette/day chips AND the drag clone,
+// so the element you drag looks EXACTLY like the one you picked up (same column layout,
+// clamped title, protein placement, size). Interactivity/cursor is layered per use.
+const chipCardClass =
+  "relative flex flex-col justify-between gap-1 rounded-xl border bg-card p-2.5 pr-16 text-left shadow-sm md:pr-14";
+
+function ChipBody({
+  title,
+  proteinPerServingG,
+}: {
+  title: string;
+  proteinPerServingG: number | null;
+}) {
+  return (
+    <>
+      <span className="line-clamp-2 text-sm font-semibold leading-tight">
+        {title}
+      </span>
+      <span className="font-mono text-xs font-bold text-accent-warm">
+        {proteinPerServingG ?? "—"} g
+      </span>
+    </>
   );
 }
 
@@ -596,16 +619,12 @@ function RecipeChip({
       {...listeners}
       {...attributes}
       className={cn(
-        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-card p-2.5 pr-16 text-left shadow-sm transition-colors hover:border-primary md:pr-14",
+        chipCardClass,
+        "group/chip cursor-grab transition-colors hover:border-primary",
         fadeWhenDragging && isDragging && "opacity-40",
       )}
     >
-      <span className="line-clamp-2 text-sm font-semibold leading-tight">
-        {title}
-      </span>
-      <span className="font-mono text-xs font-bold text-accent-warm">
-        {proteinPerServingG ?? "—"} g
-      </span>
+      <ChipBody title={title} proteinPerServingG={proteinPerServingG} />
       <div className="absolute right-1 top-1 flex gap-0.5">
         {onAdd && (
           <button
@@ -672,7 +691,7 @@ function DayRow({
     <div
       ref={setNodeRef}
       className={cn(
-        "group relative flex flex-wrap gap-4 rounded-2xl border bg-muted p-4 pr-9 transition-colors",
+        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 pr-9 transition-colors",
         done && "border-primary/55",
         isOver && "border-primary bg-primary/5",
       )}
