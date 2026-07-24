@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   useTransition,
+  type CSSProperties,
 } from "react";
 import {
   DndContext,
@@ -83,8 +84,12 @@ export function BatchBoard({
   const [dayCount, setDayCount] = useState(initialDayCount);
   const [query, setQuery] = useState("");
   const [draggingKind, setDraggingKind] = useState<string | null>(null);
-  // Recipe shown in the read-only preview modal (null = closed).
-  const [preview, setPreview] = useState<Recipe | null>(null);
+  // Read-only preview modal. `previewRecipe` is kept even while closing so the panel
+  // still has content during the exit animation; `previewOrigin` is the source point
+  // (relative to viewport center) the panel flies in from.
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
+  const [previewOrigin, setPreviewOrigin] = useState({ dx: 0, dy: 0 });
   // Flying clone shown under the cursor while dragging, so the source (a palette
   // recipe, or a dish being moved) stays visibly in place.
   const [overlay, setOverlay] = useState<{
@@ -98,6 +103,23 @@ export function BatchBoard({
     () => new Map(recipes.map((r) => [r.id, r])),
     [recipes],
   );
+
+  function openPreview(recipe: Recipe, source: HTMLElement) {
+    const rect = source.getBoundingClientRect();
+    setPreviewOrigin({
+      dx: rect.left + rect.width / 2 - window.innerWidth / 2,
+      dy: rect.top + rect.height / 2 - window.innerHeight / 2,
+    });
+    setPreviewRecipe(recipe);
+    setPreviewOpen(true);
+  }
+
+  // For a dish already placed in a day: look the full recipe up by id (entries only
+  // carry title + protein; the modal needs summary + steps).
+  function openPreviewById(recipeId: string, source: HTMLElement) {
+    const recipe = recipeById.get(recipeId);
+    if (recipe) openPreview(recipe, source);
+  }
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -329,10 +351,13 @@ export function BatchBoard({
               </p>
             ) : (
               filteredRecipes.map((recipe) => (
-                <PaletteChip
+                <RecipeChip
                   key={recipe.id}
-                  recipe={recipe}
-                  onPreview={() => setPreview(recipe)}
+                  draggableId={`recipe:${recipe.id}`}
+                  draggableData={{ kind: "recipe", recipeId: recipe.id }}
+                  title={recipe.title}
+                  proteinPerServingG={recipe.proteinPerServingG}
+                  onPreview={(source) => openPreview(recipe, source)}
                 />
               ))
             )}
@@ -354,6 +379,7 @@ export function BatchBoard({
                 canRemove={dayCount > 1}
                 onRemoveDay={() => onRemoveDay(dayIndex)}
                 onRemoveEntry={remove}
+                onPreviewRecipe={openPreviewById}
               />
             ))}
           </div>
@@ -423,18 +449,23 @@ export function BatchBoard({
         ) : null}
       </DragOverlay>
 
-      {/* Read-only recipe preview — "what am I eating?" — without leaving the composer. */}
-      <Dialog
-        open={preview !== null}
-        onOpenChange={(open) => !open && setPreview(null)}
-      >
-        <DialogContent>
-          {preview && (
+      {/* Read-only recipe preview — "what am I eating?" — without leaving the composer.
+          Flies in from the chip that was tapped (--dx/--dy). */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent
+          style={
+            {
+              "--dx": `${previewOrigin.dx}px`,
+              "--dy": `${previewOrigin.dy}px`,
+            } as CSSProperties
+          }
+        >
+          {previewRecipe && (
             <>
               <DialogHeader>
-                <DialogTitle>{preview.title}</DialogTitle>
+                <DialogTitle>{previewRecipe.title}</DialogTitle>
               </DialogHeader>
-              <RecipeDetail recipe={preview} />
+              <RecipeDetail recipe={previewRecipe} />
             </>
           )}
         </DialogContent>
@@ -476,45 +507,71 @@ function PaletteZone({
   );
 }
 
-function PaletteChip({
-  recipe,
+// A single recipe card, used both in the left palette and inside a day. Same design
+// everywhere; the difference is the corner actions: an eye (preview) always, plus an
+// X (remove) only when `onRemove` is given — so a palette recipe can't be deleted.
+// The whole card is the drag handle; the corner buttons stop the pointer from starting
+// a drag so their clicks land. `fadeWhenDragging` ghosts the source on a real move
+// (a placed dish); the palette source stays visible (the DragOverlay shows the clone).
+function RecipeChip({
+  draggableId,
+  draggableData,
+  title,
+  proteinPerServingG,
   onPreview,
+  onRemove,
+  fadeWhenDragging = false,
 }: {
-  recipe: Recipe;
-  onPreview: () => void;
+  draggableId: string;
+  draggableData: Record<string, unknown>;
+  title: string;
+  proteinPerServingG: number | null;
+  onPreview: (source: HTMLElement) => void;
+  onRemove?: () => void;
+  fadeWhenDragging?: boolean;
 }) {
-  // No transform / opacity on the source: the DragOverlay renders the flying clone,
-  // and the recipe stays fully visible in the palette (it can be added any number of times).
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: `recipe:${recipe.id}`,
-    data: { kind: "recipe", recipeId: recipe.id },
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: draggableId,
+    data: draggableData,
   });
-  // The draggable chip and the preview button are siblings (never nested): a nested
-  // button would be invalid HTML and the drag listeners would swallow its click.
   return (
-    <div className="flex items-stretch gap-1 rounded-xl border bg-card hover:border-primary">
-      <button
-        ref={setNodeRef}
-        {...listeners}
-        {...attributes}
-        type="button"
-        className="flex flex-1 cursor-grab items-center justify-between gap-2 px-3 py-2 text-left"
-      >
-        <span className="text-sm font-semibold leading-tight">
-          {recipe.title}
-        </span>
-        <span className="font-mono text-xs font-bold text-accent-warm">
-          {recipe.proteinPerServingG ?? "—"} g
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={onPreview}
-        aria-label={strings.batch.preview}
-        className="grid w-9 shrink-0 place-items-center rounded-r-xl text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-      >
-        <Eye className="size-4" aria-hidden />
-      </button>
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={cn(
+        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2.5 pr-11 text-left transition-colors hover:border-primary",
+        fadeWhenDragging && isDragging && "opacity-40",
+      )}
+    >
+      <span className="line-clamp-2 text-sm font-semibold leading-tight">
+        {title}
+      </span>
+      <span className="font-mono text-xs font-bold text-accent-warm">
+        {proteinPerServingG ?? "—"} g
+      </span>
+      <div className="absolute right-1 top-1 flex gap-0.5">
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => onPreview(e.currentTarget)}
+          aria-label={strings.batch.preview}
+          className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-primary focus-visible:opacity-100 group-hover/chip:opacity-100"
+        >
+          <Eye className="size-3.5" aria-hidden />
+        </button>
+        {onRemove && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={onRemove}
+            aria-label={strings.batch.removeDish}
+            className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-accent-warm focus-visible:opacity-100 group-hover/chip:opacity-100"
+          >
+            <X className="size-3.5" aria-hidden />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -526,6 +583,7 @@ function DayRow({
   canRemove,
   onRemoveDay,
   onRemoveEntry,
+  onPreviewRecipe,
 }: {
   dayIndex: number;
   entries: Entry[];
@@ -533,6 +591,7 @@ function DayRow({
   canRemove: boolean;
   onRemoveDay: () => void;
   onRemoveEntry: (entryId: string) => void;
+  onPreviewRecipe: (recipeId: string, source: HTMLElement) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `day:${dayIndex}`,
@@ -584,53 +643,23 @@ function DayRow({
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">{strings.batch.dropHere}</p>
         ) : (
-          <ul className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
             {entries.map((entry) => (
-              <Dish key={entry.id} entry={entry} onRemove={onRemoveEntry} />
+              <RecipeChip
+                key={entry.id}
+                draggableId={`entry:${entry.id}`}
+                draggableData={{ kind: "entry", entryId: entry.id }}
+                title={entry.title}
+                proteinPerServingG={entry.proteinPerServingG}
+                onPreview={(source) => onPreviewRecipe(entry.recipeId, source)}
+                onRemove={() => onRemoveEntry(entry.id)}
+                fadeWhenDragging
+              />
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function Dish({
-  entry,
-  onRemove,
-}: {
-  entry: Entry;
-  onRemove: (entryId: string) => void;
-}) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `entry:${entry.id}`,
-    data: { kind: "entry", entryId: entry.id },
-  });
-  return (
-    <li
-      ref={setNodeRef}
-      className={cn(
-        "group/dish relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2.5 pr-7",
-        isDragging && "opacity-40",
-      )}
-      {...listeners}
-      {...attributes}
-    >
-      <span className="line-clamp-2 text-sm font-semibold leading-tight">
-        {entry.title}
-      </span>
-      <span className="font-mono text-xs font-bold text-accent-warm">
-        {entry.proteinPerServingG ?? "—"} g
-      </span>
-      <button
-        type="button"
-        onPointerDown={(e) => e.stopPropagation()}
-        onClick={() => onRemove(entry.id)}
-        aria-label={strings.batch.removeDish}
-        className="absolute right-1 top-1 rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-accent-warm focus-visible:opacity-100 group-hover/dish:opacity-100"
-      >
-        <X className="size-3.5" aria-hidden />
-      </button>
-    </li>
-  );
-}
