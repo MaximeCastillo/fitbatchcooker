@@ -42,7 +42,12 @@ export default async function RecipeDetailPage({
         {strings.recipes.detail.back}
       </Link>
 
-      <h1 className="text-3xl font-bold tracking-tight">{recipe.title}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="text-3xl font-bold tracking-tight">{recipe.title}</h1>
+        {user && (
+          <SaveToggle recipeId={recipe.id} saved={isSaved} />
+        )}
+      </div>
       {recipe.summary && (
         <p className="mt-2 text-muted-foreground">{recipe.summary}</p>
       )}
@@ -87,12 +92,6 @@ export default async function RecipeDetailPage({
           </ol>
         )}
       </section>
-
-      {user && (
-        <div className="mt-8 max-w-xs">
-          <SaveToggle recipeId={recipe.id} saved={isSaved} />
-        </div>
-      )}
     </main>
   );
 }

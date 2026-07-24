@@ -3,21 +3,20 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { strings } from "@/lib/strings";
 
-// Shared recipe card: the common base (title, summary, macro badges). Any action
-// button(s) are passed as children (the footer slot) — save/remove today, whatever
-// we need later. The card stays agnostic of the action.
+// Shared recipe card: title, summary, macro badges, and an optional bookmark action
+// pinned top-right (the save/remove toggle). The card stays agnostic of the action —
+// the caller passes whatever bookmark node it needs.
 //
 // When `href` is set, the whole card becomes a link to the detail page via the
 // "stretched link" pattern: the title is the only real <a>, and its ::after covers
 // the whole (relative) card — so the entire card is tappable without nesting an
-// anchor around the footer button (which stays clickable thanks to z-10).
+// anchor around the bookmark button (which stays clickable thanks to z-10).
 type RecipeCardProps = {
   recipe: {
     title: string;
@@ -27,18 +26,21 @@ type RecipeCardProps = {
     caloriesPerServingKcal: number | null;
   };
   href?: string;
-  children?: React.ReactNode;
+  bookmark?: React.ReactNode;
 };
 
-export function RecipeCard({ recipe, href, children }: RecipeCardProps) {
+export function RecipeCard({ recipe, href, bookmark }: RecipeCardProps) {
   return (
     <Card
       className={cn(
-        "flex h-full flex-col",
-        href && "relative transition-shadow hover:shadow-md",
+        "relative flex h-full flex-col",
+        href && "transition-shadow hover:shadow-md",
       )}
     >
-      <CardHeader>
+      {bookmark && (
+        <div className="absolute right-2 top-2 z-10">{bookmark}</div>
+      )}
+      <CardHeader className={cn(bookmark && "pr-14")}>
         <CardTitle>
           {href ? (
             <Link
@@ -68,9 +70,6 @@ export function RecipeCard({ recipe, href, children }: RecipeCardProps) {
           </span>
         )}
       </CardContent>
-      {children && (
-        <CardFooter className="relative z-10 mt-auto">{children}</CardFooter>
-      )}
     </Card>
   );
 }

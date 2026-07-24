@@ -4,8 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { RecipeCard } from "@/components/recipe-card";
-import { SaveRecipeButton } from "@/components/save-recipe-button";
-import { toggleSaveRecipe } from "@/app/recipes/actions";
+import { SaveToggle } from "@/components/save-toggle";
 import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
@@ -39,14 +38,11 @@ export default async function BookPage() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {saved.map(({ recipe }) => (
             <li key={recipe.id}>
-              <RecipeCard recipe={recipe} href={`/recipes/${recipe.id}`}>
-                <form
-                  action={toggleSaveRecipe.bind(null, recipe.id)}
-                  className="w-full"
-                >
-                  <SaveRecipeButton label={strings.recipes.remove} />
-                </form>
-              </RecipeCard>
+              <RecipeCard
+                recipe={recipe}
+                href={`/recipes/${recipe.id}`}
+                bookmark={<SaveToggle recipeId={recipe.id} saved={true} />}
+              />
             </li>
           ))}
         </ul>
