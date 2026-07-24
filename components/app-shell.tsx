@@ -85,7 +85,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             <BrandMark showWordmark={false} />
             {/* Chrome: quick theme control + account avatar (mirrors the desktop chip). */}
             <div className="flex items-center gap-2">
-              <ThemeToggle compact />
+              <ThemeToggle />
               <Link
                 href="/account"
                 aria-label={strings.nav.account}
