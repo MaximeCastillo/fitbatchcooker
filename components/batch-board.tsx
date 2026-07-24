@@ -14,7 +14,8 @@ import {
   DragOverlay,
   useDraggable,
   useDroppable,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
@@ -90,6 +91,9 @@ export function BatchBoard({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
   const [previewOrigin, setPreviewOrigin] = useState({ dx: 0, dy: 0 });
+  // Tap-to-add: the palette recipe whose "add to which day?" picker is open (null =
+  // closed). The primary mobile path for adding a recipe without drag.
+  const [addFor, setAddFor] = useState<Recipe | null>(null);
   // Flying clone shown under the cursor while dragging, so the source (a palette
   // recipe, or a dish being moved) stays visibly in place.
   const [overlay, setOverlay] = useState<{
@@ -139,8 +143,14 @@ export function BatchBoard({
   // Stable id for the DndContext so dnd-kit's generated aria ids match between server
   // and client render (avoids a hydration mismatch on aria-describedby).
   const dndId = useId();
+  // Mouse: drag starts after a small move. Touch: press-and-hold 200ms to drag, so a
+  // quick swipe scrolls the page instead of hijacking it into a drag (tap-first,
+  // PRINCIPLES §5 — on mobile the primary path is the "+" tap-to-add, not drag).
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor),
   );
 
@@ -358,6 +368,7 @@ export function BatchBoard({
                   title={recipe.title}
                   proteinPerServingG={recipe.proteinPerServingG}
                   onPreview={(source) => openPreview(recipe, source)}
+                  onAdd={() => setAddFor(recipe)}
                 />
               ))
             )}
@@ -470,6 +481,43 @@ export function BatchBoard({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Tap-to-add: pick a day for the recipe (the drag-free add path, mobile-first).
+          Each day shows its current protein so you can fill the gauge that needs it. */}
+      <Dialog
+        open={addFor !== null}
+        onOpenChange={(open) => !open && setAddFor(null)}
+      >
+        <DialogContent className="max-w-sm">
+          {addFor && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{strings.batch.addToDay(addFor.title)}</DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-2">
+                {byDay.map((dayEntries, dayIndex) => (
+                  <button
+                    key={dayIndex}
+                    type="button"
+                    onClick={() => {
+                      addRecipeToDay(addFor.id, dayIndex);
+                      setAddFor(null);
+                    }}
+                    className="flex min-h-11 flex-col items-start justify-center rounded-xl border bg-secondary px-3 py-2 text-left transition-colors hover:border-primary"
+                  >
+                    <span className="font-display text-sm font-bold uppercase tracking-wide">
+                      {strings.batch.dayLabel(dayIndex + 1)}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {dayProteinG(dayEntries)} / {targetG ?? "—"} g
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </DndContext>
   );
 }
@@ -491,7 +539,7 @@ function PaletteZone({
     <aside
       ref={setNodeRef}
       className={cn(
-        "sticky top-4 self-start rounded-2xl border bg-muted p-4 transition-colors",
+        "self-start rounded-2xl border bg-muted p-4 transition-colors md:sticky md:top-4",
         active && "border-dashed border-destructive",
         active && isOver && "bg-destructive/10",
       )}
@@ -508,17 +556,22 @@ function PaletteZone({
 }
 
 // A single recipe card, used both in the left palette and inside a day. Same design
-// everywhere; the difference is the corner actions: an eye (preview) always, plus a
-// trash (remove) only when `onRemove` is given — so a palette recipe can't be deleted.
-// The whole card is the drag handle; the corner buttons stop the pointer from starting
-// a drag so their clicks land. `fadeWhenDragging` ghosts the source on a real move
-// (a placed dish); the palette source stays visible (the DragOverlay shows the clone).
+// everywhere; the difference is the corner actions: an eye (preview) always, a "+"
+// (tap-to-add) when `onAdd` is given (palette), and a trash (remove) when `onRemove`
+// is given (days) — so a palette recipe can't be deleted. The whole card is the drag
+// handle; corner buttons stop the pointer from starting a drag so their clicks land.
+// `fadeWhenDragging` ghosts the source on a real move (a placed dish); the palette
+// source stays visible (the DragOverlay shows the clone).
+//
+// Corner actions are always visible on touch (no hover there — tap-first, PRINCIPLES
+// §5) and ghost-on-hover from md up.
 function RecipeChip({
   draggableId,
   draggableData,
   title,
   proteinPerServingG,
   onPreview,
+  onAdd,
   onRemove,
   fadeWhenDragging = false,
 }: {
@@ -527,6 +580,7 @@ function RecipeChip({
   title: string;
   proteinPerServingG: number | null;
   onPreview: (source: HTMLElement) => void;
+  onAdd?: () => void;
   onRemove?: () => void;
   fadeWhenDragging?: boolean;
 }) {
@@ -534,13 +588,15 @@ function RecipeChip({
     id: draggableId,
     data: draggableData,
   });
+  const actionClass =
+    "grid size-7 place-items-center rounded-md text-muted-foreground transition-opacity hover:bg-muted focus-visible:opacity-100 md:size-6 md:opacity-0 md:group-hover/chip:opacity-100";
   return (
     <div
       ref={setNodeRef}
       {...listeners}
       {...attributes}
       className={cn(
-        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-card p-2.5 pr-11 text-left shadow-sm transition-colors hover:border-primary",
+        "group/chip relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-card p-2.5 pr-16 text-left shadow-sm transition-colors hover:border-primary md:pr-14",
         fadeWhenDragging && isDragging && "opacity-40",
       )}
     >
@@ -551,14 +607,25 @@ function RecipeChip({
         {proteinPerServingG ?? "—"} g
       </span>
       <div className="absolute right-1 top-1 flex gap-0.5">
+        {onAdd && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={onAdd}
+            aria-label={strings.batch.add}
+            className={cn(actionClass, "hover:text-primary")}
+          >
+            <Plus className="size-4 md:size-3.5" aria-hidden />
+          </button>
+        )}
         <button
           type="button"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => onPreview(e.currentTarget)}
           aria-label={strings.batch.preview}
-          className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-primary focus-visible:opacity-100 group-hover/chip:opacity-100"
+          className={cn(actionClass, "hover:text-primary")}
         >
-          <Eye className="size-3.5" aria-hidden />
+          <Eye className="size-4 md:size-3.5" aria-hidden />
         </button>
         {onRemove && (
           <button
@@ -566,9 +633,9 @@ function RecipeChip({
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onRemove}
             aria-label={strings.batch.removeDish}
-            className="rounded-md p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover/chip:opacity-100"
+            className={cn(actionClass, "hover:text-destructive")}
           >
-            <Trash2 className="size-3.5" aria-hidden />
+            <Trash2 className="size-4 md:size-3.5" aria-hidden />
           </button>
         )}
       </div>
