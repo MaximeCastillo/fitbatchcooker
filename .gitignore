@@ -45,3 +45,6 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# Local git worktrees created by agents
+.claude/worktrees/
