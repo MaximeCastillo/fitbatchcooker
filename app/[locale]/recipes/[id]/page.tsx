@@ -25,7 +25,8 @@ export default async function RecipeDetailPage({
     getCurrentUser(),
   ]);
 
-  if (!recipe) notFound();
+  // Visible only if it's a shared library recipe (userId null) or the user's own.
+  if (!recipe || (recipe.userId && recipe.userId !== user?.id)) notFound();
 
   const isSaved = user
     ? (await prisma.userRecipe.findUnique({

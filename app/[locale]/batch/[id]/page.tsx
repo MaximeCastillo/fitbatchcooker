@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
+import { recipeVisibilityWhere } from "@/lib/recipes";
 import { BatchBoard } from "@/components/batch-board";
 import { BatchTitle } from "@/components/batch-title";
 import { Link, redirect } from "@/i18n/navigation";
@@ -30,7 +31,10 @@ export default async function BatchPage({
         entries: { include: { recipe: true }, orderBy: { createdAt: "asc" } },
       },
     }),
-    prisma.recipe.findMany({ orderBy: { title: "asc" } }),
+    prisma.recipe.findMany({
+      where: recipeVisibilityWhere(user.id),
+      orderBy: { title: "asc" },
+    }),
   ]);
   if (!plan) notFound();
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { RecipeCard } from "@/components/recipe-card";
 import { SaveToggle } from "@/components/save-toggle";
 import { getCurrentUser } from "@/lib/auth";
+import { recipeVisibilityWhere } from "@/lib/recipes";
 
 // Render on each request (not prerendered at build): the library grows over time and
 // saved state is per-user. Opts out of Next's default static rendering.
@@ -10,10 +11,12 @@ export const dynamic = "force-dynamic";
 
 export default async function RecipesPage() {
   const t = await getTranslations("recipes");
-  const [recipes, user] = await Promise.all([
-    prisma.recipe.findMany({ orderBy: { createdAt: "desc" } }),
-    getCurrentUser(),
-  ]);
+  const user = await getCurrentUser();
+  // Shared library (userId null) + the user's own recipes (spec §7).
+  const recipes = await prisma.recipe.findMany({
+    where: recipeVisibilityWhere(user?.id),
+    orderBy: { createdAt: "desc" },
+  });
 
   // Recipes the current user has saved — scoped to their own userId (spec §7).
   const savedRecipeIds = user

@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { recipeVisibilityWhere } from "@/lib/recipes";
 import { redirect } from "@/i18n/navigation";
 
 // All actions are scoped to the logged-in user (authorization — spec §7): we never
@@ -111,7 +112,11 @@ export async function addEntry(
   const plan = await ownedPlan(planId, userId);
   if (!plan || dayIndex < 0 || dayIndex >= plan.dayCount) return null;
 
-  const recipe = await prisma.recipe.findUnique({ where: { id: recipeId } });
+  // Only add a recipe the user can actually see (shared library or their own).
+  const recipe = await prisma.recipe.findFirst({
+    where: { id: recipeId, ...recipeVisibilityWhere(userId) },
+    select: { id: true },
+  });
   if (!recipe) return null;
 
   const created = await prisma.batchEntry.create({
