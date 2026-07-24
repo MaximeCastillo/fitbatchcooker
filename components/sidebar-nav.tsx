@@ -7,17 +7,15 @@ import {
   UtensilsCrossed,
   BookMarked,
   MessageCircle,
-  CircleUser,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { strings } from "@/lib/strings";
 
 const items = [
   { href: "/batch", label: strings.nav.batch, icon: Boxes },
-  { href: "/recipes", label: strings.nav.recipes, icon: UtensilsCrossed },
   { href: "/book", label: strings.nav.book, icon: BookMarked },
   { href: "/chat", label: strings.nav.chat, icon: MessageCircle },
-  { href: "/account", label: strings.nav.account, icon: CircleUser },
+  { href: "/recipes", label: strings.nav.recipes, icon: UtensilsCrossed },
 ];
 
 // Client Component so it can highlight the active route via usePathname.
