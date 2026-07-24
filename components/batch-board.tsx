@@ -310,8 +310,10 @@ export function BatchBoard({
       onDragEnd={onDragEnd}
       onDragCancel={clearDrag}
     >
-      {/* Batch summary */}
-      <div className="mb-5 flex flex-wrap items-center gap-5 rounded-2xl border bg-card p-4">
+      {/* Batch summary. On mobile it sticks to the top while you scroll the days, so the
+          progression stays in view (the global header scrolls away underneath). One sticky
+          bar only — we don't stack several (mobile vertical budget). */}
+      <div className="mb-5 flex flex-wrap items-center gap-5 rounded-2xl border bg-card p-4 max-md:sticky max-md:top-0 max-md:z-20 max-md:shadow-sm">
         <div className="min-w-45 flex-1">
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
             <span className="font-semibold">{strings.batch.progressLabel}</span>
@@ -374,7 +376,8 @@ export function BatchBoard({
             )}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {strings.batch.dragHint}
+            <span className="md:hidden">{strings.batch.tapHint}</span>
+            <span className="hidden md:inline">{strings.batch.dragHint}</span>
           </p>
         </PaletteZone>
 
@@ -691,18 +694,19 @@ function DayRow({
     <div
       ref={setNodeRef}
       className={cn(
-        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 pr-9 transition-colors",
+        "group relative flex flex-wrap gap-4 rounded-2xl border bg-card p-4 pr-10 transition-colors",
         done && "border-primary/55",
         isOver && "border-primary bg-primary/5",
       )}
     >
-      {/* Ghost delete-day, top-right, appears on hover/focus */}
+      {/* Delete-day, top-right. Always visible on touch (no hover there — tap-first,
+          PRINCIPLES §5); ghost-on-hover from md up. */}
       {canRemove && (
         <button
           type="button"
           onClick={onRemoveDay}
           aria-label={strings.batch.removeDayLabel}
-          className="absolute right-2 top-2 z-10 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+          className="absolute right-2 top-2 z-10 grid size-8 place-items-center rounded-md text-muted-foreground transition-opacity hover:text-destructive focus-visible:opacity-100 md:size-7 md:opacity-0 md:group-hover:opacity-100"
         >
           <Trash2 className="size-4" aria-hidden />
         </button>
