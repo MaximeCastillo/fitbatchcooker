@@ -12,7 +12,7 @@ export function showUndoToast({
   actionLabel,
   onUndo,
   onCommit,
-  duration = 5000,
+  duration = 10000,
 }: {
   message: string;
   actionLabel: string;

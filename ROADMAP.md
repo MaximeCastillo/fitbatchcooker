@@ -22,10 +22,6 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## ⏭️ Court terme
-- **Undo à la Notion** (généralisé) : suppression **différée + toast « Annuler »** (client,
-  `sonner`), sans modale — la cascade s'annule gratuitement (rien n'est supprimé avant la
-  fin du délai). Débloque la **suppression libre d'un jour** (retirer le garde-fou "vide only")
-  et se réutilise (batch, plat…). Soft-delete (corbeille DB) = plus tard si besoin.
 - **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
   serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
   pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.

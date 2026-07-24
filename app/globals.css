@@ -168,25 +168,25 @@
 /* Cauldron: gentle bubbles rising inside a filled gauge, for a bit of life. */
 @keyframes cauldron-bubble {
   0% {
-    transform: translateY(2px) scale(0.7);
+    transform: translateY(2px) scale(0.6);
     opacity: 0;
   }
-  30% {
-    opacity: 0.55;
+  25% {
+    opacity: 0.75;
   }
   100% {
-    transform: translateY(-160%) scale(1);
+    transform: translateY(-190%) scale(1.05);
     opacity: 0;
   }
 }
 .cauldron-bubble {
   position: absolute;
-  bottom: 2px;
-  width: 4px;
-  height: 4px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
   border-radius: 9999px;
-  background: color-mix(in oklch, white 50%, transparent);
-  animation: cauldron-bubble 2.6s ease-in infinite;
+  background: color-mix(in oklch, white 70%, transparent);
+  animation: cauldron-bubble 2.1s ease-in infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .cauldron-bubble {

@@ -10,6 +10,7 @@ import {
 } from "react";
 import {
   DndContext,
+  DragOverlay,
   useDraggable,
   useDroppable,
   PointerSensor,
@@ -66,6 +67,12 @@ export function BatchBoard({
   const [dayCount, setDayCount] = useState(initialDayCount);
   const [query, setQuery] = useState("");
   const [draggingKind, setDraggingKind] = useState<string | null>(null);
+  // Flying clone shown under the cursor while dragging, so the source (a palette
+  // recipe, or a dish being moved) stays visibly in place.
+  const [overlay, setOverlay] = useState<{
+    title: string;
+    proteinPerServingG: number | null;
+  } | null>(null);
   const [, startTransition] = useTransition();
   const shiftRef = useRef(false);
   const tempId = useRef(0);
@@ -200,13 +207,26 @@ export function BatchBoard({
   }
 
   function onDragStart(event: DragStartEvent) {
-    setDraggingKind(
-      (event.active.data.current as { kind?: string })?.kind ?? null,
-    );
+    const a = event.active.data.current as
+      | { kind?: string; recipeId?: string; entryId?: string }
+      | undefined;
+    setDraggingKind(a?.kind ?? null);
+    if (a?.kind === "recipe") {
+      const recipe = recipeById.get(a.recipeId!);
+      setOverlay(recipe ? { title: recipe.title, proteinPerServingG: recipe.proteinPerServingG } : null);
+    } else if (a?.kind === "entry") {
+      const entry = entries.find((e) => e.id === a.entryId);
+      setOverlay(entry ? { title: entry.title, proteinPerServingG: entry.proteinPerServingG } : null);
+    }
+  }
+
+  function clearDrag() {
+    setDraggingKind(null);
+    setOverlay(null);
   }
 
   function onDragEnd(event: DragEndEvent) {
-    setDraggingKind(null);
+    clearDrag();
     const a = event.active.data.current as
       | { kind: string; recipeId?: string; entryId?: string }
       | undefined;
@@ -238,7 +258,7 @@ export function BatchBoard({
       sensors={sensors}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onDragCancel={() => setDraggingKind(null)}
+      onDragCancel={clearDrag}
     >
       {/* Batch summary */}
       <div className="mb-5 flex flex-wrap items-center gap-5 rounded-2xl border bg-card p-4">
@@ -366,6 +386,20 @@ export function BatchBoard({
           </section>
         </div>
       </div>
+
+      {/* The flying clone that follows the cursor (source stays in place). */}
+      <DragOverlay dropAnimation={null}>
+        {overlay ? (
+          <div className="flex cursor-grabbing items-center justify-between gap-2 rounded-xl border border-primary bg-card px-3 py-2 shadow-xl">
+            <span className="text-sm font-semibold leading-tight">
+              {overlay.title}
+            </span>
+            <span className="font-mono text-xs font-bold text-accent-warm">
+              {overlay.proteinPerServingG ?? "—"} g
+            </span>
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }
@@ -404,26 +438,19 @@ function PaletteZone({
 }
 
 function PaletteChip({ recipe }: { recipe: Recipe }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `recipe:${recipe.id}`,
-      data: { kind: "recipe", recipeId: recipe.id },
-    });
+  // No transform / opacity on the source: the DragOverlay renders the flying clone,
+  // and the recipe stays fully visible in the palette (it can be added any number of times).
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: `recipe:${recipe.id}`,
+    data: { kind: "recipe", recipeId: recipe.id },
+  });
   return (
     <button
       ref={setNodeRef}
       {...listeners}
       {...attributes}
       type="button"
-      style={
-        transform
-          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
-          : undefined
-      }
-      className={cn(
-        "flex cursor-grab items-center justify-between gap-2 rounded-xl border bg-card px-3 py-2 text-left hover:border-primary",
-        isDragging && "opacity-50",
-      )}
+      className="flex cursor-grab items-center justify-between gap-2 rounded-xl border bg-card px-3 py-2 text-left hover:border-primary"
     >
       <span className="text-sm font-semibold leading-tight">{recipe.title}</span>
       <span className="font-mono text-xs font-bold text-accent-warm">
@@ -516,22 +543,16 @@ function Dish({
   entry: Entry;
   onRemove: (entryId: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `entry:${entry.id}`,
-      data: { kind: "entry", entryId: entry.id },
-    });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `entry:${entry.id}`,
+    data: { kind: "entry", entryId: entry.id },
+  });
   return (
     <li
       ref={setNodeRef}
-      style={
-        transform
-          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
-          : undefined
-      }
       className={cn(
         "group/dish relative flex cursor-grab flex-col justify-between gap-1 rounded-xl border bg-secondary p-2.5 pr-7",
-        isDragging && "opacity-50",
+        isDragging && "opacity-40",
       )}
       {...listeners}
       {...attributes}

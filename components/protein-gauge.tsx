@@ -22,16 +22,20 @@ export function ProteinGauge({
         )}
       >
         <div
-          className="absolute inset-x-0 bottom-0 bg-primary transition-[height] duration-700 ease-out"
+          className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary to-primary/75 transition-[height] duration-700 ease-out"
           style={{ height: `${fill}%` }}
           aria-hidden
         >
           {fill > 0 && (
             <>
-              <span className="cauldron-bubble" style={{ left: "28%" }} />
+              <span className="cauldron-bubble" style={{ left: "24%" }} />
               <span
                 className="cauldron-bubble"
-                style={{ left: "62%", animationDelay: "0.9s" }}
+                style={{ left: "50%", animationDelay: "1.4s" }}
+              />
+              <span
+                className="cauldron-bubble"
+                style={{ left: "72%", animationDelay: "0.7s" }}
               />
             </>
           )}
