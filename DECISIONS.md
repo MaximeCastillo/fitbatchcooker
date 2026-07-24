@@ -254,3 +254,26 @@ ton tél et joue » sans le coût/réécriture d'un natif. Confirme et hausse la
 et la décision mobile du 2026-07-17.
 **Risque surveillé :** drag & drop tactile fragile → garantir un chemin **tap** pour chaque
 action (suivi dans `ROADMAP.md`).
+
+## 2026-07-24 — Phase A livrée + composeur poli (aperçu, chips unifiés, mobile v1)
+**Décision :** livrer la **page détail recette** (`/recipes/[id]`) et polir le composeur.
+Rendu recette factorisé dans un **`RecipeDetail` partagé** (page + **modale d'aperçu** dans le
+composeur). Un seul **`RecipeChip`** pour la palette et les jours (même design). **Dialog
+shadcn/Radix** (nouvelle dépendance `@radix-ui/react-dialog`), centré en flex pour laisser le
+`transform` libre à l'animation ; la modale **jaillit depuis la carte** cliquée (vars CSS
+`--dx/--dy`). **Mobile v1** : `MouseSensor` + `TouchSensor` (drag tactile = appui-maintenu, le
+swipe scrolle), **tap-to-add** (« + » → « ajouter à quel jour ? »), actions visibles au doigt.
+**Pourquoi :** une seule source de vérité pour l'affichage recette ; tap-first non négociable
+(`PRINCIPLES.md` §5) → le drag ne peut pas être l'unique chemin sur mobile.
+
+## 2026-07-24 — Page « Mon compte » (auth self-service)
+**Décision :** page **`/account`** (« Mon compte », renommée depuis `/profile`) avec **email
+connecté visible**,
+**changement d'email** (via `supabase.auth.updateUser` → mail de confirmation, non instantané)
+et **changement de mot de passe** exigeant la **re-vérification du mot de passe actuel**
+(`signInWithPassword`) avant modification. `getCurrentUser` **resynchronise** `User.email`
+depuis Supabase Auth (source de vérité) en cas de drift.
+**Pourquoi :** un incident réel (« mes données ont disparu » = en fait connecté sur un autre
+compte) a montré le besoin de voir clairement son compte et de gérer ses identifiants. La
+re-auth avant changement de mot de passe évite qu'une session laissée ouverte le change.
+**Différé :** **suppression de compte** (destructif + nécessite la service-role key serveur).

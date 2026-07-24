@@ -15,6 +15,9 @@ dans `DECISIONS.md`.
       partagée — sinon n'importe qui peut créer un compte et brûler tes tokens.
 - [ ] **BYO-key par user** (spec §6) — chaque user fournit sa clé (stockée chiffrée) et
       paie ses propres tokens. Le vrai fix économique **et** sécurité.
+- [ ] **Politique de push / branches.** En MVP on **commite et push directement sur `main`
+      sans validation** (assumé : pas de conséquence prod). Avant d'ouvrir : brancher + PR +
+      review, au moins pour les changements sensibles (auth, migrations, secrets).
 
 Idées futures à intégrer au fil de l'eau : RLS en défense en profondeur, revue des
 clés/secrets, domaine `fitbatchcooker.com`, politique de mots de passe, rate limiting.

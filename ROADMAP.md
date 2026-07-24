@@ -18,9 +18,9 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - [x] **Drag & drop** (`@dnd-kit`) : palette→jour, jour→jour, **Maj = dupliquer**,
       palette = zone « ranger », **optimistic UI** + fallback select. ✅
 - [ ] **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
-- [ ] **Mobile tap-first** (principe de base, cf. `PRINCIPLES.md` §5) : tout faisable au
-      doigt (chemin **tap** pour ajouter/déplacer/retirer, pas seulement le drag), cibles
-      ≥ 44 px, drag tactile fluide (résoudre scroll vs drag).
+- [~] **Mobile tap-first** (`PRINCIPLES.md` §5) — **v1 faite** : tap-to-add (« + » → « ajouter
+      à quel jour ? »), actions visibles au doigt, scroll vs drag réglé (Mouse/Touch sensors).
+      **Reste** : test mobile réel, chemin **tap pour déplacer** entre jours, affiner cibles ≥ 44 px.
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
 ## 🍳 Prochain chantier — Recettes riches (détail · encas · images · ingrédients)
@@ -28,8 +28,7 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 Séquencement **validé** (2026-07-24). Voir `PRINCIPLES.md` pour la philosophie
 protéines/part et `DECISIONS.md` pour le pourquoi.
 
-- **Phase A — Page détail recette** (`/recipes/[id]`) : procédure de cuisine,
-  protéines/part, portions. Rend les cartes cliquables. *(coût faible)*
+- ✅ **Phase A — Page détail recette** livrée (voir « Livré récemment »).
 - **Phase B — Encas / compléments** : champ **`Recipe.kind`** (`MAIN` | `SNACK`) +
   migration, palette du composeur en **onglets « Recettes / Encas »**, seed de quelques
   encas (skyr, poignée de noix, tartine de PB). Le drag + la jauge marchent déjà →
@@ -47,6 +46,8 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
   serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
   pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
 - **Comptes admin** : rôle `admin` (gérer les limites, voir l'usage) — introduit avec le point ci-dessus.
+- **Compte — suppression** : bouton « supprimer mon compte » (différé — destructif, nécessite la
+  *service-role key* côté serveur pour supprimer l'utilisateur Supabase Auth + cascade des données).
 - **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
 - **Guide** : product-tour léger ("clique ici") + **chef contextuel** (aide par page).
 
@@ -66,6 +67,14 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Recettes riches — Phase A** : page détail `/recipes/[id]` (étapes, macros, note « valeurs
+  approximatives »), **cartes cliquables** (stretched-link), **marque-page** save en coin de carte.
+- **Aperçu recette dans le composeur** : modale (Radix Dialog) qui **jaillit de la carte**
+  cliquée ; rendu factorisé (`RecipeDetail` partagé page + modale).
+- **Composeur unifié + mobile v1** : `RecipeChip` unique (palette = jours), **tap-to-add**
+  (« + » → « ajouter à quel jour ? »), sensors Mouse/Touch (scroll vs drag), actions visibles au doigt.
+- **Page « Mon compte »** (`/account`) : email connecté visible, changer email (confirmation
+  Supabase) + mot de passe (re-vérif du MDP actuel), sync `User.email`. *(à relire + push)*
 - **Undo à la Notion** (jour + batch) : suppression différée + toast « Annuler » (10 s, barre
   de décompte), zéro soft-delete en base. Drag & drop poli : **DragOverlay** (la recette reste
   en place dans la palette), jauge plus vivante, nommage unifié « recette ».

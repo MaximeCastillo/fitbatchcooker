@@ -160,3 +160,57 @@ testé et déployable**. Premier **rename de base maîtrisé** sans rien perdre.
    Maj = dupliquer, palette = zone « ranger », + optimistic.
 2. Puis : **« Ajouter à mon batch »** depuis les cartes recettes, polish **mobile tap-first**.
 3. Plus tard : couche **ingrédients / protéines vérifiées**, suggestions de complément.
+
+---
+
+## Session 4 — 2026-07-24 — Recettes riches (Phase A), aperçu, et le composeur mobile-first
+
+**Objectif :** rendre les recettes « riches » (Phase A) et polir le composeur de batch,
+d'abord pour le mobile. Résultat : Phase A livrée + gros polish UX du composeur.
+
+### Ce qu'on a construit
+- **Polish UX batch** (début de session) : jauge plus vivante, undo à 10 s, **DragOverlay**
+  (la recette reste en place dans la palette quand on la glisse), nommage unifié « recette ».
+- **Docs fondatrices** : skill **`/session`** (runbook), **`PRINCIPLES.md`** (régularité >
+  précision, modèle protéines/part) et **`DESIGN.md`** (direction artistique) ; **mobile-first**
+  élevé au rang de principe.
+- **Phase A — page détail recette** (`/recipes/[id]`) : étapes de cuisine, macros,
+  note « valeurs approximatives » ; **cartes cliquables** (stretched-link).
+- **Icône marque-page** (save) en coin de carte, un seul `SaveToggle` optimistic partout.
+- **Modale d'aperçu** dans le composeur (voir une recette sans quitter la page), avec un
+  composant **`RecipeDetail` partagé** (page + modale) et une **anim qui jaillit depuis la
+  carte** cliquée.
+- **`RecipeChip` unifié** (palette + jours, même design), et **polish mobile v1** :
+  **tap-to-add** (bouton « + » → « ajouter à quel jour ? »), actions visibles au doigt,
+  drag tactile = appui-maintenu (le swipe scrolle).
+- **Page « Mon compte »** (email connecté visible, changer email/mot de passe) — déléguée
+  à un agent, à relire avant push.
+
+### Concepts appris (🆕)
+- **`params` est une Promise** en Next 16 (`const { id } = await params`) — Next peut streamer.
+- **Stretched-link** : `::after { inset: 0 }` sur un seul vrai `<a>` → toute la carte cliquable
+  sans imbriquer d'ancre autour d'un bouton.
+- **Radix Dialog + Portal** : modale rendue au niveau du `<body>` (échappe aux `overflow`/
+  `z-index`), focus-trap/Échap/scroll-lock/exit-anim **gratuits**.
+- **Centrage en flex plutôt qu'en `transform`** : garder le `transform` d'un élément **libre**
+  pour l'animer (deux `transform` se marchent dessus). Anim d'origine via variables CSS
+  `--dx/--dy` (translate depuis le point cliqué), coupée en `prefers-reduced-motion`.
+- **React Compiler** (activé ici) : une closure doit référencer une valeur mémoïsée
+  **déjà déclarée** au-dessus → ordonner les fonctions après leurs `useMemo`.
+- **Sensors `@dnd-kit`** : `MouseSensor` + `TouchSensor` (délai) au lieu de `PointerSensor`,
+  pour que le **scroll tactile** ne soit pas capté comme un drag.
+- **Hiérarchie de surfaces / élévation** : sur un fond teinté, les panneaux blancs
+  « flottent » ; on ne peut pas être plus clair que blanc → l'élévation d'une carte sur un
+  panneau blanc se fait par **l'ombre**, pas par un fond plus clair.
+- **Autorisation scopée user** : bug prod « mes données ont disparu » = simplement **connecté
+  sur un autre compte** ; chaque requête est `where: { userId }` (comme `current_user.x` en
+  Rails). D'où la page « Mon compte » avec l'email connecté bien visible.
+
+### Victoires
+🎉 Les recettes ont enfin une **page détail**, le composeur devient **utilisable au doigt**
+(tap-to-add), et l'aperçu qui **jaillit de la carte** donne un vrai sentiment « produit fini ».
+
+### Prochaine session
+1. Relire + valider la **page « Mon compte »** (agent), puis push.
+2. **Phase B — encas** (`Recipe.kind` MAIN/SNACK + onglets palette + seed).
+3. Test **mobile réel** du composeur, itérer le tap-first si besoin.
