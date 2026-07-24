@@ -36,9 +36,30 @@
     "recipes": "Recettes",
     "book": "Mes recettes",
     "chat": "Le chef",
+    "ingredients": "Ingrédients",
     "account": "Mon compte",
     "login": "Se connecter",
     "logout": "Se déconnecter"
+  },
+  "ingredients": {
+    "title": "Ingrédients",
+    "search": "Rechercher un ingrédient…",
+    "empty": "Aucun ingrédient.",
+    "all": "Tous",
+    "count": "{count, plural, one {# ingrédient} other {# ingrédients}}",
+    "proteinPer100g": "≈ {grams} g de protéines / 100 g",
+    "categories": {
+      "MEAT": "Viande",
+      "FISH": "Poisson",
+      "VEGETABLE": "Légume",
+      "DAIRY_EGG": "Œuf & laitier",
+      "STARCH": "Féculent",
+      "FRUIT": "Fruit",
+      "NUTS_SEEDS": "Noix & graines",
+      "LEGUME": "Légumineuse",
+      "FAT": "Matière grasse",
+      "OTHER": "Autre"
+    }
   },
   "batch": {
     "defaultName": "Batch du {dateLabel}",

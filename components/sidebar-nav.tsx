@@ -5,6 +5,7 @@ import {
   UtensilsCrossed,
   BookMarked,
   MessageCircle,
+  Carrot,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const items = [
   { href: "/book", key: "book", icon: BookMarked },
   { href: "/chat", key: "chat", icon: MessageCircle },
   { href: "/recipes", key: "recipes", icon: UtensilsCrossed },
+  { href: "/ingredients", key: "ingredients", icon: Carrot },
 ] as const;
 
 // Client Component so it can highlight the active route via usePathname.
