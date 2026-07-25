@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { AuthTopbarAction } from "@/components/auth-topbar-action";
 import { APP_NAME } from "@/lib/constants";
+import { BrandIcon } from "@/components/brand-icon";
 import { Link } from "@/i18n/navigation";
 
 // Brand lockup — the mark echoes the signature protein gauge (a container filled with
@@ -13,9 +14,7 @@ import { Link } from "@/i18n/navigation";
 function BrandMark({ showWordmark = true }: { showWordmark?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2">
-      <span className="relative grid size-9 shrink-0 overflow-hidden rounded-xl border-2 border-primary bg-primary/10">
-        <span className="absolute inset-x-0 bottom-0 h-[58%] bg-primary" aria-hidden />
-      </span>
+      <BrandIcon className="size-9 shrink-0 text-primary" />
       {showWordmark && (
         <span className="font-display text-lg font-bold tracking-wide whitespace-nowrap uppercase">
           {APP_NAME}

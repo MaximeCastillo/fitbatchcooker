@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { login, signup } from "./actions";
 import { Button } from "@/components/ui/button";
+import { BrandIcon } from "@/components/brand-icon";
+import { APP_NAME } from "@/lib/constants";
 import { Link } from "@/i18n/navigation";
 
 // One auth screen, one mode at a time (driven by ?mode=signup) → a single primary
@@ -22,11 +24,11 @@ export default async function LoginPage({
         {/* Value panel */}
         <aside className="relative hidden flex-col justify-between gap-8 bg-primary p-8 text-primary-foreground md:flex">
           <div className="flex items-center gap-2">
-            <span className="relative grid size-9 shrink-0 overflow-hidden rounded-xl border-2 border-primary-foreground/70 bg-primary-foreground/10">
-              <span className="absolute inset-x-0 bottom-0 h-[58%] bg-primary-foreground/80" />
-            </span>
+            {/* On the green panel the mark must read white-ish, so drive it with the
+                foreground token (currentColor), not the primary green. */}
+            <BrandIcon className="size-9 shrink-0 text-primary-foreground" />
             <span className="font-display text-lg font-bold tracking-wide uppercase">
-              FitBatchCooker
+              {APP_NAME}
             </span>
           </div>
 

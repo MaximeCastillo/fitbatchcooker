@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Brand mark favicon: the protein vessel. Explicit green (#16a34a) — a favicon
+       has no theme context, so no CSS vars here. -->
+  <rect x="3" y="3" width="18" height="18" rx="5" fill="#16a34a" fill-opacity="0.12" />
+  <path d="M3 11.6 H21 V16 A5 5 0 0 1 16 21 H8 A5 5 0 0 1 3 16 Z" fill="#16a34a" />
+  <rect x="3" y="3" width="18" height="18" rx="5" stroke="#16a34a" stroke-width="2" />
+</svg>
