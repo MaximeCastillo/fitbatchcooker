@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
 import { ingredientPicto } from "@/lib/ingredients";
 import {
@@ -9,7 +10,6 @@ import {
   type RecipeCardData,
 } from "@/app/[locale]/recipes/actions";
 import { RecipeCard } from "@/components/recipe-card";
-import { RecipeGridSkeleton } from "@/components/recipe-grid-skeleton";
 import { SaveToggle } from "@/components/save-toggle";
 import {
   Dialog,
@@ -115,8 +115,8 @@ function IngredientRecipes({
 
   if (loading) {
     return (
-      <div className="py-1">
-        <RecipeGridSkeleton count={2} />
+      <div className="grid place-items-center py-10" role="status" aria-live="polite">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" aria-hidden />
       </div>
     );
   }
