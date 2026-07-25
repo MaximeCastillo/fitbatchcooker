@@ -1,18 +1,17 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
 import { SaveToggle } from "@/components/save-toggle";
 import { RecipeDetail } from "@/components/recipe-detail";
 import { Link } from "@/i18n/navigation";
+import { getRecipeDetailData } from "../recipe-detail-data";
 
 // Render on each request: recipe content and per-user saved state both vary.
 export const dynamic = "force-dynamic";
 
-// Recipe detail: cooking steps, protein per serving, portions. Reached by tapping a
-// recipe card. Data access is server-side; the saved state is scoped to the logged-in
-// user (spec §7). Anonymous visitors can read the recipe but see no save button.
+// Recipe detail (full page): cooking steps, protein per serving, ingredients. Reached by
+// a hard link / refresh / share; from the /recipes list a card opens the intercepting
+// modal instead (see @modal/(.)[id]). Same data source, shared visibility scoping.
 export default async function RecipeDetailPage({
   params,
 }: {
@@ -20,30 +19,8 @@ export default async function RecipeDetailPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("recipes");
-  const [recipe, user] = await Promise.all([
-    prisma.recipe.findUnique({
-      where: { id },
-      include: {
-        ingredients: {
-          include: {
-            ingredient: { select: { name: true, category: true, picto: true } },
-          },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-    }),
-    getCurrentUser(),
-  ]);
-
-  // Visible only if it's a shared library recipe (userId null) or the user's own.
-  if (!recipe || (recipe.userId && recipe.userId !== user?.id)) notFound();
-
-  const isSaved = user
-    ? (await prisma.userRecipe.findUnique({
-        where: { userId_recipeId: { userId: user.id, recipeId: recipe.id } },
-        select: { id: true },
-      })) != null
-    : false;
+  const data = await getRecipeDetailData(id);
+  if (!data) notFound();
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
@@ -56,25 +33,11 @@ export default async function RecipeDetailPage({
       </Link>
 
       <div className="mb-4 flex items-start justify-between gap-3">
-        <h1 className="text-3xl font-bold tracking-tight">{recipe.title}</h1>
-        {user && <SaveToggle recipeId={recipe.id} saved={isSaved} />}
+        <h1 className="text-3xl font-bold tracking-tight">{data.title}</h1>
+        {data.canSave && <SaveToggle recipeId={data.id} saved={data.isSaved} />}
       </div>
 
-      <RecipeDetail
-        recipe={{
-          summary: recipe.summary,
-          mealType: recipe.mealType,
-          proteinPerServingG: recipe.proteinPerServingG,
-          caloriesPerServingKcal: recipe.caloriesPerServingKcal,
-          steps: recipe.steps,
-          ingredients: recipe.ingredients.map((link) => ({
-            name: link.ingredient.name,
-            category: link.ingredient.category,
-            picto: link.ingredient.picto,
-            quantityG: link.quantityG,
-          })),
-        }}
-      />
+      <RecipeDetail recipe={data.detail} />
     </main>
   );
 }
