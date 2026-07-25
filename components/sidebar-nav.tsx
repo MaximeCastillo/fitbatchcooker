@@ -3,7 +3,6 @@
 import {
   Boxes,
   UtensilsCrossed,
-  BookMarked,
   MessageCircle,
   Carrot,
 } from "lucide-react";
@@ -15,7 +14,6 @@ import { Link, usePathname } from "@/i18n/navigation";
 // labels are resolved from the `nav` message namespace at render time.
 const items = [
   { href: "/batch", key: "batch", icon: Boxes },
-  { href: "/book", key: "book", icon: BookMarked },
   { href: "/chat", key: "chat", icon: MessageCircle },
   { href: "/recipes", key: "recipes", icon: UtensilsCrossed },
   { href: "/ingredients", key: "ingredients", icon: Carrot },

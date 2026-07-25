@@ -21,22 +21,21 @@ export type RecipeCardData = {
   saved: boolean;
 };
 
-// Two orthogonal lists: the shared curated LIBRARY (userId = null, read-only, what you
-// discover on /recipes) and the user's BOOK (recipes they saved — bookmarked shared ones
-// + their own auto-saved creations — shown on /book and in the batch palette).
-export type RecipeScope = "library" | "book";
-
+// One recipe list, scoped to what the user may see: the shared library (userId = null) +
+// their own recipes (never another user's). `favoritesOnly` narrows to what they saved
+// (the bookmark). Single page `/recipes` with a Favorites filter; the batch palette uses
+// the same query.
 export type RecipeFilters = {
   search?: string;
   mealType?: MealType | null;
-  scope?: RecipeScope;
+  favoritesOnly?: boolean;
 };
 
 const RECIPES_PAGE_SIZE = 12;
-// Never-matching sentinel: anonymous users have no book, and can't own a saved row.
+// Never-matching sentinel: anonymous users have no saved rows.
 const NO_USER = "00000000-0000-0000-0000-000000000000";
 
-// Cursor-paginated, filtered, scoped recipe list — powers the browse + book infinite
+// Cursor-paginated, filtered, visibility-scoped recipe list — powers the browse infinite
 // scroll. Same query path for filtering + paging: filters build the `where`, the cursor
 // (last id of the previous page) + take(N+1) yield the page and next cursor.
 export async function loadRecipes(
@@ -45,15 +44,12 @@ export async function loadRecipes(
 ): Promise<{ recipes: RecipeCardData[]; nextCursor: string | null }> {
   const user = await getCurrentUser();
   const userId = user?.id ?? NO_USER;
-  const base =
-    filters.scope === "book"
-      ? { savedBy: { some: { userId } } } // my saved recipes
-      : { userId: null }; // shared curated library
 
   const rows = await prisma.recipe.findMany({
     where: {
       AND: [
-        base,
+        recipeVisibilityWhere(user?.id), // public + own, never another user's
+        ...(filters.favoritesOnly ? [{ savedBy: { some: { userId } } }] : []),
         ...(filters.mealType ? [{ mealType: filters.mealType }] : []),
         ...(filters.search?.trim()
           ? [{ title: { contains: filters.search.trim(), mode: "insensitive" as const } }]
@@ -72,7 +68,7 @@ export async function loadRecipes(
       caloriesPerServingKcal: true,
       imageUrl: true,
       // Empty for anonymous (the sentinel never matches a real user); one row if the
-      // current user saved it (always present in the "book" scope).
+      // current user saved (favorited) it.
       savedBy: {
         where: { userId },
         select: { id: true },
@@ -162,9 +158,8 @@ export async function toggleSaveRecipe(recipeId: string) {
     await prisma.userRecipe.create({ data: { userId: user.id, recipeId } });
   }
 
-  // Refresh the pages that show saved state.
+  // Refresh the page that shows saved state.
   revalidatePath("/recipes");
-  revalidatePath("/book");
 }
 
 // Create a recipe owned by the current user from the manual form. Ingredients are

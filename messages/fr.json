@@ -34,7 +34,6 @@
   "nav": {
     "batch": "Mes batchs",
     "recipes": "Recettes",
-    "book": "Mes recettes",
     "chat": "Le chef",
     "ingredients": "Ingrédients",
     "account": "Mon compte",
@@ -93,7 +92,6 @@
     "recipes": "Recettes",
     "searchPlaceholder": "Rechercher…",
     "noRecipe": "Aucune recette.",
-    "emptyPalette": "Sauvegarde des recettes dans ton livre pour composer un batch.",
     "dragHint": "Glisse une recette sur un jour (Maj = dupliquer), ou touche +.",
     "tapHint": "Touche + pour ajouter une recette à un jour.",
     "preview": "Aperçu de la recette",
@@ -131,7 +129,8 @@
     "remove": "Retirer",
     "new": "Nouvelle recette",
     "filters": {
-      "search": "Rechercher une recette…"
+      "search": "Rechercher une recette…",
+      "favorites": "Favoris"
     },
     "mealType": {
       "all": "Tous",
@@ -159,11 +158,6 @@
       "stepsEmpty": "La procédure de cette recette arrive bientôt.",
       "approxNote": "Valeurs approximatives — l'important, c'est la régularité."
     }
-  },
-  "book": {
-    "title": "Mes recettes",
-    "empty": "Tu n'as pas encore sauvegardé de recette.",
-    "browse": "Parcourir les recettes"
   },
   "chat": {
     "title": "Le chef",

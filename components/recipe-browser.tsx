@@ -2,13 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Search } from "lucide-react";
+import { Bookmark, Search } from "lucide-react";
 import type { MealType } from "@/lib/generated/prisma/enums";
 import {
   loadRecipes,
   type RecipeCardData,
   type RecipeFilters,
-  type RecipeScope,
 } from "@/app/[locale]/recipes/actions";
 import { RecipeCard } from "@/components/recipe-card";
 import { SaveToggle } from "@/components/save-toggle";
@@ -16,23 +15,22 @@ import { cn } from "@/lib/utils";
 
 const MEAL_TABS: (MealType | null)[] = [null, "MAIN", "SNACK", "BREAKFAST"];
 
-// Client browse: search + mealType tabs over cursor-paginated results fed by the
-// loadRecipes server action, with infinite scroll. `scope` picks the list (shared
-// library vs the user's book); `canSave` shows the bookmark toggle.
+// Client browse: search + mealType tabs + a Favorites toggle over cursor-paginated results
+// fed by the loadRecipes server action, with infinite scroll. The list is visibility-scoped
+// server-side (public + own). `canSave` shows the bookmark toggle + the Favorites filter.
 export function RecipeBrowser({
   initialRecipes,
   initialNextCursor,
-  scope,
   canSave,
 }: {
   initialRecipes: RecipeCardData[];
   initialNextCursor: string | null;
-  scope: RecipeScope;
   canSave: boolean;
 }) {
   const t = useTranslations("recipes");
   const [search, setSearch] = useState("");
   const [mealType, setMealType] = useState<MealType | null>(null);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [recipes, setRecipes] = useState(initialRecipes);
   const [cursor, setCursor] = useState(initialNextCursor);
   const [loading, setLoading] = useState(false);
@@ -41,7 +39,7 @@ export function RecipeBrowser({
   const loadingRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const filters: RecipeFilters = { search, mealType, scope };
+  const filters: RecipeFilters = { search, mealType, favoritesOnly };
   const filterKey = JSON.stringify(filters);
 
   // Refetch page 1 whenever a filter changes. Skip the first render (the server already
@@ -122,6 +120,20 @@ export function RecipeBrowser({
             {mt ? t(`mealType.${mt}`) : t("mealType.all")}
           </button>
         ))}
+        {canSave && (
+          <button
+            type="button"
+            onClick={() => setFavoritesOnly((v) => !v)}
+            aria-pressed={favoritesOnly}
+            className={cn(chipClass(favoritesOnly), "ml-auto gap-1.5")}
+          >
+            <Bookmark
+              className={cn("size-3.5", favoritesOnly && "fill-primary")}
+              aria-hidden
+            />
+            {t("filters.favorites")}
+          </button>
+        )}
       </div>
 
       {recipes.length === 0 ? (

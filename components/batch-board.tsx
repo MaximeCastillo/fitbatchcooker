@@ -22,7 +22,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Eye, Plus, Search, Trash2 } from "lucide-react";
+import { Bookmark, Eye, Plus, Search, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   addEntry,
@@ -41,7 +41,6 @@ import {
 import { showUndoToast } from "@/components/undo-toast";
 import { ProteinGauge } from "@/components/protein-gauge";
 import { RecipeDetail } from "@/components/recipe-detail";
-import { Link } from "@/i18n/navigation";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +57,7 @@ type Recipe = {
   summary: string | null;
   caloriesPerServingKcal: number | null;
   steps: string[];
+  saved: boolean;
 };
 type Entry = {
   id: string;
@@ -83,6 +83,7 @@ export function BatchBoard({
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
   const [dayCount, setDayCount] = useState(initialDayCount);
   const [query, setQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [draggingKind, setDraggingKind] = useState<string | null>(null);
   // Read-only preview modal. `previewRecipe` is kept even while closing so the panel
   // still has content during the exit animation; `previewOrigin` is the source point
@@ -299,11 +300,25 @@ export function BatchBoard({
     }
   }
 
-  const filteredRecipes = recipes.filter((r) =>
-    r.title.toLowerCase().includes(query.trim().toLowerCase()),
+  const filteredRecipes = recipes.filter(
+    (r) =>
+      (!favoritesOnly || r.saved) &&
+      r.title.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const quota = batchQuota(entries);
-  const progressPct = dayCount ? Math.round((greenDays / dayCount) * 100) : 0;
+  // Top batch bar: a CONTINUOUS protein ratio so it advances with each dish (not by whole
+  // days). Each day's contribution is capped at the daily target so one overloaded day
+  // can't mask an empty one — it reaches 100% exactly when every day hits its target.
+  const hasTarget = targetG != null && targetG > 0;
+  const batchGoalG = hasTarget ? targetG * dayCount : 0;
+  const batchFilledG = hasTarget
+    ? byDay.reduce(
+        (sum, dayEntries) => sum + Math.min(dayProteinG(dayEntries), targetG),
+        0,
+      )
+    : 0;
+  const progressPct =
+    batchGoalG > 0 ? Math.round((batchFilledG / batchGoalG) * 100) : 0;
 
   return (
     <DndContext
@@ -321,7 +336,7 @@ export function BatchBoard({
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
             <span className="font-semibold">{t("batch.progressLabel")}</span>
             <span className="font-mono text-muted-foreground">
-              {greenDays}/{dayCount}
+              {hasTarget ? `${batchFilledG} / ${batchGoalG} g` : `${greenDays}/${dayCount}`}
             </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
@@ -345,63 +360,64 @@ export function BatchBoard({
           <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
             {t("batch.recipes")}
           </h2>
-          {recipes.length === 0 ? (
-            // Empty book → nothing to compose with yet. Send them to the library to save
-            // some recipes first (same "no recipe → go browse" logic as /book).
-            <div className="flex flex-col items-start gap-3">
+          <div className="relative mb-2">
+            <Search
+              className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("batch.searchPlaceholder")}
+              aria-label={t("batch.searchPlaceholder")}
+              className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
+            />
+          </div>
+          {/* Favorites filter — the palette shows public + own recipes by default (never
+              empty), narrow to saved ones here. */}
+          <button
+            type="button"
+            onClick={() => setFavoritesOnly((v) => !v)}
+            aria-pressed={favoritesOnly}
+            className={cn(
+              "mb-2 flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-colors",
+              favoritesOnly
+                ? "border-primary bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <Bookmark
+              className={cn("size-3.5", favoritesOnly && "fill-primary")}
+              aria-hidden
+            />
+            {t("recipes.filters.favorites")}
+          </button>
+          {/* Bounded height so a long list scrolls inside the palette instead of
+              stretching the page (the palette is sticky on desktop). */}
+          <div className="flex max-h-[24rem] flex-col gap-2 overflow-y-auto md:max-h-[calc(100vh-11rem)]">
+            {filteredRecipes.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {t("batch.emptyPalette")}
+                {t("batch.noRecipe")}
               </p>
-              <Link
-                href="/recipes"
-                className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                {t("book.browse")}
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="relative mb-2">
-                <Search
-                  className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
+            ) : (
+              filteredRecipes.map((recipe) => (
+                <RecipeChip
+                  key={recipe.id}
+                  draggableId={`recipe:${recipe.id}`}
+                  draggableData={{ kind: "recipe", recipeId: recipe.id }}
+                  title={recipe.title}
+                  proteinPerServingG={recipe.proteinPerServingG}
+                  onPreview={(source) => openPreview(recipe, source)}
+                  onAdd={() => setAddFor(recipe)}
                 />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t("batch.searchPlaceholder")}
-                  aria-label={t("batch.searchPlaceholder")}
-                  className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
-                />
-              </div>
-              {/* Bounded height so a long book scrolls inside the palette instead of
-                  stretching the page (the palette is sticky on desktop). */}
-              <div className="flex max-h-[24rem] flex-col gap-2 overflow-y-auto md:max-h-[calc(100vh-11rem)]">
-                {filteredRecipes.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    {t("batch.noRecipe")}
-                  </p>
-                ) : (
-                  filteredRecipes.map((recipe) => (
-                    <RecipeChip
-                      key={recipe.id}
-                      draggableId={`recipe:${recipe.id}`}
-                      draggableData={{ kind: "recipe", recipeId: recipe.id }}
-                      title={recipe.title}
-                      proteinPerServingG={recipe.proteinPerServingG}
-                      onPreview={(source) => openPreview(recipe, source)}
-                      onAdd={() => setAddFor(recipe)}
-                    />
-                  ))
-                )}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                <span className="md:hidden">{t("batch.tapHint")}</span>
-                <span className="hidden md:inline">{t("batch.dragHint")}</span>
-              </p>
-            </>
-          )}
+              ))
+            )}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            <span className="md:hidden">{t("batch.tapHint")}</span>
+            <span className="hidden md:inline">{t("batch.dragHint")}</span>
+          </p>
         </PaletteZone>
 
         {/* Days + add-day + quota */}

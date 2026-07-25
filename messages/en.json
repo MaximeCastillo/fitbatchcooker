@@ -34,7 +34,6 @@
   "nav": {
     "batch": "My batches",
     "recipes": "Recipes",
-    "book": "My recipes",
     "chat": "The chef",
     "ingredients": "Ingredients",
     "account": "My account",
@@ -93,7 +92,6 @@
     "recipes": "Recipes",
     "searchPlaceholder": "Search…",
     "noRecipe": "No recipe.",
-    "emptyPalette": "Save recipes to your book to compose a batch.",
     "dragHint": "Drag a recipe onto a day (Shift = duplicate), or tap +.",
     "tapHint": "Tap + to add a recipe to a day.",
     "preview": "Recipe preview",
@@ -131,7 +129,8 @@
     "remove": "Remove",
     "new": "New recipe",
     "filters": {
-      "search": "Search a recipe…"
+      "search": "Search a recipe…",
+      "favorites": "Favorites"
     },
     "mealType": {
       "all": "All",
@@ -159,11 +158,6 @@
       "stepsEmpty": "The steps for this recipe are coming soon.",
       "approxNote": "Approximate values — what matters is consistency."
     }
-  },
-  "book": {
-    "title": "My recipes",
-    "empty": "You haven't saved any recipe yet.",
-    "browse": "Browse recipes"
   },
   "chat": {
     "title": "The chef",
