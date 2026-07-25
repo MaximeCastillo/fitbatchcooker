@@ -9,6 +9,7 @@ import {
   type RecipeCardData,
 } from "@/app/[locale]/recipes/actions";
 import { RecipeCard } from "@/components/recipe-card";
+import { RecipeGridSkeleton } from "@/components/recipe-grid-skeleton";
 import { SaveToggle } from "@/components/save-toggle";
 import {
   Dialog,
@@ -36,43 +37,6 @@ export function IngredientRecipesModal({
   onClose: () => void;
 }) {
   const t = useTranslations("ingredients");
-  const [recipes, setRecipes] = useState<RecipeCardData[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const loadingRef = useRef(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  // (Re)load page 1 whenever a new ingredient is opened.
-  useEffect(() => {
-    if (!ingredient) return;
-    let active = true;
-    loadingRef.current = true;
-    loadRecipesByIngredient(ingredient.id, null).then((res) => {
-      if (!active) return;
-      setRecipes(res.recipes);
-      setCursor(res.nextCursor);
-      loadingRef.current = false;
-    });
-    return () => {
-      active = false;
-    };
-  }, [ingredient]);
-
-  // Infinite scroll inside the modal's scroll area.
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || cursor === null || !ingredient) return;
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries[0].isIntersecting || loadingRef.current) return;
-      loadingRef.current = true;
-      loadRecipesByIngredient(ingredient.id, cursor).then((res) => {
-        setRecipes((prev) => [...prev, ...res.recipes]);
-        setCursor(res.nextCursor);
-        loadingRef.current = false;
-      });
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [cursor, ingredient]);
 
   return (
     <Dialog
@@ -88,38 +52,101 @@ export function IngredientRecipesModal({
                 {t("recipesWith", { name: ingredient.name })}
               </DialogTitle>
             </DialogHeader>
-            <div className="max-h-[60vh] overflow-y-auto">
-              {recipes.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">
-                  {t("noRecipeWith")}
-                </p>
-              ) : (
-                <ul className="grid gap-3">
-                  {recipes.map((recipe) => (
-                    <li key={recipe.id}>
-                      <RecipeCard
-                        recipe={recipe}
-                        href={`/recipes/${recipe.id}`}
-                        bookmark={
-                          canSave ? (
-                            <SaveToggle
-                              recipeId={recipe.id}
-                              saved={recipe.saved}
-                            />
-                          ) : undefined
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {cursor !== null && (
-                <div ref={sentinelRef} className="h-8" aria-hidden />
-              )}
-            </div>
+            {/* Keyed by id → the list remounts fresh for each ingredient, so we never
+                flash the previous ingredient's recipes while the new ones load. */}
+            <IngredientRecipes
+              key={ingredient.id}
+              ingredientId={ingredient.id}
+              canSave={canSave}
+            />
           </>
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function IngredientRecipes({
+  ingredientId,
+  canSave,
+}: {
+  ingredientId: string;
+  canSave: boolean;
+}) {
+  const t = useTranslations("ingredients");
+  const [recipes, setRecipes] = useState<RecipeCardData[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const loadingRef = useRef(true);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Initial page. This component is remounted per ingredient (via key), so state starts
+  // empty + loading — no stale results from a previously opened ingredient.
+  useEffect(() => {
+    let active = true;
+    loadRecipesByIngredient(ingredientId, null).then((res) => {
+      if (!active) return;
+      setRecipes(res.recipes);
+      setCursor(res.nextCursor);
+      setLoading(false);
+      loadingRef.current = false;
+    });
+    return () => {
+      active = false;
+    };
+  }, [ingredientId]);
+
+  // Infinite scroll for further pages.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || cursor === null) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting || loadingRef.current) return;
+      loadingRef.current = true;
+      loadRecipesByIngredient(ingredientId, cursor).then((res) => {
+        setRecipes((prev) => [...prev, ...res.recipes]);
+        setCursor(res.nextCursor);
+        loadingRef.current = false;
+      });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [cursor, ingredientId]);
+
+  if (loading) {
+    return (
+      <div className="py-1">
+        <RecipeGridSkeleton count={2} />
+      </div>
+    );
+  }
+
+  if (recipes.length === 0) {
+    return (
+      <p className="py-6 text-center text-sm text-muted-foreground">
+        {t("noRecipeWith")}
+      </p>
+    );
+  }
+
+  return (
+    <div className="max-h-[60vh] overflow-y-auto">
+      <ul className="grid gap-3">
+        {recipes.map((recipe) => (
+          <li key={recipe.id}>
+            <RecipeCard
+              recipe={recipe}
+              href={`/recipes/${recipe.id}`}
+              bookmark={
+                canSave ? (
+                  <SaveToggle recipeId={recipe.id} saved={recipe.saved} />
+                ) : undefined
+              }
+            />
+          </li>
+        ))}
+      </ul>
+      {cursor !== null && <div ref={sentinelRef} className="h-8" aria-hidden />}
+    </div>
   );
 }

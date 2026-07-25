@@ -48,6 +48,7 @@
     "count": "{count, plural, one {# ingrédient} other {# ingrédients}}",
     "proteinPer100g": "≈ {grams} g de protéines / 100 g",
     "proteinPer100gShort": "≈ {grams} g",
+    "proteinBasis": "protéines pour 100 g",
     "recipesWith": "Recettes avec {name}",
     "noRecipeWith": "Aucune recette n'utilise cet ingrédient pour l'instant.",
     "categories": {
