@@ -374,3 +374,25 @@ requête et non en colonne `NOT NULL`.
   légumineuses/oléagineux, valeurs protéiques de référence. Le seed **purge les ingrédients
   renommés/retirés** non référencés. **Unité œuf en grammes conservée** pour le MVP (compteur
   d'unités reporté). **Cap : on arrête le polish de cette feature ici**, place au reste du MVP.
+
+## 2026-07-25 — Retours d'usage (round 3) : modale de retour, filtres multi-select
+- **La modale recette revient — mais en état client**, pas en route interceptée. Le premier
+  essai (`@modal` + `(.)[id]`, cf. entrée précédente) jetait des 500 « Invalid interception
+  route » sous le segment `[locale]` : supprimé en `8418a95`. La v2 est un simple Radix
+  Dialog piloté par `useState` dans `RecipeBrowser` — même pattern que la modale ingrédients,
+  qui elle n'a jamais bronché. **Pourquoi :** on perd le lien profond « URL = modale ouverte »,
+  mais on gagne un truc qui ne casse pas ; l'interception de route reste un piège tant que
+  Next ne la gère pas proprement sous un segment dynamique de locale.
+- **La carte reste un vrai `<a>`** : on n'intercepte que le clic gauche simple. Cmd/Ctrl-clic,
+  clic milieu et « ouvrir dans un nouvel onglet » atteignent toujours la page autonome.
+- **Filtres type de repas en multi-select** (`mealTypes[]` → `{ mealType: { in: [...] } }`),
+  « Tous » = vider la sélection. Chips passées à 44 px : on tape beaucoup plus dessus.
+- **Filtres transmis par `?from=`** de la modale vers la page recette, puis re-sérialisés par
+  la page pour bâtir son lien retour. `filter-params.ts` est la source unique de cet encodage
+  et **valide par whitelist** : un `?from=` bricolé retombe sur `/recipes` nu.
+- **`SaveToggle` gagne un `onToggle`** : un favori coché dans la modale met à jour la carte
+  derrière. La liste fige ses lignes dans un `useState`, donc `revalidatePath` ne l'atteint
+  jamais (même racine que le bug favori du round 2).
+- **Hydration mismatch sur `<body>`** : c'était une **extension navigateur**
+  (`cz-shortcut-listen`) qui écrit dans le DOM avant React, pas notre code →
+  `suppressHydrationWarning` sur `<body>`.
