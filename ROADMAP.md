@@ -17,7 +17,6 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
 - [x] **Multi-plans** : liste « Mes batchs », créer / renommer / supprimer. ✅
 - [x] **Drag & drop** (`@dnd-kit`) : palette→jour, jour→jour, **Maj = dupliquer**,
       palette = zone « ranger », **optimistic UI** + fallback select. ✅
-- [ ] **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
 - [~] **Mobile tap-first** (`PRINCIPLES.md` §5) — **v1 faite** : tap-to-add (« + » → « ajouter
       à quel jour ? »), actions visibles au doigt, scroll vs drag réglé (Mouse/Touch sensors).
       **Reste** : test mobile réel, chemin **tap pour déplacer** entre jours, affiner cibles ≥ 44 px.
@@ -62,6 +61,7 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - **Guide** : product-tour léger ("clique ici") + **chef contextuel** (aide par page).
 
 ## 🔭 Plus tard / idées
+- **« Ajouter à mon batch » depuis les cartes recettes** (2ᵉ point d'entrée) — **écarté le 2026-07-26**, on n'en veut pas pour l'instant. Le seul chemin reste le composeur (glisser depuis la palette, ou « + » → « quel jour ? »).
 - **3D** : d'abord la **célébration "jour scellé au vert"** (1er moment 3D, périmètre
   maîtrisé) ; **mascotte** (2D puis éventuellement 3D) bien après, si ça décolle.
 - **"Ce que le chef sait de moi"** : écran préférences éditable/supprimable.

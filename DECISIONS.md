@@ -416,6 +416,10 @@ requête et non en colonne `NOT NULL`.
 - **Reste vraiment à faire côté « recettes riches »** : les **images** (Phase C, rien de
   commencé) et le **filtre par type dans la palette du composeur** (la page `/recipes`
   filtre, la palette non).
-- **Fin des worktrees pour ce dépôt** : `"worktree": {"bgIsolation": "none"}` dans
-  `.claude/settings.json`. **Pourquoi :** solo dev, on travaille sur `main` — l'isolation
-  en worktree et la cérémonie PR ne protégeaient personne et ajoutaient une étape.
+- **On commite directement sur `main`** (retour au rythme des débuts du projet). Solo dev,
+  MVP non-prod : la cérémonie branche/PR et l'isolation en worktree ne protègent personne.
+  Le **worktree reste dans la boîte à outils pour ce à quoi il sert vraiment** — l'isolation
+  quand plusieurs agents/jobs écrivent en parallèle — pas pour le travail courant.
+  `.claude/settings.json` reste à la **config Claude par défaut** (pas d'override).
+- **« Ajouter à mon batch » depuis les cartes recettes : écarté.** On n'en veut pas pour
+  l'instant ; l'ajout se fait uniquement depuis le composeur. Déplacé en « Plus tard ».
