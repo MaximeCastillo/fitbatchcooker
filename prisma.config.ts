@@ -10,6 +10,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Command run by `npx prisma db seed` (Prisma 7 moved this out of package.json).
+    seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
     url: env("DIRECT_URL"),

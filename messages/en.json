@@ -34,11 +34,35 @@
   "nav": {
     "batch": "My batches",
     "recipes": "Recipes",
-    "book": "My recipes",
     "chat": "The chef",
+    "ingredients": "Ingredients",
     "account": "My account",
     "login": "Sign in",
     "logout": "Sign out"
+  },
+  "ingredients": {
+    "title": "Ingredients",
+    "search": "Search an ingredient…",
+    "empty": "No ingredients.",
+    "all": "All",
+    "count": "{count, plural, one {# ingredient} other {# ingredients}}",
+    "proteinPer100g": "≈ {grams} g protein / 100 g",
+    "proteinPer100gShort": "≈ {grams} g",
+    "proteinBasis": "protein per 100 g",
+    "recipesWith": "Recipes with {name}",
+    "noRecipeWith": "No recipe uses this ingredient yet.",
+    "categories": {
+      "MEAT": "Meat",
+      "FISH": "Fish",
+      "VEGETABLE": "Vegetable",
+      "DAIRY_EGG": "Dairy & egg",
+      "STARCH": "Starch",
+      "FRUIT": "Fruit",
+      "NUTS_SEEDS": "Nuts & seeds",
+      "LEGUME": "Legume",
+      "CONDIMENT": "Condiment",
+      "OTHER": "Other"
+    }
   },
   "batch": {
     "defaultName": "Batch of {dateLabel}",
@@ -104,17 +128,37 @@
     "save": "Save",
     "saved": "Saved ✓",
     "remove": "Remove",
+    "new": "New recipe",
+    "filters": {
+      "search": "Search a recipe…",
+      "favorites": "Favorites"
+    },
+    "mealType": {
+      "all": "All",
+      "MAIN": "Mains",
+      "SNACK": "Snacks",
+      "BREAKFAST": "Breakfast"
+    },
+    "end": "You've seen it all!",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. Grilled chicken, rice & broccoli",
+      "mealType": "Type",
+      "steps": "Steps",
+      "step": "Step",
+      "addStep": "Add a step",
+      "ingredients": "Ingredients",
+      "pickIngredient": "Pick…",
+      "addIngredient": "Add an ingredient",
+      "submit": "Create recipe"
+    },
     "detail": {
       "back": "All recipes",
+      "ingredientsTitle": "Ingredients",
       "stepsTitle": "Preparation",
       "stepsEmpty": "The steps for this recipe are coming soon.",
       "approxNote": "Approximate values — what matters is consistency."
     }
-  },
-  "book": {
-    "title": "My recipes",
-    "empty": "You haven't saved any recipe yet.",
-    "browse": "Browse recipes"
   },
   "chat": {
     "title": "The chef",
@@ -131,6 +175,9 @@
   "profile": {
     "title": "Profile",
     "firstName": "First name",
+    "weight": "Weight (kg)",
+    "weightHint": "We derive your protein goal from it (~2 g/kg).",
+    "customTarget": "Customize",
     "proteinTarget": "Protein goal (g/day)",
     "proteinHint": "We suggest ~2 g/kg of body weight — it's up to you to set your target.",
     "save": "Save",

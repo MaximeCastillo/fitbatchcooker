@@ -297,3 +297,80 @@ langue — non pertinent maintenant (app perso, derrière auth). Le jour où le 
 (une **landing**), on repassera en `as-needed` **sélectivement** sur ces pages (juste un flag).
 **À revoir :** renommer `middleware.ts` → `proxy.ts` (déprécation Next 16) ; métadonnées
 `title`/`description` non encore localisées.
+
+## 2026-07-25 — Cœur produit : ingrédients partagés + recettes per-user
+**Décision :** deux couches distinctes. **Ingrédients GLOBAUX** (un catalogue unique : nom,
+catégorie+picto, `proteinPer100g` ~objectif, dédupliqués par `normalizedName`), réutilisés
+par toutes les recettes et tous les users ; le chef lit l'existant avant d'en créer.
+**Recettes PER-USER** via `Recipe.userId` **nullable** : `NULL` = **bibliothèque partagée**
+(contenu curé qui peut grandir), non-null = recette de l'user ; navigation =
+`where OR [userId=moi, null]`. **2 axes orthogonaux** : `Recipe.userId` = propriété ;
+`UserRecipe` = sauvegardé/favori (« mon livre ») — on garde les deux. **1 recette = 1 part**
+(pas de `servings` ; pour manger plus, poser le plat plusieurs fois dans un jour).
+**Protéines/part dérivées** des ingrédients mais **mises en cache** dans
+`Recipe.proteinPerServingG` (recalculées à chaque write via `recomputeRecipeProtein`) → le
+composeur de batch (chemin chaud) lit la colonne, inchangé. Création : **manuelle**
+(`/recipes/new`) **et par le chef** (`create_recipe`, confirmation explicite). Navigation :
+filtres + **scroll infini** (curseur). **Seed recherché** (44 ingrédients + 19 recettes,
+protéines croisées Ciqual/USDA).
+**Pourquoi :** réconcilie partage (protéine ~objective → globale) et personnalisation
+(recettes = mienne vs bibliothèque). Le cache protéine garde la jauge rapide sans dupliquer
+la logique. `userId` nullable **pour toujours** = sentinelle « bibliothèque », visibilité en
+requête et non en colonne `NOT NULL`.
+**Contenu recettes en français** (la parité bilingue stricte = UI/`messages` seulement).
+**Différé :** communauté/partage, upload d'images, édition `proteinPer100g`, liste de courses.
+
+## 2026-07-25 — Affinages cœur produit (retours d'usage)
+Évolutions du socle ci-dessus après premier usage :
+- **Catalogue d'ingrédients VERROUILLÉ** (seed only) : ni le chef ni le formulaire ne créent
+  d'ingrédient — ils ne piochent que dans l'existant (un nom inconnu proposé par le chef est
+  rejeté, pas créé). On étoffe le seed (~80 ingrédients) au lieu d'ouvrir la création.
+  **Pourquoi :** l'ingrédient est partagé par tous → éviter la pollution/les doublons de la base.
+- **Catégorie `CONDIMENT`** (huile, sel, poivre, sauce soja, miel…) remplace `FAT` (supprimée) ;
+  avocat → `VEGETABLE`. Basiques = supposés dispo, rangés à part.
+- **Deux listes distinctes** : `/recipes` = **bibliothèque partagée** (découverte + bookmark,
+  non modifiable) ; `/book` (« Mes recettes ») = **livre** = recettes sauvegardées + créées
+  (auto-sauvegardées). Le bouton « Nouvelle recette » vit sur `/book`. La **palette du batch =
+  le livre**. On a retiré le filtre « mine » (propriété) devenu source de confusion.
+- **Suppression de `servings`** (Recipe + BatchEntry) : 1 entrée = 1 part. Manger à plusieurs =
+  poser le plat N fois dans un jour, **affiché groupé en ×N** (comme le bloc « à cuisiner »).
+- **Page ingrédients = recherche inversée** (façon Marmiton) : cliquer un ingrédient ouvre les
+  recettes qui l'utilisent (bookmark + scroll infini). Pas d'édition (base partagée).
+
+## 2026-07-25 — Retours d'usage (round 2)
+- **Pivot : un seul onglet « Recettes »** (fin de `/book`). La page montre **public + mes
+  recettes** (scopé, jamais celles d'un autre user) avec un **filtre « Favoris »** (= lignes
+  `UserRecipe`). La palette du batch utilise la même source + le même filtre → **plus jamais
+  vide** au 1ᵉʳ usage. Distinction publique/perso conservée en base (`Recipe.userId`),
+  transparente pour l'user. **Pourquoi :** le split biblio/livre rendait la palette vide au
+  départ et « Mes recettes » vs « Recettes » était confus.
+- **Picto par ingrédient** : colonne `Ingredient.picto` semée par un emoji best-fit (map
+  nom→emoji dans le seed) ; fallback sur le picto de catégorie. **Pourquoi :** un picto par
+  catégorie montrait du riz pour des pâtes, du sel pour de l'huile.
+- **Objectif protéines dérivé du poids** : on capture le **poids** au profil → **~2 g/kg**
+  (friction minimale) ; un **switch « objectif personnalisé »** override (implicite : `on`
+  ssi `proteinTargetG` non-null, pas de colonne en plus). **Pourquoi :** sans objectif, les
+  jauges restaient à 0 (`dayProgressPct` → 0) et semblaient cassées.
+- **Barre de progression du batch continue** : **somme de toutes les protéines / objectif
+  total** (`cible × jours`) au lieu de `jours_verts / jours` → elle avance **à chaque plat**,
+  en un coup d'œil. La barre plafonne à 100 % mais le libellé montre le vrai total (« 228 /
+  200 g », teinté quand on dépasse). Choix assumé : simplicité/lisibilité plutôt qu'une
+  formule par jour (un gros jour peut « masquer » un jour vide — acceptable ici).
+- **Bug favori corrigé** : `SaveToggle` possède son état (`useState`) — un `useOptimistic`
+  retombait sur un prop figé par le `useState(initialRecipes)` de la liste (favori qui ne
+  « prenait » qu'au reload).
+- **Images (chat + recettes) : différées** ; approche prévue = génération IA + cache Supabase
+  Storage (bucket + `SUPABASE_SERVICE_ROLE_KEY` à provisionner), ~1-4 ¢/image.
+
+## 2026-07-25 — Modale recette + catalogue d'ingrédients élargi
+- **Fiche recette en modale** depuis la liste `/recipes` (routes parallèles `@modal` +
+  interception `(.)[id]`) : la liste reste montée dessous → **filtres + scroll préservés**
+  (« pour pas perdre le fil »). Lien « page complète » dans la modale ; lien direct / refresh
+  / partage → page autonome. Fetch mutualisé dans `recipe-detail-data.ts`. **Pourquoi :**
+  ouvrir une recette puis revenir perdait les filtres sélectionnés.
+- **Catalogue d'ingrédients élargi (~157) et généralisé** : noms génériques (« Champignons »
+  au lieu de « Champignons de Paris », « Bœuf »/« Porc », « Tortilla »…) pour qu'une entrée
+  couvre plusieurs recettes ; gros ajout de **fruits** + légumes/poissons/fromages/féculents/
+  légumineuses/oléagineux, valeurs protéiques de référence. Le seed **purge les ingrédients
+  renommés/retirés** non référencés. **Unité œuf en grammes conservée** pour le MVP (compteur
+  d'unités reporté). **Cap : on arrête le polish de cette feature ici**, place au reste du MVP.

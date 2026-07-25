@@ -22,7 +22,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Eye, Plus, Search, Trash2 } from "lucide-react";
+import { Bookmark, Eye, Plus, Search, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   addEntry,
@@ -55,15 +55,14 @@ type Recipe = {
   title: string;
   proteinPerServingG: number | null;
   summary: string | null;
-  servings: number;
   caloriesPerServingKcal: number | null;
   steps: string[];
+  saved: boolean;
 };
 type Entry = {
   id: string;
   recipeId: string;
   dayIndex: number;
-  servings: number;
   title: string;
   proteinPerServingG: number | null;
 };
@@ -84,6 +83,7 @@ export function BatchBoard({
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
   const [dayCount, setDayCount] = useState(initialDayCount);
   const [query, setQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [draggingKind, setDraggingKind] = useState<string | null>(null);
   // Read-only preview modal. `previewRecipe` is kept even while closing so the panel
   // still has content during the exit animation; `previewOrigin` is the source point
@@ -169,10 +169,7 @@ export function BatchBoard({
   ).length;
   const avgPerDay = dayCount
     ? Math.round(
-        entries.reduce(
-          (s, e) => s + (e.proteinPerServingG ?? 0) * e.servings,
-          0,
-        ) / dayCount,
+        entries.reduce((s, e) => s + (e.proteinPerServingG ?? 0), 0) / dayCount,
       )
     : 0;
 
@@ -187,7 +184,6 @@ export function BatchBoard({
         id: temp,
         recipeId,
         dayIndex,
-        servings: 1,
         title: recipe.title,
         proteinPerServingG: recipe.proteinPerServingG,
       },
@@ -304,11 +300,24 @@ export function BatchBoard({
     }
   }
 
-  const filteredRecipes = recipes.filter((r) =>
-    r.title.toLowerCase().includes(query.trim().toLowerCase()),
+  const filteredRecipes = recipes.filter(
+    (r) =>
+      (!favoritesOnly || r.saved) &&
+      r.title.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const quota = batchQuota(entries);
-  const progressPct = dayCount ? Math.round((greenDays / dayCount) * 100) : 0;
+  // Top batch bar: ALL protein placed across the batch over the whole goal (target × days).
+  // Dead simple so it advances with every dish at a glance — no per-day maths. Going over
+  // is fine: the bar caps at 100% but the label shows the real total (e.g. 228 / 200 g).
+  const hasTarget = targetG != null && targetG > 0;
+  const batchGoalG = hasTarget ? targetG * dayCount : 0;
+  const batchFilledG = entries.reduce(
+    (sum, e) => sum + (e.proteinPerServingG ?? 0),
+    0,
+  );
+  const progressPct =
+    batchGoalG > 0 ? Math.min(100, Math.round((batchFilledG / batchGoalG) * 100)) : 0;
+  const overTarget = batchGoalG > 0 && batchFilledG > batchGoalG;
 
   return (
     <DndContext
@@ -325,8 +334,13 @@ export function BatchBoard({
         <div className="min-w-45 flex-1">
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
             <span className="font-semibold">{t("batch.progressLabel")}</span>
-            <span className="font-mono text-muted-foreground">
-              {greenDays}/{dayCount}
+            <span
+              className={cn(
+                "font-mono text-muted-foreground",
+                overTarget && "font-semibold text-primary",
+              )}
+            >
+              {hasTarget ? `${batchFilledG} / ${batchGoalG} g` : `${greenDays}/${dayCount}`}
             </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
@@ -364,7 +378,28 @@ export function BatchBoard({
               className="w-full rounded-lg border border-input bg-background py-1.5 pl-8 pr-2 text-sm outline-none focus-visible:border-ring"
             />
           </div>
-          <div className="flex flex-col gap-2">
+          {/* Favorites filter — the palette shows public + own recipes by default (never
+              empty), narrow to saved ones here. */}
+          <button
+            type="button"
+            onClick={() => setFavoritesOnly((v) => !v)}
+            aria-pressed={favoritesOnly}
+            className={cn(
+              "mb-2 flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-colors",
+              favoritesOnly
+                ? "border-primary bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <Bookmark
+              className={cn("size-3.5", favoritesOnly && "fill-primary")}
+              aria-hidden
+            />
+            {t("recipes.filters.favorites")}
+          </button>
+          {/* Bounded height so a long list scrolls inside the palette instead of
+              stretching the page (the palette is sticky on desktop). */}
+          <div className="flex max-h-[24rem] flex-col gap-2 overflow-y-auto md:max-h-[calc(100vh-11rem)]">
             {filteredRecipes.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {t("batch.noRecipe")}
@@ -576,17 +611,26 @@ const chipCardClass =
 function ChipBody({
   title,
   proteinPerServingG,
+  count,
 }: {
   title: string;
   proteinPerServingG: number | null;
+  count?: number;
 }) {
   return (
     <>
       <span className="line-clamp-2 text-sm font-semibold leading-tight">
         {title}
       </span>
-      <span className="font-mono text-xs font-bold text-accent-warm">
-        {proteinPerServingG ?? "—"} g
+      <span className="flex items-center gap-1.5">
+        <span className="font-mono text-xs font-bold text-accent-warm">
+          {proteinPerServingG ?? "—"} g
+        </span>
+        {count && count > 1 ? (
+          <span className="rounded-full bg-primary/10 px-1.5 font-display text-xs font-bold text-primary">
+            ×{count}
+          </span>
+        ) : null}
       </span>
     </>
   );
@@ -607,6 +651,7 @@ function RecipeChip({
   draggableData,
   title,
   proteinPerServingG,
+  count,
   onPreview,
   onAdd,
   onRemove,
@@ -616,6 +661,7 @@ function RecipeChip({
   draggableData: Record<string, unknown>;
   title: string;
   proteinPerServingG: number | null;
+  count?: number;
   onPreview: (source: HTMLElement) => void;
   onAdd?: () => void;
   onRemove?: () => void;
@@ -639,7 +685,7 @@ function RecipeChip({
         fadeWhenDragging && isDragging && "opacity-40",
       )}
     >
-      <ChipBody title={title} proteinPerServingG={proteinPerServingG} />
+      <ChipBody title={title} proteinPerServingG={proteinPerServingG} count={count} />
       <div className="absolute right-1 top-1 flex gap-0.5">
         {onAdd && (
           <button
@@ -675,6 +721,30 @@ function RecipeChip({
       </div>
     </div>
   );
+}
+
+// Collapse a day's entries into one group per recipe (one entry = one part), preserving
+// first-seen order so chips don't jump around as parts are added/removed.
+type EntryGroup = {
+  recipeId: string;
+  title: string;
+  proteinPerServingG: number | null;
+  entryIds: string[];
+};
+function groupByRecipe(entries: Entry[]): EntryGroup[] {
+  const groups = new Map<string, EntryGroup>();
+  for (const entry of entries) {
+    const group = groups.get(entry.recipeId);
+    if (group) group.entryIds.push(entry.id);
+    else
+      groups.set(entry.recipeId, {
+        recipeId: entry.recipeId,
+        title: entry.title,
+        proteinPerServingG: entry.proteinPerServingG,
+        entryIds: [entry.id],
+      });
+  }
+  return [...groups.values()];
 }
 
 function DayRow({
@@ -741,21 +811,25 @@ function DayRow({
         </div>
       </div>
 
-      {/* Right: dishes */}
+      {/* Right: dishes. Same recipe placed several times = ONE chip with ×N (one entry
+          per part). Dragging moves one part; the trash removes one part. */}
       <div className="flex-1">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("dropHere")}</p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-            {entries.map((entry) => (
+            {groupByRecipe(entries).map((group) => (
               <RecipeChip
-                key={entry.id}
-                draggableId={`entry:${entry.id}`}
-                draggableData={{ kind: "entry", entryId: entry.id }}
-                title={entry.title}
-                proteinPerServingG={entry.proteinPerServingG}
-                onPreview={(source) => onPreviewRecipe(entry.recipeId, source)}
-                onRemove={() => onRemoveEntry(entry.id)}
+                key={group.recipeId}
+                draggableId={`entry:${group.entryIds[0]}`}
+                draggableData={{ kind: "entry", entryId: group.entryIds[0] }}
+                title={group.title}
+                proteinPerServingG={group.proteinPerServingG}
+                count={group.entryIds.length}
+                onPreview={(source) => onPreviewRecipe(group.recipeId, source)}
+                onRemove={() =>
+                  onRemoveEntry(group.entryIds[group.entryIds.length - 1])
+                }
                 fadeWhenDragging
               />
             ))}

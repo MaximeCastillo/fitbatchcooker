@@ -10,6 +10,28 @@ datasource db {
   provider = "postgresql"
 }
 
+// Coarse ingredient family — drives the category picto (lib/ingredients.ts) and the
+// ingredients-page filter. Enum values in English (code); French labels live in i18n.
+enum IngredientCategory {
+  MEAT
+  FISH
+  VEGETABLE
+  DAIRY_EGG
+  STARCH
+  FRUIT
+  NUTS_SEEDS
+  LEGUME
+  CONDIMENT
+  OTHER
+}
+
+// What kind of thing a recipe is. Subsumes the earlier MAIN|SNACK "kind" idea.
+enum MealType {
+  MAIN
+  SNACK
+  BREAKFAST
+}
+
 // A user of the app. Will later be linked to Supabase Auth (id = auth.users.id).
 model User {
   id             String   @id @default(uuid()) @db.Uuid
@@ -24,29 +46,74 @@ model User {
   updatedAt      DateTime @updatedAt
 
   savedRecipes   UserRecipe[]
+  recipes        Recipe[]
   preferences    Preference[]
   batches        Batch[]
 }
 
-// A recipe. Seed recipes and AI-validated recipes both live here.
+// A recipe. `userId` = ownership: NULL means a shared starter/template recipe (the
+// curated library, visible to everyone read-only); non-null means a user's own recipe.
+// A recipe is ONE part (MVP): to eat more, place it several times in a batch. Protein/
+// part is DERIVED from the ingredients (see lib/recipes.ts) and cached in
+// proteinPerServingG so the batch composer's hot path keeps reading a single column.
 model Recipe {
   id       String   @id @default(uuid()) @db.Uuid
+  userId   String?  @db.Uuid
   title    String
   summary  String?
   // Ordered preparation steps.
   steps    String[]
-  // Reference portion; displayed quantities scale from this.
-  servings Int      @default(1)
-  // Highlighted metric (estimate) — protein per serving in grams.
+  mealType MealType @default(MAIN)
+  imageUrl String?
+  // Cached, derived from the recipe's ingredients (protein for one part), in grams.
   proteinPerServingG     Int?
   caloriesPerServingKcal Int?
-  // Free-form tag for now (chicken, pasta, ...). May become an enum later.
-  category  String?
+  // Legacy: `category` unused (superseded by mealType). Kept additive; removable later.
+  category String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredients  RecipeIngredient[]
   savedBy      UserRecipe[]
   batchEntries BatchEntry[]
+
+  @@index([userId])
+}
+
+// A shared, GLOBAL ingredient reused across recipes and users. `proteinPer100g` is
+// ~objective ("à la louche", PRINCIPLES §3). `normalizedName` is the dedup key
+// (lowercased, accent-stripped) the chef uses to reuse existing rows before creating
+// new ones. `defaultQuantityG` = the "usual amount" prefill hint.
+model Ingredient {
+  id               String             @id @default(uuid()) @db.Uuid
+  name             String
+  normalizedName   String             @unique
+  category         IngredientCategory
+  proteinPer100g   Float
+  defaultQuantityG Int?
+  // Per-ingredient emoji; falls back to the category picto when null (see lib/ingredients).
+  picto            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  recipeLinks RecipeIngredient[]
+}
+
+// Join: an ingredient used in a recipe, with the quantity (g) FOR ONE PART of the recipe.
+model RecipeIngredient {
+  id           String   @id @default(uuid()) @db.Uuid
+  recipeId     String   @db.Uuid
+  ingredientId String   @db.Uuid
+  quantityG    Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([recipeId, ingredientId])
+  @@index([ingredientId])
 }
 
 // A user's saved recipe (their "recipe book" entry): links a user to a recipe, with
@@ -101,15 +168,14 @@ model Batch {
   @@index([userId])
 }
 
-// A dish placed in a plan, on a given day (0-based dayIndex) with a number of servings.
-// Protein contribution = servings × recipe.proteinPerServingG. Batch quota = total
-// servings of a recipe across the whole plan.
+// A dish placed in a plan, on a given day (0-based dayIndex). One entry = one part;
+// protein contribution = recipe.proteinPerServingG. Placing a recipe twice in a day = two
+// entries (shown grouped as ×N). Batch quota = number of entries of a recipe across the plan.
 model BatchEntry {
   id        String   @id @default(uuid()) @db.Uuid
   batchId   String   @db.Uuid
   recipeId  String   @db.Uuid
   dayIndex  Int
-  servings  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -117,6 +183,6 @@ model BatchEntry {
   recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   // No uniqueness on (batch, day, recipe): a user may place the same dish more than once
-  // in a day. Quantity is expressed either by `servings` or by multiple entries.
+  // in a day (each placement is one part; the UI groups them as ×N).
   @@index([batchId])
 }

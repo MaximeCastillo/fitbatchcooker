@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { dailyProteinTargetG } from "@/lib/nutrition";
+import { recipeVisibilityWhere } from "@/lib/recipes";
 import { BatchBoard } from "@/components/batch-board";
 import { BatchTitle } from "@/components/batch-title";
 import { Link, redirect } from "@/i18n/navigation";
@@ -30,7 +31,13 @@ export default async function BatchPage({
         entries: { include: { recipe: true }, orderBy: { createdAt: "asc" } },
       },
     }),
-    prisma.recipe.findMany({ orderBy: { title: "asc" } }),
+    // Palette = every recipe the user may see (shared library + their own), so it's never
+    // empty at first use. A client-side Favorites toggle narrows it to saved recipes.
+    prisma.recipe.findMany({
+      where: recipeVisibilityWhere(user.id),
+      orderBy: { title: "asc" },
+      include: { savedBy: { where: { userId: user.id }, select: { id: true } } },
+    }),
   ]);
   if (!plan) notFound();
 
@@ -40,19 +47,19 @@ export default async function BatchPage({
     id: e.id,
     recipeId: e.recipeId,
     dayIndex: e.dayIndex,
-    servings: e.servings,
     title: e.recipe.title,
     proteinPerServingG: e.recipe.proteinPerServingG,
   }));
-  // Palette recipes carry enough to render the preview modal without a second fetch.
+  // Palette recipes carry enough to render the preview modal without a second fetch, plus
+  // whether the user saved it (for the Favorites filter).
   const recipeList = recipes.map((r) => ({
     id: r.id,
     title: r.title,
     proteinPerServingG: r.proteinPerServingG,
     summary: r.summary,
-    servings: r.servings,
     caloriesPerServingKcal: r.caloriesPerServingKcal,
     steps: r.steps,
+    saved: r.savedBy.length > 0,
   }));
 
   return (

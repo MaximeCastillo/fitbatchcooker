@@ -1,18 +1,17 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
 import { SaveToggle } from "@/components/save-toggle";
 import { RecipeDetail } from "@/components/recipe-detail";
 import { Link } from "@/i18n/navigation";
+import { getRecipeDetailData } from "../recipe-detail-data";
 
 // Render on each request: recipe content and per-user saved state both vary.
 export const dynamic = "force-dynamic";
 
-// Recipe detail: cooking steps, protein per serving, portions. Reached by tapping a
-// recipe card. Data access is server-side; the saved state is scoped to the logged-in
-// user (spec §7). Anonymous visitors can read the recipe but see no save button.
+// Recipe detail (full page): cooking steps, protein per serving, ingredients. Reached by
+// tapping a recipe card (the /recipes list keeps its filters in the URL, so Back restores
+// them). Visibility-scoped via the shared getRecipeDetailData helper.
 export default async function RecipeDetailPage({
   params,
 }: {
@@ -20,19 +19,8 @@ export default async function RecipeDetailPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("recipes");
-  const [recipe, user] = await Promise.all([
-    prisma.recipe.findUnique({ where: { id } }),
-    getCurrentUser(),
-  ]);
-
-  if (!recipe) notFound();
-
-  const isSaved = user
-    ? (await prisma.userRecipe.findUnique({
-        where: { userId_recipeId: { userId: user.id, recipeId: recipe.id } },
-        select: { id: true },
-      })) != null
-    : false;
+  const data = await getRecipeDetailData(id);
+  if (!data) notFound();
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
@@ -45,11 +33,11 @@ export default async function RecipeDetailPage({
       </Link>
 
       <div className="mb-4 flex items-start justify-between gap-3">
-        <h1 className="text-3xl font-bold tracking-tight">{recipe.title}</h1>
-        {user && <SaveToggle recipeId={recipe.id} saved={isSaved} />}
+        <h1 className="text-3xl font-bold tracking-tight">{data.title}</h1>
+        {data.canSave && <SaveToggle recipeId={data.id} saved={data.isSaved} />}
       </div>
 
-      <RecipeDetail recipe={recipe} />
+      <RecipeDetail recipe={data.detail} />
     </main>
   );
 }

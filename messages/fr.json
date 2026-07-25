@@ -34,11 +34,35 @@
   "nav": {
     "batch": "Mes batchs",
     "recipes": "Recettes",
-    "book": "Mes recettes",
     "chat": "Le chef",
+    "ingredients": "Ingrédients",
     "account": "Mon compte",
     "login": "Se connecter",
     "logout": "Se déconnecter"
+  },
+  "ingredients": {
+    "title": "Ingrédients",
+    "search": "Rechercher un ingrédient…",
+    "empty": "Aucun ingrédient.",
+    "all": "Tous",
+    "count": "{count, plural, one {# ingrédient} other {# ingrédients}}",
+    "proteinPer100g": "≈ {grams} g de protéines / 100 g",
+    "proteinPer100gShort": "≈ {grams} g",
+    "proteinBasis": "protéines pour 100 g",
+    "recipesWith": "Recettes avec {name}",
+    "noRecipeWith": "Aucune recette n'utilise cet ingrédient pour l'instant.",
+    "categories": {
+      "MEAT": "Viande",
+      "FISH": "Poisson",
+      "VEGETABLE": "Légume",
+      "DAIRY_EGG": "Œuf & laitier",
+      "STARCH": "Féculent",
+      "FRUIT": "Fruit",
+      "NUTS_SEEDS": "Noix & graines",
+      "LEGUME": "Légumineuse",
+      "CONDIMENT": "Condiment",
+      "OTHER": "Autre"
+    }
   },
   "batch": {
     "defaultName": "Batch du {dateLabel}",
@@ -104,17 +128,37 @@
     "save": "Sauvegarder",
     "saved": "Enregistré ✓",
     "remove": "Retirer",
+    "new": "Nouvelle recette",
+    "filters": {
+      "search": "Rechercher une recette…",
+      "favorites": "Favoris"
+    },
+    "mealType": {
+      "all": "Tous",
+      "MAIN": "Plats",
+      "SNACK": "Encas",
+      "BREAKFAST": "Petit-déj"
+    },
+    "end": "Tu as tout vu !",
+    "form": {
+      "title": "Titre",
+      "titlePlaceholder": "Ex. Poulet grillé, riz & brocoli",
+      "mealType": "Type",
+      "steps": "Étapes",
+      "step": "Étape",
+      "addStep": "Ajouter une étape",
+      "ingredients": "Ingrédients",
+      "pickIngredient": "Choisir…",
+      "addIngredient": "Ajouter un ingrédient",
+      "submit": "Créer la recette"
+    },
     "detail": {
       "back": "Toutes les recettes",
+      "ingredientsTitle": "Ingrédients",
       "stepsTitle": "Préparation",
       "stepsEmpty": "La procédure de cette recette arrive bientôt.",
       "approxNote": "Valeurs approximatives — l'important, c'est la régularité."
     }
-  },
-  "book": {
-    "title": "Mes recettes",
-    "empty": "Tu n'as pas encore sauvegardé de recette.",
-    "browse": "Parcourir les recettes"
   },
   "chat": {
     "title": "Le chef",
@@ -131,6 +175,9 @@
   "profile": {
     "title": "Profil",
     "firstName": "Prénom",
+    "weight": "Poids (kg)",
+    "weightHint": "On en déduit ton objectif protéines (~2 g/kg).",
+    "customTarget": "Personnaliser",
     "proteinTarget": "Objectif protéines (g/jour)",
     "proteinHint": "On conseille ~2 g/kg de masse corporelle — à toi de fixer ta cible.",
     "save": "Enregistrer",
