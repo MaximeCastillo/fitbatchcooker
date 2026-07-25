@@ -306,19 +306,18 @@ export function BatchBoard({
       r.title.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const quota = batchQuota(entries);
-  // Top batch bar: a CONTINUOUS protein ratio so it advances with each dish (not by whole
-  // days). Each day's contribution is capped at the daily target so one overloaded day
-  // can't mask an empty one — it reaches 100% exactly when every day hits its target.
+  // Top batch bar: ALL protein placed across the batch over the whole goal (target × days).
+  // Dead simple so it advances with every dish at a glance — no per-day maths. Going over
+  // is fine: the bar caps at 100% but the label shows the real total (e.g. 228 / 200 g).
   const hasTarget = targetG != null && targetG > 0;
   const batchGoalG = hasTarget ? targetG * dayCount : 0;
-  const batchFilledG = hasTarget
-    ? byDay.reduce(
-        (sum, dayEntries) => sum + Math.min(dayProteinG(dayEntries), targetG),
-        0,
-      )
-    : 0;
+  const batchFilledG = entries.reduce(
+    (sum, e) => sum + (e.proteinPerServingG ?? 0),
+    0,
+  );
   const progressPct =
-    batchGoalG > 0 ? Math.round((batchFilledG / batchGoalG) * 100) : 0;
+    batchGoalG > 0 ? Math.min(100, Math.round((batchFilledG / batchGoalG) * 100)) : 0;
+  const overTarget = batchGoalG > 0 && batchFilledG > batchGoalG;
 
   return (
     <DndContext
@@ -335,7 +334,12 @@ export function BatchBoard({
         <div className="min-w-45 flex-1">
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
             <span className="font-semibold">{t("batch.progressLabel")}</span>
-            <span className="font-mono text-muted-foreground">
+            <span
+              className={cn(
+                "font-mono text-muted-foreground",
+                overTarget && "font-semibold text-primary",
+              )}
+            >
               {hasTarget ? `${batchFilledG} / ${batchGoalG} g` : `${greenDays}/${dayCount}`}
             </span>
           </div>
