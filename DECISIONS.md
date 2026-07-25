@@ -351,9 +351,11 @@ requête et non en colonne `NOT NULL`.
   (friction minimale) ; un **switch « objectif personnalisé »** override (implicite : `on`
   ssi `proteinTargetG` non-null, pas de colonne en plus). **Pourquoi :** sans objectif, les
   jauges restaient à 0 (`dayProgressPct` → 0) et semblaient cassées.
-- **Barre de progression du batch continue** : `Σ min(protéine_jour, cible) / (cible ×
-  jours)` (bornée) au lieu de `jours_verts / jours` → elle avance **à chaque plat**, atteint
-  100 % quand tous les jours sont au vert.
+- **Barre de progression du batch continue** : **somme de toutes les protéines / objectif
+  total** (`cible × jours`) au lieu de `jours_verts / jours` → elle avance **à chaque plat**,
+  en un coup d'œil. La barre plafonne à 100 % mais le libellé montre le vrai total (« 228 /
+  200 g », teinté quand on dépasse). Choix assumé : simplicité/lisibilité plutôt qu'une
+  formule par jour (un gros jour peut « masquer » un jour vide — acceptable ici).
 - **Bug favori corrigé** : `SaveToggle` possède son état (`useState`) — un `useOptimistic`
   retombait sur un prop figé par le `useState(initialRecipes)` de la liste (favori qui ne
   « prenait » qu'au reload).
