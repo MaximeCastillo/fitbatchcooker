@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
-// Shared server-side fetch for a recipe's detail — used by BOTH the full page
-// (/recipes/[id]) and the intercepting modal (@modal/(.)[id]). Visibility-scoped: a
-// recipe is readable only if it's shared (userId null) or the current user's own.
-// Returns null when it doesn't exist or isn't visible (caller calls notFound()).
+// Shared server-side fetch for a recipe's detail (used by the /recipes/[id] page).
+// Visibility-scoped: a recipe is readable only if it's shared (userId null) or the
+// current user's own. Returns null when it doesn't exist or isn't visible (caller
+// calls notFound()).
 export async function getRecipeDetailData(id: string) {
   const [recipe, user] = await Promise.all([
     prisma.recipe.findUnique({

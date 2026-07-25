@@ -10,8 +10,8 @@ import { getRecipeDetailData } from "../recipe-detail-data";
 export const dynamic = "force-dynamic";
 
 // Recipe detail (full page): cooking steps, protein per serving, ingredients. Reached by
-// a hard link / refresh / share; from the /recipes list a card opens the intercepting
-// modal instead (see @modal/(.)[id]). Same data source, shared visibility scoping.
+// tapping a recipe card (the /recipes list keeps its filters in the URL, so Back restores
+// them). Visibility-scoped via the shared getRecipeDetailData helper.
 export default async function RecipeDetailPage({
   params,
 }: {

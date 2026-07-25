@@ -11,6 +11,7 @@ import {
 } from "@/app/[locale]/recipes/actions";
 import { RecipeCard } from "@/components/recipe-card";
 import { SaveToggle } from "@/components/save-toggle";
+import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const MEAL_TABS: (MealType | null)[] = [null, "MAIN", "SNACK", "BREAKFAST"];
@@ -18,19 +19,28 @@ const MEAL_TABS: (MealType | null)[] = [null, "MAIN", "SNACK", "BREAKFAST"];
 // Client browse: search + mealType tabs + a Favorites toggle over cursor-paginated results
 // fed by the loadRecipes server action, with infinite scroll. The list is visibility-scoped
 // server-side (public + own). `canSave` shows the bookmark toggle + the Favorites filter.
+// Filters are mirrored into the URL query so opening a recipe and hitting Back restores
+// them (initial values come from the server, which read the same query params).
 export function RecipeBrowser({
   initialRecipes,
   initialNextCursor,
   canSave,
+  initialSearch,
+  initialMealType,
+  initialFavoritesOnly,
 }: {
   initialRecipes: RecipeCardData[];
   initialNextCursor: string | null;
   canSave: boolean;
+  initialSearch: string;
+  initialMealType: MealType | null;
+  initialFavoritesOnly: boolean;
 }) {
   const t = useTranslations("recipes");
-  const [search, setSearch] = useState("");
-  const [mealType, setMealType] = useState<MealType | null>(null);
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const router = useRouter();
+  const [search, setSearch] = useState(initialSearch);
+  const [mealType, setMealType] = useState<MealType | null>(initialMealType);
+  const [favoritesOnly, setFavoritesOnly] = useState(initialFavoritesOnly);
   const [recipes, setRecipes] = useState(initialRecipes);
   const [cursor, setCursor] = useState(initialNextCursor);
   const [loading, setLoading] = useState(false);
@@ -42,8 +52,9 @@ export function RecipeBrowser({
   const filters: RecipeFilters = { search, mealType, favoritesOnly };
   const filterKey = JSON.stringify(filters);
 
-  // Refetch page 1 whenever a filter changes. Skip the first render (the server already
-  // provided page 1) and debounce a touch so typing doesn't fire a query per keystroke.
+  // Refetch page 1 + mirror the filters into the URL whenever a filter changes. Skip the
+  // first render (the server already provided page 1 for the initial URL) and debounce a
+  // touch so typing doesn't fire a query per keystroke.
   useEffect(() => {
     if (!didMount.current) {
       didMount.current = true;
@@ -51,7 +62,16 @@ export function RecipeBrowser({
     }
     let active = true;
     const handle = setTimeout(() => {
-      loadRecipes(JSON.parse(filterKey) as RecipeFilters, null).then((res) => {
+      const f = JSON.parse(filterKey) as RecipeFilters;
+      // Sync the URL (replace, no scroll) so Back restores these filters.
+      const params = new URLSearchParams();
+      if (f.search?.trim()) params.set("q", f.search.trim());
+      if (f.mealType) params.set("meal", f.mealType);
+      if (f.favoritesOnly) params.set("fav", "1");
+      const qs = params.toString();
+      router.replace(qs ? `/recipes?${qs}` : "/recipes", { scroll: false });
+
+      loadRecipes(f, null).then((res) => {
         if (!active) return;
         setRecipes(res.recipes);
         setCursor(res.nextCursor);
@@ -61,7 +81,7 @@ export function RecipeBrowser({
       active = false;
       clearTimeout(handle);
     };
-  }, [filterKey]);
+  }, [filterKey, router]);
 
   // Infinite scroll: load the next page when the sentinel enters the viewport. The
   // loadingRef guard stops a fast scroll from firing two loads for the same cursor.

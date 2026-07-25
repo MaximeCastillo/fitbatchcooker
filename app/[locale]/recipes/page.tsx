@@ -2,18 +2,36 @@ import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { Link } from "@/i18n/navigation";
-import { loadRecipes } from "./actions";
+import { loadRecipes, type RecipeFilters } from "./actions";
 import { RecipeBrowser } from "@/components/recipe-browser";
+import type { MealType } from "@/lib/generated/prisma/enums";
 
 // Render on each request: recipes + per-user saved state change over time.
 export const dynamic = "force-dynamic";
 
+const MEAL_TYPES: MealType[] = ["MAIN", "SNACK", "BREAKFAST"];
+
 // The single Recipes page: everything the user may see (shared library + their own),
-// filterable (search, meal type, Favorites). Create a recipe from here.
-export default async function RecipesPage() {
+// filterable (search, meal type, Favorites). Filters live in the URL query so opening a
+// recipe and hitting Back restores them. Create a recipe from here.
+export default async function RecipesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; meal?: string; fav?: string }>;
+}) {
+  const sp = await searchParams;
   const t = await getTranslations("recipes");
   const user = await getCurrentUser();
-  const { recipes, nextCursor } = await loadRecipes({}, null);
+
+  const mealType = MEAL_TYPES.includes(sp.meal as MealType)
+    ? (sp.meal as MealType)
+    : null;
+  const filters: RecipeFilters = {
+    search: sp.q ?? "",
+    mealType,
+    favoritesOnly: sp.fav === "1",
+  };
+  const { recipes, nextCursor } = await loadRecipes(filters, null);
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
@@ -33,6 +51,9 @@ export default async function RecipesPage() {
         initialRecipes={recipes}
         initialNextCursor={nextCursor}
         canSave={user != null}
+        initialSearch={filters.search ?? ""}
+        initialMealType={mealType}
+        initialFavoritesOnly={filters.favoritesOnly ?? false}
       />
     </main>
   );
