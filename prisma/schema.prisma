@@ -92,6 +92,8 @@ model Ingredient {
   category         IngredientCategory
   proteinPer100g   Float
   defaultQuantityG Int?
+  // Per-ingredient emoji; falls back to the category picto when null (see lib/ingredients).
+  picto            String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 

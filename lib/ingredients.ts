@@ -18,6 +18,15 @@ export const INGREDIENT_PICTO: Record<IngredientCategory, string> = {
   OTHER: "📦",
 };
 
+// The emoji to show for an ingredient: its own picto when set, else the category picto as
+// a safe fallback (so a chip/list never shows a missing icon).
+export function ingredientPicto(ingredient: {
+  picto?: string | null;
+  category: IngredientCategory;
+}): string {
+  return ingredient.picto ?? INGREDIENT_PICTO[ingredient.category];
+}
+
 // Dedup key for the shared ingredient catalog: lowercased, accent-stripped, whitespace
 // collapsed. The chef normalizes a proposed ingredient name to this before deciding to
 // reuse an existing row or create a new one; it also backs the `normalizedName @unique`

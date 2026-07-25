@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
 import type { MealType } from "@/lib/generated/prisma/enums";
-import { INGREDIENT_PICTO } from "@/lib/ingredients";
+import { ingredientPicto } from "@/lib/ingredients";
 
 // The shared recipe "body": mealType + macro badges, ingredient list (picto + quantity),
 // the approximate-values note, and the numbered steps. Single source of truth rendered by
@@ -19,6 +19,7 @@ type RecipeDetailData = {
   ingredients?: {
     name: string;
     category: IngredientCategory;
+    picto: string | null;
     quantityG: number;
   }[];
 };
@@ -61,7 +62,7 @@ export function RecipeDetail({ recipe }: { recipe: RecipeDetailData }) {
             {recipe.ingredients.map((ingredient, index) => (
               <li key={index} className="flex items-center gap-2.5 text-sm">
                 <span className="text-lg leading-none" aria-hidden>
-                  {INGREDIENT_PICTO[ingredient.category]}
+                  {ingredientPicto(ingredient)}
                 </span>
                 <span className="flex-1">{ingredient.name}</span>
                 <span className="font-mono text-muted-foreground">

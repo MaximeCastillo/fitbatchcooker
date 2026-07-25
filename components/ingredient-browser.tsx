@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
-import { INGREDIENT_PICTO } from "@/lib/ingredients";
+import { INGREDIENT_PICTO, ingredientPicto } from "@/lib/ingredients";
 import { IngredientRecipesModal } from "@/components/ingredient-recipes-modal";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ type Ingredient = {
   name: string;
   category: IngredientCategory;
   proteinPer100g: number;
+  picto: string | null;
 };
 
 // Fixed category order for the filter chips (matches the picto map).
@@ -117,7 +118,7 @@ export function IngredientBrowser({
                   className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-xl"
                   aria-hidden
                 >
-                  {INGREDIENT_PICTO[ing.category]}
+                  {ingredientPicto(ing)}
                 </span>
                 {/* Name breathes (no truncation) with the category below; the protein is a
                     compact badge so it can't crowd the name out on a narrow cell. */}

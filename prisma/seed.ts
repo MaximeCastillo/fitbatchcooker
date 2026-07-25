@@ -138,6 +138,79 @@ const INGREDIENTS: SeedIngredient[] = [
   { name: "Miel", category: IngredientCategory.CONDIMENT, proteinPer100g: 0, defaultQuantityG: 20 },
 ];
 
+// Per-ingredient emoji (keyed by name). Ingredients absent here fall back to their category
+// picto at render time — so we only list the ones with a distinct, better-fitting emoji.
+const PICTO_BY_NAME: Record<string, string> = {
+  // MEAT
+  "Blanc de poulet": "🍗",
+  "Cuisse de poulet": "🍗",
+  "Escalope de dinde": "🦃",
+  "Dinde hachée": "🦃",
+  "Steak haché 5% MG": "🥩",
+  "Bœuf (rumsteck)": "🥩",
+  "Filet mignon de porc": "🐖",
+  "Jambon blanc": "🍖",
+  Lardons: "🥓",
+  // FISH
+  Crevettes: "🦐",
+  // DAIRY_EGG
+  Œuf: "🥚",
+  "Blanc d'œuf": "🥚",
+  Skyr: "🥛",
+  "Yaourt grec": "🥛",
+  "Fromage blanc 0%": "🥛",
+  "Fromage cottage": "🧀",
+  Feta: "🧀",
+  Mozzarella: "🧀",
+  Parmesan: "🧀",
+  Emmental: "🧀",
+  "Lait demi-écrémé": "🥛",
+  // STARCH
+  Pâtes: "🍝",
+  Boulgour: "🌾",
+  Quinoa: "🌾",
+  "Pomme de terre": "🥔",
+  "Patate douce": "🍠",
+  "Flocons d'avoine": "🥣",
+  "Pain complet": "🍞",
+  "Wrap (tortilla)": "🌯",
+  // VEGETABLE
+  Épinards: "🥬",
+  Courgette: "🥒",
+  Carotte: "🥕",
+  "Champignons de Paris": "🍄",
+  Aubergine: "🍆",
+  Tomate: "🍅",
+  Poivron: "🫑",
+  Oignon: "🧅",
+  Concombre: "🥒",
+  "Salade verte": "🥬",
+  Maïs: "🌽",
+  "Petits pois": "🫛",
+  "Haricots verts": "🫛",
+  Avocat: "🥑",
+  // FRUIT
+  Banane: "🍌",
+  Pomme: "🍎",
+  "Fruits rouges": "🫐",
+  Orange: "🍊",
+  Fraise: "🍓",
+  Mangue: "🥭",
+  Kiwi: "🥝",
+  // NUTS_SEEDS
+  Amandes: "🌰",
+  Noix: "🌰",
+  "Beurre de cacahuète": "🥜",
+  // LEGUME
+  Edamame: "🫛",
+  // CONDIMENT
+  "Huile d'olive": "🫒",
+  Sel: "🧂",
+  "Sauce soja": "🍶",
+  "Sauce tomate": "🥫",
+  Miel: "🍯",
+};
+
 type SeedRecipe = {
   title: string;
   summary: string;
@@ -433,6 +506,7 @@ async function main() {
   //    re-run: refreshes the reference values without touching recipes or user data.
   for (const ing of INGREDIENTS) {
     const normalizedName = normalizeName(ing.name);
+    const picto = PICTO_BY_NAME[ing.name] ?? null;
     await prisma.ingredient.upsert({
       where: { normalizedName },
       update: {
@@ -440,6 +514,7 @@ async function main() {
         category: ing.category,
         proteinPer100g: ing.proteinPer100g,
         defaultQuantityG: ing.defaultQuantityG,
+        picto,
       },
       create: {
         name: ing.name,
@@ -447,6 +522,7 @@ async function main() {
         category: ing.category,
         proteinPer100g: ing.proteinPer100g,
         defaultQuantityG: ing.defaultQuantityG,
+        picto,
       },
     });
   }

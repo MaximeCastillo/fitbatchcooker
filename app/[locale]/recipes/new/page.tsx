@@ -15,7 +15,7 @@ export default async function NewRecipePage() {
   // The whole shared ingredient catalog — small enough to ship to the client picker.
   const catalog = await prisma.ingredient.findMany({
     orderBy: { name: "asc" },
-    select: { id: true, name: true, category: true },
+    select: { id: true, name: true, category: true, picto: true },
   });
 
   return (

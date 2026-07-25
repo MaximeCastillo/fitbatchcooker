@@ -13,7 +13,13 @@ export default async function IngredientsPage() {
     getCurrentUser(),
     prisma.ingredient.findMany({
       orderBy: [{ category: "asc" }, { name: "asc" }],
-      select: { id: true, name: true, category: true, proteinPer100g: true },
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        proteinPer100g: true,
+        picto: true,
+      },
     }),
   ]);
 

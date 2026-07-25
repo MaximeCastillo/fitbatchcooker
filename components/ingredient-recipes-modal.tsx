@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
-import { INGREDIENT_PICTO } from "@/lib/ingredients";
+import { ingredientPicto } from "@/lib/ingredients";
 import {
   loadRecipesByIngredient,
   type RecipeCardData,
@@ -21,6 +21,7 @@ type SelectedIngredient = {
   id: string;
   name: string;
   category: IngredientCategory;
+  picto: string | null;
 };
 
 // Reverse-search modal (Marmiton-style): the recipes that use the tapped ingredient,
@@ -83,7 +84,7 @@ export function IngredientRecipesModal({
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span aria-hidden>{INGREDIENT_PICTO[ingredient.category]}</span>
+                <span aria-hidden>{ingredientPicto(ingredient)}</span>
                 {t("recipesWith", { name: ingredient.name })}
               </DialogTitle>
             </DialogHeader>

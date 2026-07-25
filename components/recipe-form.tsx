@@ -4,11 +4,16 @@ import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import type { IngredientCategory, MealType } from "@/lib/generated/prisma/enums";
-import { INGREDIENT_PICTO } from "@/lib/ingredients";
+import { ingredientPicto } from "@/lib/ingredients";
 import { createRecipe } from "@/app/[locale]/recipes/actions";
 import { cn } from "@/lib/utils";
 
-type CatalogItem = { id: string; name: string; category: IngredientCategory };
+type CatalogItem = {
+  id: string;
+  name: string;
+  category: IngredientCategory;
+  picto: string | null;
+};
 type Row = { key: number; ingredientId: string; quantityG: string };
 type Step = { key: number; text: string };
 
@@ -159,7 +164,7 @@ export function RecipeForm({ catalog }: { catalog: CatalogItem[] }) {
               <option value="">{t("form.pickIngredient")}</option>
               {catalog.map((ing) => (
                 <option key={ing.id} value={ing.id}>
-                  {INGREDIENT_PICTO[ing.category]} {ing.name}
+                  {ingredientPicto(ing)} {ing.name}
                 </option>
               ))}
             </select>

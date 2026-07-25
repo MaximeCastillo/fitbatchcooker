@@ -25,7 +25,9 @@ export default async function RecipeDetailPage({
       where: { id },
       include: {
         ingredients: {
-          include: { ingredient: { select: { name: true, category: true } } },
+          include: {
+            ingredient: { select: { name: true, category: true, picto: true } },
+          },
           orderBy: { createdAt: "asc" },
         },
       },
@@ -68,6 +70,7 @@ export default async function RecipeDetailPage({
           ingredients: recipe.ingredients.map((link) => ({
             name: link.ingredient.name,
             category: link.ingredient.category,
+            picto: link.ingredient.picto,
             quantityG: link.quantityG,
           })),
         }}
