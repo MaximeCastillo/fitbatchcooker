@@ -336,3 +336,26 @@ requête et non en colonne `NOT NULL`.
   poser le plat N fois dans un jour, **affiché groupé en ×N** (comme le bloc « à cuisiner »).
 - **Page ingrédients = recherche inversée** (façon Marmiton) : cliquer un ingrédient ouvre les
   recettes qui l'utilisent (bookmark + scroll infini). Pas d'édition (base partagée).
+
+## 2026-07-25 — Retours d'usage (round 2)
+- **Pivot : un seul onglet « Recettes »** (fin de `/book`). La page montre **public + mes
+  recettes** (scopé, jamais celles d'un autre user) avec un **filtre « Favoris »** (= lignes
+  `UserRecipe`). La palette du batch utilise la même source + le même filtre → **plus jamais
+  vide** au 1ᵉʳ usage. Distinction publique/perso conservée en base (`Recipe.userId`),
+  transparente pour l'user. **Pourquoi :** le split biblio/livre rendait la palette vide au
+  départ et « Mes recettes » vs « Recettes » était confus.
+- **Picto par ingrédient** : colonne `Ingredient.picto` semée par un emoji best-fit (map
+  nom→emoji dans le seed) ; fallback sur le picto de catégorie. **Pourquoi :** un picto par
+  catégorie montrait du riz pour des pâtes, du sel pour de l'huile.
+- **Objectif protéines dérivé du poids** : on capture le **poids** au profil → **~2 g/kg**
+  (friction minimale) ; un **switch « objectif personnalisé »** override (implicite : `on`
+  ssi `proteinTargetG` non-null, pas de colonne en plus). **Pourquoi :** sans objectif, les
+  jauges restaient à 0 (`dayProgressPct` → 0) et semblaient cassées.
+- **Barre de progression du batch continue** : `Σ min(protéine_jour, cible) / (cible ×
+  jours)` (bornée) au lieu de `jours_verts / jours` → elle avance **à chaque plat**, atteint
+  100 % quand tous les jours sont au vert.
+- **Bug favori corrigé** : `SaveToggle` possède son état (`useState`) — un `useOptimistic`
+  retombait sur un prop figé par le `useState(initialRecipes)` de la liste (favori qui ne
+  « prenait » qu'au reload).
+- **Images (chat + recettes) : différées** ; approche prévue = génération IA + cache Supabase
+  Storage (bucket + `SUPABASE_SERVICE_ROLE_KEY` à provisionner), ~1-4 ¢/image.
