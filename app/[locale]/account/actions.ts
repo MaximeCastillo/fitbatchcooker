@@ -27,16 +27,26 @@ export async function updateProfile(formData: FormData) {
 
   const firstName = String(formData.get("firstName") ?? "").trim() || null;
 
+  const rawWeight = String(formData.get("weightKg") ?? "").trim();
+  const weightNum = Number(rawWeight);
+  const weightKg =
+    rawWeight !== "" && Number.isFinite(weightNum) && weightNum > 0
+      ? weightNum
+      : null;
+
+  // Custom target is opt-in via the switch; otherwise we clear it so the weight-derived
+  // (~2 g/kg) value wins in dailyProteinTargetG.
+  const customTarget = String(formData.get("customTarget") ?? "") === "1";
   const rawTarget = String(formData.get("proteinTargetG") ?? "").trim();
   const parsed = Number(rawTarget);
   const proteinTargetG =
-    rawTarget !== "" && Number.isFinite(parsed) && parsed > 0
+    customTarget && rawTarget !== "" && Number.isFinite(parsed) && parsed > 0
       ? Math.round(parsed)
       : null;
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { firstName, proteinTargetG },
+    data: { firstName, weightKg, proteinTargetG },
   });
 
   redirect({ href: { pathname: "/account", query: { saved: "1" } }, locale });

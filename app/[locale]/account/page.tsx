@@ -1,8 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth";
-import { updateProfile } from "./actions";
 import { logout } from "@/app/[locale]/login/actions";
 import { EmailForm, PasswordForm } from "@/components/account-forms";
+import { ProfileForm } from "@/components/profile-form";
 import {
   Card,
   CardContent,
@@ -14,9 +14,6 @@ import { Button } from "@/components/ui/button";
 import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
-
-const inputClasses =
-  "rounded-lg border border-input bg-background px-3 py-2.5 text-base font-normal outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40";
 
 // "Mon compte" — the account hub at /account. user.email is the authoritative
 // Supabase-Auth address: getCurrentUser realigns our column to it on every load
@@ -49,42 +46,14 @@ export default async function AccountPage({
           <CardTitle>{t("account.profileSection")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={updateProfile} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {t("profile.firstName")}
-              <input
-                type="text"
-                name="firstName"
-                defaultValue={user.firstName ?? ""}
-                autoComplete="given-name"
-                className={inputClasses}
-              />
-            </label>
-
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
-              {t("profile.proteinTarget")}
-              <input
-                type="number"
-                name="proteinTargetG"
-                min={0}
-                defaultValue={user.proteinTargetG ?? ""}
-                className={inputClasses}
-              />
-              <span className="text-xs font-normal text-muted-foreground">
-                {t("profile.proteinHint")}
-              </span>
-            </label>
-
-            {saved && (
-              <p role="status" className="text-sm text-primary">
-                {t("profile.saved")}
-              </p>
-            )}
-
-            <Button type="submit" className="mt-1 h-11 w-full text-base">
-              {t("profile.save")}
-            </Button>
-          </form>
+          <ProfileForm
+            user={{
+              firstName: user.firstName,
+              weightKg: user.weightKg,
+              proteinTargetG: user.proteinTargetG,
+            }}
+            saved={!!saved}
+          />
         </CardContent>
       </Card>
 
