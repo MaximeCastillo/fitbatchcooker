@@ -9,10 +9,10 @@ import { cn } from "@/lib/utils";
 const inputClasses =
   "rounded-lg border border-input bg-background px-3 py-2.5 text-base font-normal outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40";
 
-// Profile editor (client, so the custom-target switch can show/hide + preview live).
-// We ask WEIGHT to reduce friction — the protein goal is derived (~2 g/kg). The switch
-// lets power users override with an explicit target instead. "Custom" is implicit: it's
-// on iff a proteinTargetG is stored — no extra column.
+// Profile editor (client, so the custom-target switch can toggle the goal field live).
+// We ask WEIGHT to reduce friction — the protein goal is derived (~2 g/kg) and shown
+// greyed-out; the switch un-greys it to override. "Custom" is implicit: it's on iff a
+// proteinTargetG is stored — no extra column.
 export function ProfileForm({
   user,
   saved,
@@ -64,49 +64,58 @@ export function ProfileForm({
         </span>
       </label>
 
-      {/* Override switch. A hidden field carries its state to the server action. */}
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium">{t("customTarget")}</span>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={customTarget}
-          aria-label={t("customTarget")}
-          onClick={() => setCustomTarget((v) => !v)}
+      {/* Protein goal. By default it's derived from the weight and shown greyed-out
+          (read-only). The switch un-greys it so it can be overridden. A disabled input
+          isn't submitted, so when the switch is off the server keeps proteinTargetG null
+          and the weight-derived value wins. */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-medium">{t("proteinTarget")}</span>
+          <label className="flex cursor-pointer items-center gap-2">
+            <span className="text-xs text-muted-foreground">{t("customTarget")}</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={customTarget}
+              aria-label={t("customTarget")}
+              onClick={() => {
+                // Prefill with the weight-derived value the first time it's enabled.
+                if (!customTarget && !target && autoTarget != null) {
+                  setTarget(String(autoTarget));
+                }
+                setCustomTarget((v) => !v);
+              }}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors",
+                customTarget ? "bg-primary" : "bg-input",
+              )}
+            >
+              <span
+                className={cn(
+                  "inline-block size-5 rounded-full bg-background shadow-sm transition-transform",
+                  customTarget ? "translate-x-[22px]" : "translate-x-0.5",
+                )}
+              />
+            </button>
+          </label>
+        </div>
+        <input
+          type="number"
+          name="proteinTargetG"
+          min={0}
+          value={customTarget ? target : (autoTarget ?? "")}
+          onChange={(e) => setTarget(e.target.value)}
+          disabled={!customTarget}
           className={cn(
-            "relative h-6 w-11 shrink-0 rounded-full transition-colors",
-            customTarget ? "bg-primary" : "bg-input",
+            inputClasses,
+            !customTarget && "cursor-not-allowed text-muted-foreground opacity-60",
           )}
-        >
-          <span
-            className={cn(
-              "absolute top-0.5 size-5 rounded-full bg-background transition-transform",
-              customTarget ? "translate-x-5" : "translate-x-0.5",
-            )}
-          />
-        </button>
+        />
+        <span className="text-xs font-normal text-muted-foreground">
+          {customTarget ? t("proteinHint") : t("weightHint")}
+        </span>
       </div>
       <input type="hidden" name="customTarget" value={customTarget ? "1" : ""} />
-
-      {customTarget ? (
-        <label className="flex flex-col gap-1.5 text-sm font-medium">
-          {t("proteinTarget")}
-          <input
-            type="number"
-            name="proteinTargetG"
-            min={0}
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
-            className={inputClasses}
-          />
-        </label>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          {autoTarget != null
-            ? t("autoTargetPreview", { grams: autoTarget })
-            : t("proteinHint")}
-        </p>
-      )}
 
       {saved && (
         <p role="status" className="text-sm text-primary">
