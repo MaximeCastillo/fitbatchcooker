@@ -281,7 +281,9 @@ Résultat : le flow « parcourir les recettes » ne se coupe plus.
 - **Filtres multi-select** (Encas + Petit-déj ensemble), « Tous » = vider.
 - **Modale d'aperçu** au clic sur une carte, qui **jaillit de la carte** ; lien « page
   complète » qui **emporte les filtres**, et lien retour qui les **restaure**.
-- **2 tests E2E** ajoutés (multi-select ; carte → modale → page → retour filtré).
+- **Retour navigateur = fermer la modale** (entrée d'historique jetable + `popstate`).
+- **3 tests E2E** ajoutés (multi-select ; carte → modale → page → retour filtré ; Retour
+  navigateur qui ferme la modale).
 
 ### Concepts appris (🆕)
 - **Hydration mismatch ≠ toujours ton bug.** Une extension navigateur qui écrit un attribut
@@ -301,6 +303,14 @@ Résultat : le flow « parcourir les recettes » ne se coupe plus.
   → le serveur rend la bonne page 1, le client re-synchronise, et le bouton Retour marche
   gratuitement. Un seul module (`filter-params.ts`) sérialise **et** parse, ce qui donne la
   **validation par whitelist** en prime : un `?from=` bricolé retombe sur `/recipes`.
+- **Piloter le bouton Retour, c'est juste l'History API.** Ouvrir la modale fait un
+  `pushState` d'une entrée **jetable** (même URL, un marqueur dans `history.state`) ; le
+  `popstate` la referme. Le piège, c'est la symétrie : fermer par Échap ou la croix doit
+  **consommer** cette entrée (`history.back()`), sinon l'utilisateur doit appuyer deux fois
+  sur Retour pour quitter la page. Et le lien vers la page complète part en `replace` pour
+  prendre la place de l'entrée jetable plutôt que s'empiler dessus. Règle générale : **si
+  une UI se superpose et se ferme, elle devrait avoir une entrée d'historique** — c'est ce
+  que la route interceptée offrait gratuitement, et qu'on refait ici en 15 lignes.
 - **`useState(initialX)` fige la donnée.** Corollaire du bug favori du round 2 : dès qu'une
   liste met ses lignes en state, `revalidatePath` ne l'atteint plus. Toute mutation faite
   ailleurs (ici la modale) doit **remonter par callback**.

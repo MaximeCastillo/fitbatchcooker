@@ -113,6 +113,40 @@ test.describe("signed in", () => {
     await expect(page).toHaveURL(/fav=1/);
   });
 
+  test("browser Back closes the preview modal instead of leaving the list", async ({
+    page,
+  }) => {
+    await signUp(page);
+    // A known previous entry, so "one Back leaves the list" is a deterministic assertion.
+    await page.goto("/ingredients");
+    await page.goto("/recipes");
+    await page.getByRole("button", { name: /^(Snacks|Encas)$/ }).click();
+    await expect(page).toHaveURL(/meal=SNACK/);
+
+    const card = page.locator('a[href*="/recipes/"]:not([href$="/new"])').first();
+    await expect(card).toBeVisible();
+    const dialog = page.locator('[role="dialog"]');
+
+    // Back dismisses the modal and keeps us on the filtered list
+    await card.click();
+    await expect(dialog).toBeVisible();
+    await page.goBack();
+    await expect(dialog).toBeHidden();
+    await expect(page).toHaveURL(/\/recipes\?.*meal=SNACK/);
+    await expect(
+      page.getByRole("button", { name: /^(Snacks|Encas)$/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    // Closing by other means consumes the entry too, so Back doesn't need two presses.
+    await card.click();
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await page.waitForTimeout(500); // let the modal's own history.back() land
+    await page.goBack();
+    await expect(page).toHaveURL(/\/ingredients/);
+  });
+
   test("tapping a card opens the preview modal, and the filters survive the full page", async ({
     page,
   }) => {

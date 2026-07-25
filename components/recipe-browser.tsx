@@ -56,6 +56,8 @@ export function RecipeBrowser({
   const didMount = useRef(false);
   const loadingRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  // True while the modal owns a history entry it still has to clean up.
+  const ownsHistoryEntryRef = useRef(false);
 
   // Canonical query string for the active filters — it doubles as the URL we push, the
   // effect dependency, and the `?from=` payload handed to the detail page.
@@ -109,6 +111,28 @@ export function RecipeBrowser({
     return () => observer.disconnect();
   }, [cursor, filterQuery]);
 
+  // Back should dismiss the modal, not leave the page — the reflex on mobile. Opening it
+  // pushes a throwaway history entry (same URL, just a marker in history.state), so the
+  // next Back pops that entry instead of navigating, and popstate closes the modal.
+  useEffect(() => {
+    function handlePopState() {
+      ownsHistoryEntryRef.current = false;
+      setPreviewOpen(false);
+    }
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // Closing any other way (Esc, backdrop, the X) has to consume that entry too, otherwise
+  // Back would need two presses to actually leave the list.
+  function closePreview() {
+    setPreviewOpen(false);
+    if (ownsHistoryEntryRef.current) {
+      ownsHistoryEntryRef.current = false;
+      window.history.back();
+    }
+  }
+
   // "All" clears the selection; any other chip toggles in/out of it.
   function toggleMealType(mealType: MealType) {
     setMealTypes((current) =>
@@ -131,6 +155,15 @@ export function RecipeBrowser({
       },
     });
     setPreviewOpen(true);
+    if (!ownsHistoryEntryRef.current) {
+      // Same URL, so nothing visibly changes; the marker is what popstate/back act on.
+      window.history.pushState(
+        { ...window.history.state, recipePreview: true },
+        "",
+        window.location.href,
+      );
+      ownsHistoryEntryRef.current = true;
+    }
   }
 
   // Bookmarking from inside the modal must also update the card behind it (the list
@@ -254,7 +287,7 @@ export function RecipeBrowser({
         open={previewOpen}
         canSave={canSave}
         filterQuery={filterQuery}
-        onClose={() => setPreviewOpen(false)}
+        onClose={closePreview}
         onSavedChange={applySavedChange}
       />
     </div>

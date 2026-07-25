@@ -86,8 +86,12 @@ export function RecipePreviewModal({
 
             <PreviewBody key={recipe.id} recipeId={recipe.id} />
 
+            {/* `replace`: the open modal owns a throwaway history entry, so the detail
+                page takes its place instead of stacking on top. Back then lands straight
+                back on the list rather than on a dead duplicate entry. */}
             <Link
               href={fullHref}
+              replace
               className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-medium text-primary hover:underline"
             >
               {t("detail.openFull")}

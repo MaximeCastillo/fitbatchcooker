@@ -396,3 +396,10 @@ requête et non en colonne `NOT NULL`.
 - **Hydration mismatch sur `<body>`** : c'était une **extension navigateur**
   (`cz-shortcut-listen`) qui écrit dans le DOM avant React, pas notre code →
   `suppressHydrationWarning` sur `<body>`.
+- **Le Retour navigateur ferme la modale.** Ouvrir la modale **pousse une entrée
+  d'historique jetable** (même URL, un simple marqueur dans `history.state`) ; un
+  `popstate` la referme. Fermer autrement (Échap, backdrop, croix) **consomme** cette
+  entrée via `history.back()`, sinon il faudrait deux Retour pour quitter la liste. Le lien
+  « page complète » utilise `replace` pour prendre la place de l'entrée jetable.
+  **Pourquoi :** sur mobile, Retour = fermer la modale, c'est le réflexe. On récupère ce que
+  la route interceptée offrait gratuitement, sans son fragile.
