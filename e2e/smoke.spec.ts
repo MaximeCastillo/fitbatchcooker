@@ -84,24 +84,62 @@ test.describe("signed in", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("browse filters are kept in the URL and restored on Back", async ({ page }) => {
+  test("meal-type filters are multi-select and mirrored in the URL", async ({
+    page,
+  }) => {
     await signUp(page);
     await page.goto("/recipes");
-    // meal-type + favorites both reflect in the URL
-    await page.getByRole("button", { name: /^(Snacks|Encas)$/ }).click();
-    await expect(page).toHaveURL(/meal=SNACK/);
+    const snacks = page.getByRole("button", { name: /^(Snacks|Encas)$/ });
+    const breakfast = page.getByRole("button", { name: /^(Breakfast|Petit-déj)$/ });
+    const all = page.getByRole("button", { name: /^(All|Tous)$/ });
+
+    await snacks.click();
+    await expect(page).toHaveURL(/meal=SNACK(&|$)/);
+    // a second type ADDS to the selection instead of replacing it
+    await breakfast.click();
+    await expect(page).toHaveURL(/meal=SNACK%2CBREAKFAST|meal=SNACK,BREAKFAST/);
+    await expect(snacks).toHaveAttribute("aria-pressed", "true");
+    await expect(breakfast).toHaveAttribute("aria-pressed", "true");
+    // clicking an active chip again removes just that one
+    await snacks.click();
+    await expect(page).toHaveURL(/meal=BREAKFAST(&|$)/);
+    // "All" clears the whole selection
+    await all.click();
+    await expect(page).not.toHaveURL(/meal=/);
+    await expect(all).toHaveAttribute("aria-pressed", "true");
+
+    // favorites is an independent filter
     await page.getByRole("button", { name: /Favorites|Favoris/i }).click();
     await expect(page).toHaveURL(/fav=1/);
-    // turn favorites off so the public snack list is populated to click into
-    await page.getByRole("button", { name: /Favorites|Favoris/i }).click();
-    await expect(page).not.toHaveURL(/fav=1/);
-    // open a real recipe card (NOT the "New recipe" link) → detail → Back keeps the filter
+  });
+
+  test("tapping a card opens the preview modal, and the filters survive the full page", async ({
+    page,
+  }) => {
+    await signUp(page);
+    await page.goto("/recipes");
+    await page.getByRole("button", { name: /^(Snacks|Encas)$/ }).click();
+    await expect(page).toHaveURL(/meal=SNACK/);
+
+    // a card opens the modal over the list — no navigation
     const card = page.locator('a[href*="/recipes/"]:not([href$="/new"])').first();
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/recipes\/[0-9a-f-]{8}/, { timeout: 8_000 });
-    await page.goBack();
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
     await expect(page).toHaveURL(/meal=SNACK/);
+
+    // the modal's link goes to the standalone page, carrying the filters...
+    await dialog
+      .getByRole("link", { name: /Open full page|Voir la page complète/i })
+      .click();
+    await page.waitForURL(/\/recipes\/[0-9a-f-]{8}/, { timeout: 8_000 });
+
+    // ...so the detail page's own back link restores them
+    await page
+      .getByRole("link", { name: /All recipes|Toutes les recettes/i })
+      .click();
+    await page.waitForURL(/meal=SNACK/, { timeout: 8_000 });
     await expect(
       page.getByRole("button", { name: /^(Snacks|Encas)$/ }),
     ).toHaveAttribute("aria-pressed", "true");
