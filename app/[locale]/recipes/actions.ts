@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { recipeVisibilityWhere, recomputeRecipeProtein } from "@/lib/recipes";
+import { getRecipeDetailData } from "./recipe-detail-data";
 import { redirect } from "@/i18n/navigation";
 import type { MealType } from "@/lib/generated/prisma/enums";
 
@@ -25,9 +26,12 @@ export type RecipeCardData = {
 // their own recipes (never another user's). `favoritesOnly` narrows to what they saved
 // (the bookmark). Single page `/recipes` with a Favorites filter; the batch palette uses
 // the same query.
+//
+// `mealTypes` is a multi-select: empty (or absent) means "All", otherwise the union of the
+// checked types — picking Snacks + Breakfast shows both.
 export type RecipeFilters = {
   search?: string;
-  mealType?: MealType | null;
+  mealTypes?: MealType[];
   favoritesOnly?: boolean;
 };
 
@@ -50,7 +54,9 @@ export async function loadRecipes(
       AND: [
         recipeVisibilityWhere(user?.id), // public + own, never another user's
         ...(filters.favoritesOnly ? [{ savedBy: { some: { userId } } }] : []),
-        ...(filters.mealType ? [{ mealType: filters.mealType }] : []),
+        ...(filters.mealTypes?.length
+          ? [{ mealType: { in: filters.mealTypes } }]
+          : []),
         ...(filters.search?.trim()
           ? [{ title: { contains: filters.search.trim(), mode: "insensitive" as const } }]
           : []),
@@ -90,6 +96,15 @@ export async function loadRecipes(
   }));
 
   return { recipes, nextCursor: hasMore ? page[page.length - 1].id : null };
+}
+
+// Recipe detail for the browse preview modal — same visibility-scoped fetch the full page
+// uses, just reachable from a Client Component. Returns null when the recipe doesn't exist
+// or isn't the caller's to see.
+export type RecipeDetailPayload = Awaited<ReturnType<typeof getRecipeDetailData>>;
+
+export async function loadRecipeDetail(id: string): Promise<RecipeDetailPayload> {
+  return getRecipeDetailData(id);
 }
 
 // Reverse search (Marmiton-style): recipes that USE a given ingredient, among those the

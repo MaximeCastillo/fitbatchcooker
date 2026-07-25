@@ -2,35 +2,25 @@ import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { Link } from "@/i18n/navigation";
-import { loadRecipes, type RecipeFilters } from "./actions";
+import { loadRecipes } from "./actions";
+import { parseRecipeFilters, type RecipeQuery } from "./filter-params";
 import { RecipeBrowser } from "@/components/recipe-browser";
-import type { MealType } from "@/lib/generated/prisma/enums";
 
 // Render on each request: recipes + per-user saved state change over time.
 export const dynamic = "force-dynamic";
 
-const MEAL_TYPES: MealType[] = ["MAIN", "SNACK", "BREAKFAST"];
-
 // The single Recipes page: everything the user may see (shared library + their own),
-// filterable (search, meal type, Favorites). Filters live in the URL query so opening a
-// recipe and hitting Back restores them. Create a recipe from here.
+// filterable (search, meal types, Favorites). Filters live in the URL query so opening a
+// recipe and coming back restores them. Create a recipe from here.
 export default async function RecipesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; meal?: string; fav?: string }>;
+  searchParams: Promise<RecipeQuery>;
 }) {
-  const sp = await searchParams;
   const t = await getTranslations("recipes");
   const user = await getCurrentUser();
 
-  const mealType = MEAL_TYPES.includes(sp.meal as MealType)
-    ? (sp.meal as MealType)
-    : null;
-  const filters: RecipeFilters = {
-    search: sp.q ?? "",
-    mealType,
-    favoritesOnly: sp.fav === "1",
-  };
+  const filters = parseRecipeFilters(await searchParams);
   const { recipes, nextCursor } = await loadRecipes(filters, null);
 
   return (
@@ -51,9 +41,7 @@ export default async function RecipesPage({
         initialRecipes={recipes}
         initialNextCursor={nextCursor}
         canSave={user != null}
-        initialSearch={filters.search ?? ""}
-        initialMealType={mealType}
-        initialFavoritesOnly={filters.favoritesOnly ?? false}
+        initialFilters={filters}
       />
     </main>
   );

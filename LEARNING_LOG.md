@@ -267,3 +267,67 @@ et on a bouclé un **cycle PR complet** (branche, preview, relecture, merge) —
 ### Prochaine session
 1. **Phase B — encas** (`Recipe.kind` + onglets palette + seed).
 2. Éventuel : couche E2E **Playwright** propre (helper d'auth + CI) si on veut.
+
+---
+
+## Session 6 — 2026-07-25 — Retours d'usage : la modale revient, filtres multi-select
+
+**Objectif :** traiter trois retours de recette avant d'attaquer les features suivantes.
+Résultat : le flow « parcourir les recettes » ne se coupe plus.
+
+### Ce qu'on a construit
+- **Warning d'hydratation éteint** : `suppressHydrationWarning` sur `<body>`.
+- **Lien retour** sur `/recipes/new` (le formulaire était un cul-de-sac).
+- **Filtres multi-select** (Encas + Petit-déj ensemble), « Tous » = vider.
+- **Modale d'aperçu** au clic sur une carte, qui **jaillit de la carte** ; lien « page
+  complète » qui **emporte les filtres**, et lien retour qui les **restaure**.
+- **Retour navigateur = fermer la modale** (entrée d'historique jetable + `popstate`).
+- **3 tests E2E** ajoutés (multi-select ; carte → modale → page → retour filtré ; Retour
+  navigateur qui ferme la modale).
+
+### Concepts appris (🆕)
+- **Hydration mismatch ≠ toujours ton bug.** Une extension navigateur qui écrit un attribut
+  sur `<body>` avant React déclenche le même warning. `suppressHydrationWarning` ne
+  désactive le diff que **sur cet élément-là** (ses attributs / son texte), pas sur l'arbre
+  en dessous — c'est pour ça qu'on peut le poser sans rien masquer d'important.
+- **Les routes interceptées de Next ne sont pas un acquis.** `@modal` + `(.)[id]` est
+  l'approche « officielle » pour ce cas, mais elle casse sous `[locale]`. Leçon générale :
+  quand une primitive du framework se bat contre ton archi, **une `useState` + un Dialog**
+  font le boulot. La solution ennuyeuse gagne.
+- **Intercepter un clic sans tuer le lien.** On garde un `<a href>` réel et on ne
+  `preventDefault()` que si le clic est *simple* (pas de Cmd/Ctrl/Shift/Alt, bouton 0).
+  Cmd-clic, clic milieu et « ouvrir dans un nouvel onglet » continuent de marcher.
+  En Rails, l'équivalent mental c'est `data-turbo-frame` : le lien reste un lien, c'est le
+  *rendu* qui change.
+- **Un état d'UI dans l'URL, c'est du state partageable.** Les filtres vivent dans la query
+  → le serveur rend la bonne page 1, le client re-synchronise, et le bouton Retour marche
+  gratuitement. Un seul module (`filter-params.ts`) sérialise **et** parse, ce qui donne la
+  **validation par whitelist** en prime : un `?from=` bricolé retombe sur `/recipes`.
+- **Piloter le bouton Retour, c'est juste l'History API.** Ouvrir la modale fait un
+  `pushState` d'une entrée **jetable** (même URL, un marqueur dans `history.state`) ; le
+  `popstate` la referme. Le piège, c'est la symétrie : fermer par Échap ou la croix doit
+  **consommer** cette entrée (`history.back()`), sinon l'utilisateur doit appuyer deux fois
+  sur Retour pour quitter la page. Et le lien vers la page complète part en `replace` pour
+  prendre la place de l'entrée jetable plutôt que s'empiler dessus. Règle générale : **si
+  une UI se superpose et se ferme, elle devrait avoir une entrée d'historique** — c'est ce
+  que la route interceptée offrait gratuitement, et qu'on refait ici en 15 lignes.
+- **`useState(initialX)` fige la donnée.** Corollaire du bug favori du round 2 : dès qu'une
+  liste met ses lignes en state, `revalidatePath` ne l'atteint plus. Toute mutation faite
+  ailleurs (ici la modale) doit **remonter par callback**.
+
+### Pièges rencontrés & résolus
+- Modale qui se vide pendant l'animation de fermeture → séparer `open` (booléen) de la
+  **donnée affichée**, qu'on garde le temps de la sortie.
+- Worktree sans `.env` ni client Prisma généré → `tsc` crachait 20 erreurs de modules
+  introuvables. Rien à voir avec le code : `cp .env` + `prisma generate`.
+- Serveur de dev à réviser sur un **port dédié** (3100) : Playwright réutilise celui du
+  port 3000, qui aurait testé l'autre checkout.
+
+### Victoires
+🎉 On clique une recette, on regarde, on ferme, on reste pile où on était — filtres compris.
+Et le « Encas + Petit-déj » qui manquait est là. 14/14 tests E2E au vert.
+
+### Prochaine session
+1. **Phase B — encas** (`Recipe.kind` + onglets palette + seed) *(à re-situer : le multi-select
+   couvre peut-être déjà une partie du besoin)*.
+2. **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).

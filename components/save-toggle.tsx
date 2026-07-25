@@ -12,12 +12,16 @@ import { toggleSaveRecipe } from "@/app/[locale]/recipes/actions";
 // recipe list that renders us freezes its data in useState, so revalidatePath never reaches
 // this prop — an earlier bug where the fill reverted until a full reload.) We only roll back
 // if the action actually throws. 44px hit area (tap-first, PRINCIPLES §5).
+// `onToggle` lets a parent that caches the list (the browse page) mirror the new state, so
+// a bookmark flipped inside the preview modal is still right on the card behind it.
 export function SaveToggle({
   recipeId,
   saved,
+  onToggle,
 }: {
   recipeId: string;
   saved: boolean;
+  onToggle?: (saved: boolean) => void;
 }) {
   const [isSaved, setIsSaved] = useState(saved);
   const [pending, startTransition] = useTransition();
@@ -33,10 +37,12 @@ export function SaveToggle({
         startTransition(async () => {
           const next = !isSaved;
           setIsSaved(next); // optimistic, and kept after the transition resolves
+          onToggle?.(next);
           try {
             await toggleSaveRecipe(recipeId);
           } catch {
             setIsSaved(!next); // only revert if the write actually failed
+            onToggle?.(!next);
           }
         })
       }

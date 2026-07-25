@@ -67,6 +67,10 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Browse recettes, round 3** : filtres type de repas en **multi-select** (« Tous » = vider),
+  **modale d'aperçu** au clic sur une carte (état client, la liste reste montée → filtres +
+  scroll gardés), **filtres restaurés** au retour depuis la page recette (`?from=`), lien
+  retour sur `/recipes/new`, warning d'hydratation `<body>` éteint. Détail : `DECISIONS.md`.
 - **App multilingue (FR/EN)** — next-intl **sans préfixe** (défaut EN, détection device),
   catalogues ICU `messages/fr.json`/`en.json`, **sélecteur de langue** + **toggle clair/sombre**
   dans le chrome, 404 localisé, chef IA multilingue, `proxy.ts` (Next 16). **1ʳᵉ PR + preview

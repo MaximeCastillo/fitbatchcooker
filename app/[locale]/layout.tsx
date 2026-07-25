@@ -58,7 +58,11 @@ export default async function LocaleLayout({ children, params }: Props) {
       suppressHydrationWarning
       className={`${barlow.variable} ${barlowCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
+      {/* suppressHydrationWarning: browser extensions (password managers, ColorZilla's
+          `cz-shortcut-listen`…) inject attributes on <body> before React hydrates, which
+          React reports as a mismatch. It only silences THIS element's own attributes —
+          children are still diffed normally. */}
+      <body className="min-h-full" suppressHydrationWarning>
         {/* NextIntlClientProvider inherits locale + messages from the request config,
             making translations available to Client Components below. */}
         <NextIntlClientProvider>
