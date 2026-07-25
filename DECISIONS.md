@@ -361,3 +361,16 @@ requête et non en colonne `NOT NULL`.
   « prenait » qu'au reload).
 - **Images (chat + recettes) : différées** ; approche prévue = génération IA + cache Supabase
   Storage (bucket + `SUPABASE_SERVICE_ROLE_KEY` à provisionner), ~1-4 ¢/image.
+
+## 2026-07-25 — Modale recette + catalogue d'ingrédients élargi
+- **Fiche recette en modale** depuis la liste `/recipes` (routes parallèles `@modal` +
+  interception `(.)[id]`) : la liste reste montée dessous → **filtres + scroll préservés**
+  (« pour pas perdre le fil »). Lien « page complète » dans la modale ; lien direct / refresh
+  / partage → page autonome. Fetch mutualisé dans `recipe-detail-data.ts`. **Pourquoi :**
+  ouvrir une recette puis revenir perdait les filtres sélectionnés.
+- **Catalogue d'ingrédients élargi (~157) et généralisé** : noms génériques (« Champignons »
+  au lieu de « Champignons de Paris », « Bœuf »/« Porc », « Tortilla »…) pour qu'une entrée
+  couvre plusieurs recettes ; gros ajout de **fruits** + légumes/poissons/fromages/féculents/
+  légumineuses/oléagineux, valeurs protéiques de référence. Le seed **purge les ingrédients
+  renommés/retirés** non référencés. **Unité œuf en grammes conservée** pour le MVP (compteur
+  d'unités reporté). **Cap : on arrête le polish de cette feature ici**, place au reste du MVP.
