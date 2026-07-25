@@ -23,23 +23,33 @@ figé du pourquoi) · `PROD_CHECKLIST.md` (dettes avant prod) · `LEARNING_LOG.m
       **Reste** : test mobile réel, chemin **tap pour déplacer** entre jours, affiner cibles ≥ 44 px.
 - _MVP mono-mangeur (toi) ; schéma additif pour le multi-personnes plus tard._
 
-## 🍳 Prochain chantier — Recettes riches (détail · encas · images · ingrédients)
+## 🍳 Recettes riches (détail · encas · images · ingrédients) — **3 phases sur 4 livrées**
 
-Séquencement **validé** (2026-07-24). Voir `PRINCIPLES.md` pour la philosophie
-protéines/part et `DECISIONS.md` pour le pourquoi.
+Séquencement validé le 2026-07-24, **état revu le 2026-07-26** : A, B et D sont faites
+(B et D ont dévié du plan initial, voir ci-dessous), il ne reste que **C — les images**,
+plus deux morceaux détachés (palette par type, liste de courses). Voir `PRINCIPLES.md`
+pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 
 - ✅ **Phase A — Page détail recette** livrée (voir « Livré récemment »).
-- **Phase B — Encas / compléments** : champ **`Recipe.kind`** (`MAIN` | `SNACK`) +
-  migration, palette du composeur en **onglets « Recettes / Encas »**, seed de quelques
-  encas (skyr, poignée de noix, tartine de PB). Le drag + la jauge marchent déjà →
-  gros « aha » sur le fait de glisser pour atteindre le quota. *(coût moyen)*
-- **Phase C — Images de plat** : brique **Supabase Storage** (upload serveur, URL
-  publique, policies) ; image sur la carte + la page détail. *(coût moyen, concept neuf)*
-- **Phase D — Couche ingrédients** *(différée — gros milestone)* :
-  `Ingredient(proteinPer100g, quantité habituelle)` + `RecipeIngredient(quantityG)` →
-  protéines/part **dérivées** au lieu de saisies, **pré-remplies par l'IA**, ajustables
-  à la volée. Débloque aussi liste de courses + scaling. ⚠️ **Point de validation
-  dédié avant de construire** (socle du sens de l'app — cf. `PRINCIPLES.md` §4).
+- ✅ **Phase B — Encas / compléments** livrée, **sous une autre forme** : pas de
+  `Recipe.kind` (`MAIN`|`SNACK`) mais un **`MealType`** (`MAIN`|`SNACK`|`BREAKFAST`,
+  migration `20260724215827`) qui couvre le petit-déj en prime. Seed : **6 encas +
+  5 petits-déj**. Filtres par type sur `/recipes`, **multi-select** depuis le 2026-07-25.
+  - ⚠️ **Seul morceau non fait** : la **palette du composeur ignore le type** (elle ne
+    filtre que par favoris + recherche texte, `batch-board.tsx`). Pas d'onglets
+    « Recettes / Encas » pour attraper un encas quand il manque 15 g. *(petit coût)*
+- **Phase C — Images de plat** *(pas commencée)* : brique **Supabase Storage** (upload
+  serveur, URL publique, policies) ; image sur la carte + la page détail. La colonne
+  `Recipe.imageUrl` existe déjà et la carte a son emplacement (placeholder).
+  *(coût moyen, concept neuf)*
+- ✅ **Phase D — Couche ingrédients** livrée pour l'essentiel — elle était notée
+  « différée, gros milestone » et s'est faite en cours de route.
+  `Ingredient(proteinPer100g, defaultQuantityG, picto)` + `RecipeIngredient(quantityG)`,
+  protéines/part **dérivées** (`recomputeRecipeProtein`), **pré-remplies par l'IA** via les
+  outils `search_ingredients` / `create_recipe` sur un **catalogue verrouillé** (le chef ne
+  peut pas inventer d'ingrédient), page `/ingredients` en recherche inversée, ~157 entrées.
+  - ⚠️ **Reste ce que la couche débloque** : **liste de courses** et **scaling** des
+    quantités. Ni l'un ni l'autre n'existe.
 
 ## ⏭️ Court terme
 - **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
@@ -67,6 +77,12 @@ protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Encas & petits-déj (ex-« Phase B »)** : `MealType` (`MAIN`|`SNACK`|`BREAKFAST`) au lieu
+  du `Recipe.kind` prévu, 6 encas + 5 petits-déj au seed, filtres par type sur `/recipes`.
+- **Couche ingrédients (ex-« Phase D », qu'on croyait différée)** : catalogue ~157 entrées
+  avec `proteinPer100g` + picto, `RecipeIngredient(quantityG)`, **protéines/part dérivées**
+  au lieu de saisies, **remplies par l'IA** sur catalogue verrouillé, page `/ingredients`
+  en recherche inversée.
 - **Browse recettes, round 3** : filtres type de repas en **multi-select** (« Tous » = vider),
   **modale d'aperçu** au clic sur une carte (état client, la liste reste montée → filtres +
   scroll gardés), **filtres restaurés** au retour depuis la page recette (`?from=`), lien

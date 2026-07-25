@@ -403,3 +403,19 @@ requête et non en colonne `NOT NULL`.
   « page complète » utilise `replace` pour prendre la place de l'entrée jetable.
   **Pourquoi :** sur mobile, Retour = fermer la modale, c'est le réflexe. On récupère ce que
   la route interceptée offrait gratuitement, sans son fragile.
+
+## 2026-07-26 — Recalage du ROADMAP sur le code réel
+- **`MealType` a absorbé le `Recipe.kind` prévu.** La « Phase B — encas » devait ajouter un
+  champ `kind` (`MAIN`|`SNACK`) ; le code a livré un **`MealType`** à trois valeurs
+  (`MAIN`|`SNACK`|`BREAKFAST`). **Pourquoi :** le petit-déj est un troisième cas légitime,
+  et une seule dimension « type de repas » évite deux champs qui disent presque la même chose.
+- **La « Phase D — couche ingrédients », notée différée, était en fait construite** :
+  protéines/part **dérivées** des ingrédients et remplies par l'IA sur catalogue verrouillé.
+  Le point de validation prévu avant de la bâtir n'a jamais eu lieu — elle s'est faite en
+  chemin. **Il reste ce qu'elle débloque** : liste de courses, scaling.
+- **Reste vraiment à faire côté « recettes riches »** : les **images** (Phase C, rien de
+  commencé) et le **filtre par type dans la palette du composeur** (la page `/recipes`
+  filtre, la palette non).
+- **Fin des worktrees pour ce dépôt** : `"worktree": {"bgIsolation": "none"}` dans
+  `.claude/settings.json`. **Pourquoi :** solo dev, on travaille sur `main` — l'isolation
+  en worktree et la cérémonie PR ne protégeaient personne et ajoutaient une étape.

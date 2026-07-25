@@ -3,5 +3,8 @@
     "context7@claude-plugins-official": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "taste-skill@taste-skill": true
+  },
+  "worktree": {
+    "bgIsolation": "none"
   }
 }
