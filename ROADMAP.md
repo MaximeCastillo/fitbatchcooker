@@ -51,6 +51,17 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
     quantités. Ni l'un ni l'autre n'existe.
 
 ## ⏭️ Court terme
+- 🐛 **Langue du chef** : le chef doit répondre **dans la langue à laquelle on s'adresse à lui**,
+  au minimum celle de l'UI. Bug repéré le 2026-07-27 : UI en FR mais chef en EN. Cause —
+  `app/api/chat/route.ts` résout la locale via le **seul cookie `NEXT_LOCALE`** et retombe sur
+  `defaultLocale = "en"` quand il est absent (device détecté par `Accept-Language`, cookie non
+  posé tant qu'on n'a pas touché au sélecteur). Fix : résoudre la locale comme les pages (prendre
+  aussi `Accept-Language`), voire détecter la langue du message lui-même.
+- 🥕 **Enrichir le catalogue d'ingrédients** : trop maigre. Démo du 2026-07-27 — le chef a dû
+  réduire une recette à poulet + brocoli seuls (huile d'olive, ail, crème, fromage, paprika,
+  herbes de Provence tous absents), d'où 3 allers-retours de refus. Le garde-fou marche (catalogue
+  verrouillé) mais le catalogue doit couvrir les basiques cuisine. *(lié : voir aussi la rugosité
+  « chercher avant de proposer » — durcir le prompt / modèle plus costaud que `gpt-4o-mini`.)*
 - **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
   serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
   pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
