@@ -90,6 +90,16 @@ export default async function LoginPage({
             </Button>
           </form>
 
+          {/* Password recovery — only relevant when signing in. */}
+          {!isSignup && (
+            <Link
+              href="/forgot-password"
+              className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+            >
+              {t("forgotPasswordLink")}
+            </Link>
+          )}
+
           {/* Switch mode */}
           <p className="text-sm text-muted-foreground">
             {isSignup ? t("haveAccount") : t("noAccount")}{" "}

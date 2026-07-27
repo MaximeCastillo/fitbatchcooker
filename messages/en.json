@@ -117,7 +117,31 @@
       "A protein goal per day, at your own pace",
       "Each day turning green",
       "A chef who learns your tastes"
-    ]
+    ],
+    "forgotPasswordLink": "Forgot your password?"
+  },
+  "forgotPassword": {
+    "title": "Forgot your password",
+    "subtitle": "Enter your email and we'll send you a link to reset your password.",
+    "email": "Email",
+    "submit": "Send the link",
+    "sent": "If an account exists for this address, a reset link has just been sent. Check your inbox.",
+    "emailInvalid": "Enter a valid email address.",
+    "error": "Something went wrong. Try again in a moment.",
+    "backToLogin": "Back to sign in"
+  },
+  "resetPassword": {
+    "title": "New password",
+    "subtitle": "Choose a new password for your account.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "submit": "Update password",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "passwordMismatch": "Passwords don't match.",
+    "updated": "Password updated ✓",
+    "error": "Couldn't update the password. Please try again.",
+    "invalidLink": "This reset link is invalid or has expired.",
+    "requestNew": "Request a new link"
   },
   "recipes": {
     "title": "Recipes",
