@@ -118,7 +118,10 @@
       "Chaque journée qui passe au vert",
       "Un chef qui apprend tes goûts"
     ],
-    "forgotPasswordLink": "Mot de passe oublié ?"
+    "forgotPasswordLink": "Mot de passe oublié ?",
+    "invalidCredentials": "Email ou mot de passe incorrect.",
+    "emailTaken": "Un compte existe déjà avec cet email.",
+    "error": "Une erreur est survenue. Réessaie."
   },
   "forgotPassword": {
     "title": "Mot de passe oublié",

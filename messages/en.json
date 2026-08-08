@@ -118,7 +118,10 @@
       "Each day turning green",
       "A chef who learns your tastes"
     ],
-    "forgotPasswordLink": "Forgot your password?"
+    "forgotPasswordLink": "Forgot your password?",
+    "invalidCredentials": "Incorrect email or password.",
+    "emailTaken": "An account already exists with this email.",
+    "error": "Something went wrong. Please try again."
   },
   "forgotPassword": {
     "title": "Forgot your password",

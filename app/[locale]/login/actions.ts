@@ -11,8 +11,8 @@ export async function login(formData: FormData) {
   const locale = await getLocale();
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  const t = await getTranslations("login");
   if (!email || !password) {
-    const t = await getTranslations("login");
     redirect({
       href: { pathname: "/login", query: { error: t("missingFields") } },
       locale,
@@ -22,8 +22,12 @@ export async function login(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
+    // Supabase returns raw English messages — map the common ones to translated text.
+    const message = /invalid login credentials/i.test(error.message)
+      ? t("invalidCredentials")
+      : t("error");
     redirect({
-      href: { pathname: "/login", query: { error: error.message } },
+      href: { pathname: "/login", query: { error: message } },
       locale,
     });
   }
@@ -42,14 +46,18 @@ export async function signup(formData: FormData) {
       locale,
     });
 
+  const t = await getTranslations("login");
   if (!email || !password) {
-    const t = await getTranslations("login");
     back(t("missingFields"));
   }
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signUp({ email, password });
-  if (error) back(error.message);
+  if (error) {
+    // Supabase returns raw English messages — map the common ones to translated text.
+    const taken = /registered|already|exists/i.test(error.message);
+    back(taken ? t("emailTaken") : t("error"));
+  }
 
   redirect({ href: "/batch", locale });
 }
