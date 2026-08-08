@@ -51,11 +51,10 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
     quantités. Ni l'un ni l'autre n'existe.
 
 ## ⏭️ Court terme
-- 🥕 **Enrichir le catalogue d'ingrédients** : trop maigre. Démo du 2026-07-27 — le chef a dû
-  réduire une recette à poulet + brocoli seuls (huile d'olive, ail, crème, fromage, paprika,
-  herbes de Provence tous absents), d'où 3 allers-retours de refus. Le garde-fou marche (catalogue
-  verrouillé) mais le catalogue doit couvrir les basiques cuisine. *(lié : voir aussi la rugosité
-  « chercher avant de proposer » — durcir le prompt / modèle plus costaud que `gpt-4o-mini`.)*
+- 🤖 **Rugosité du chef : « chercher avant de proposer »** — le prompt lui dit d'appeler
+  `search_ingredients` AVANT de composer, mais `gpt-4o-mini` propose souvent d'abord et se fait
+  refuser ensuite. Pistes : durcir le prompt, ou passer à un modèle qui suit mieux la consigne.
+  *(Moins douloureux depuis le catalogue bilingue + 420 entrées, mais toujours là.)*
 - **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
   serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
   pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
@@ -82,6 +81,13 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Catalogue d'ingrédients bilingue (FR/EN) + 157 → 420** : `nameFr`/`nameEn` +
+  `normalizedNameFr`/`normalizedNameEn` (2 clés uniques), les outils du chef résolvent dans
+  **les deux langues**. Corrige le vrai bug de la démo : « Olive oil » ne matchait pas
+  « Huile d'olive » alors que la ligne existait. CONDIMENT 14 → 79 (épices, herbes et sauces
+  individuelles, bases cuisine), nouilles, fromages, `OTHER` activé en rayon épicerie.
+  Seed rendu **non destructif** au passage (les batchs ne perdent plus les recettes
+  bibliothèque). Détail : `DECISIONS.md` (2026-08-08).
 - **Langue du chef corrigée** : le chef répond dans la langue de l'UI. Le client envoie sa
   locale (`useLocale`) dans le body de `/api/chat` ; le serveur la privilégie (puis cookie,
   puis défaut). Avant : la route, hors segment `[locale]`, ne lisait que le cookie `NEXT_LOCALE`

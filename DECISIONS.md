@@ -444,6 +444,40 @@ requête et non en colonne `NOT NULL`.
   régler le besoin réel (isoler dev/prod côté données) — qui resterait de toute façon sur
   Supabase pour l'auth. Séparation dev/prod le jour venu : 2ᵉ projet Supabase gratuit (dev)
   ou Branching (Pro). Stack `CLAUDE.md` réaffirmée.
+
+## 2026-08-08 — Catalogue d'ingrédients bilingue (157 → 420)
+- **Le bug de la démo n'était pas un catalogue maigre, mais un catalogue MONOLINGUE.** Le chef
+  répondait en anglais, proposait `Olive oil`/`Garlic`/`Cream`/`Parmesan` — tous **présents** en
+  base sous leur nom français — et `create_recipe` les rejetait, la résolution ne connaissant que
+  `normalizeName(nom français)`. Vérifié ligne à ligne avant de coder.
+- **Bilingue PAR COLONNE, pas par ligne** : une seule ligne porte `nameFr` + `nameEn`, donc un
+  `RecipeIngredient` pointe toujours vers UN ingrédient quelle que soit la langue du lecteur.
+  Deux clés normalisées **uniques** (`normalizedNameFr`, `normalizedNameEn`) ; les outils du chef
+  résolvent avec un `OR` sur les deux. **Priorité FR** dans la map de résolution.
+  *Écarté :* un `searchKeys String[]` (Prisma ne sait pas faire de `contains` sur une liste
+  scalaire, il aurait fallu du SQL brut) et une table de noms (un seul espace de clés global
+  casserait les ~62 entrées où FR == EN : Parmesan, Quinoa, Chorizo…).
+- **Rename `name` → `nameFr` assumé** plutôt qu'un simple ajout de `nameEn` : le rename transforme
+  tout site d'affichage oublié en **erreur `tsc`** au lieu d'un français affiché en silence — la
+  classe de bug qu'on corrigeait. Le compilateur a listé les 14 sites, tous traités.
+- **Bug évité au passage** : avec deux langues, un modèle proposant `Ail` ET `Garlic` créait deux
+  liens vers le même ingrédient → violation de `@@unique([recipeId, ingredientId])`. `create_recipe`
+  **résout d'abord, fusionne les quantités par `ingredientId`** ensuite.
+- **Migration en deux temps** sur la base partagée : M1 (RENAME COLUMN + colonnes EN nullables) →
+  `db seed` (backfill) → M2 (NOT NULL + index unique, avec une garde SQL qui explique quoi faire).
+  `migrate deploy` et non `migrate dev`. Fenêtre de ~4 min assumée (solo, pas d'utilisateurs) ;
+  l'alternative expand/contract est notée pour le jour où il y en aura. Rollback dans le commit.
+- **Seed rendu non destructif d'abord** (commit séparé) : il supprimait les recettes bibliothèque,
+  ce qui cascade sur `BatchEntry`. Vérifié en conditions réelles — 19 recettes, 38 entrées de batch,
+  dont 9 recettes référencées : ids identiques avant/après reseed.
+- **`picto` intégré à l'entrée**, `PICTO_BY_NAME` supprimée : une map keyée par nom n'a plus de
+  langue évidente et échouait **en silence** sur une faute de frappe. Le seed **refuse de tourner**
+  si un nom EN est le nom FR d'une autre entrée (collision invisible en relecture, corruption
+  silencieuse de la catégorie et des protéines).
+- **Anglais américain** (Zucchini, Eggplant, Arugula, Cilantro) : meilleure reconnaissance et
+  registre par défaut du modèle. Faux amis figés dans un test : `Raisin`→Grapes / `Raisins secs`→
+  Raisins, `Prune`→Plum / `Pruneaux`→Prunes, `Poivre`→Black pepper / `Poivron`→Bell pepper,
+  `Bar`→Sea bass. **Aucun nom FR existant renommé** (sinon orphelins en base).
 - **Langue du chef = celle de l'utilisateur, pas seulement l'UI (option C).** Le prompt suit
   la langue du **dernier message** ; repli sur la locale de l'UI si le message est trop
   court/ambigu. **Pourquoi :** un user qui écrit en FR veut une réponse FR même si l'UI est en
