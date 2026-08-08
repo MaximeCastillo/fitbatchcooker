@@ -88,6 +88,10 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Mot de passe oublié** : lien sur `/login` → `/forgot-password` (réponse **neutre**
+  anti-énumération) → email → `/api/auth/callback` (échange du `code` **PKCE** contre une
+  session) → `/reset-password`. Bout-en-bout validé **localhost + Vercel**, i18n FR/EN.
+  Détail & choix : `DECISIONS.md` (2026-08-08).
 - **Encas & petits-déj (ex-« Phase B »)** : `MealType` (`MAIN`|`SNACK`|`BREAKFAST`) au lieu
   du `Recipe.kind` prévu, 6 encas + 5 petits-déj au seed, filtres par type sur `/recipes`.
 - **Couche ingrédients (ex-« Phase D », qu'on croyait différée)** : catalogue ~157 entrées
