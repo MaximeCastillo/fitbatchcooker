@@ -25,12 +25,14 @@ export async function requestPasswordReset(
   }
 
   // Build the redirect target from the current origin so it works on localhost and in
-  // prod alike. NOTE: each origin must be allow-listed in Supabase → Authentication →
-  // URL Configuration, otherwise Supabase refuses the redirectTo.
+  // prod alike. Keep it query-less: Supabase matches the WHOLE redirectTo against the
+  // allow-list, so a trailing "?next=..." wouldn't match an exact "/api/auth/callback"
+  // entry and Supabase would fall back to the Site URL. Each origin must be allow-listed
+  // in Supabase → Authentication → URL Configuration.
   const requestHeaders = await headers();
   const origin =
     requestHeaders.get("origin") ?? `https://${requestHeaders.get("host")}`;
-  const redirectTo = `${origin}/api/auth/callback?next=/reset-password`;
+  const redirectTo = `${origin}/api/auth/callback`;
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {

@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Auth callback for password reset (and future email confirmation). Supabase sends the
-// user here with a `?code=` param; we exchange it for a session (PKCE) so the browser is
-// authenticated, then forward to the page named in `next` (default /reset-password).
+// Auth callback for password reset. Supabase sends the user here with a `?code=` param; we
+// exchange it for a session (PKCE) so the browser is authenticated, then forward to
+// /reset-password. Kept query-less on our side so the redirectTo exactly matches the
+// Supabase allow-list entry (see forgot-password/actions.ts).
 //
 // Lives under /api so the next-intl proxy treats it as an API route (no locale rewrite).
 // We build the client against the redirect RESPONSE — as the session middleware does — so
@@ -11,10 +12,9 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/reset-password";
 
   if (code) {
-    const response = NextResponse.redirect(`${origin}${next}`);
+    const response = NextResponse.redirect(`${origin}/reset-password`);
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
