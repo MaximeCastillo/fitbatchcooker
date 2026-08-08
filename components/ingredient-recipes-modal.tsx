@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
-import { ingredientPicto } from "@/lib/ingredients";
+import { ingredientName, ingredientPicto } from "@/lib/ingredients";
 import {
   loadRecipesByIngredient,
   type RecipeCardData,
@@ -20,7 +20,8 @@ import {
 
 type SelectedIngredient = {
   id: string;
-  name: string;
+  nameFr: string;
+  nameEn: string;
   category: IngredientCategory;
   picto: string | null;
 };
@@ -37,6 +38,7 @@ export function IngredientRecipesModal({
   onClose: () => void;
 }) {
   const t = useTranslations("ingredients");
+  const locale = useLocale();
 
   return (
     <Dialog
@@ -49,7 +51,7 @@ export function IngredientRecipesModal({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span aria-hidden>{ingredientPicto(ingredient)}</span>
-                {t("recipesWith", { name: ingredient.name })}
+                {t("recipesWith", { name: ingredientName(ingredient, locale) })}
               </DialogTitle>
             </DialogHeader>
             {/* Keyed by id → the list remounts fresh for each ingredient, so we never

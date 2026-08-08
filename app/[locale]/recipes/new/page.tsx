@@ -10,13 +10,15 @@ export const dynamic = "force-dynamic";
 
 export default async function NewRecipePage() {
   const t = await getTranslations("recipes");
+  const locale = await getLocale();
   const user = await getCurrentUser();
-  if (!user) return redirect({ href: "/login", locale: await getLocale() });
+  if (!user) return redirect({ href: "/login", locale });
 
   // The whole shared ingredient catalog — small enough to ship to the client picker.
+  // Sorted on the reader's column so the picker reads alphabetically in their language.
   const catalog = await prisma.ingredient.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, category: true, picto: true },
+    orderBy: locale === "fr" ? { nameFr: "asc" } : { nameEn: "asc" },
+    select: { id: true, nameFr: true, nameEn: true, category: true, picto: true },
   });
 
   return (

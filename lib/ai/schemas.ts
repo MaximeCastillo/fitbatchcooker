@@ -22,11 +22,14 @@ export const savePreferenceInput = z.object({
 
 // The chef searches the shared ingredient catalog (by name) BEFORE composing a recipe,
 // to reuse existing ingredients + their protein values instead of inventing numbers.
+// The catalog is bilingual: a query in either language finds the row.
 export const searchIngredientsInput = z.object({
   query: z
     .string()
     .min(1)
-    .describe("Nom d'ingrédient à chercher dans le catalogue partagé (ex: « poulet »)"),
+    .describe(
+      "Nom d'ingrédient à chercher dans le catalogue partagé, en français OU en anglais (ex: « poulet », « chicken »)",
+    ),
 });
 
 // The chef proposes a recipe; we validate it before writing. A recipe is ONE part —
@@ -34,7 +37,10 @@ export const searchIngredientsInput = z.object({
 // the chef references them by name (found via search_ingredients) and we resolve each to
 // an existing row — it can NOT invent new ingredients or protein values.
 export const createRecipeInput = z.object({
-  title: z.string().min(1).describe("Titre de la recette, en français"),
+  title: z
+    .string()
+    .min(1)
+    .describe("Titre de la recette, dans la langue de la conversation"),
   summary: z.string().optional().describe("Résumé court (une phrase), optionnel"),
   steps: z
     .array(z.string().min(1))
@@ -50,7 +56,7 @@ export const createRecipeInput = z.object({
           .string()
           .min(1)
           .describe(
-            "Nom EXACT d'un ingrédient du catalogue partagé (trouvé via search_ingredients). Aucun ingrédient hors catalogue.",
+            "Nom EXACT d'un ingrédient du catalogue, copié tel quel depuis search_ingredients — le nom français OU le nom anglais, les deux sont acceptés. Aucun ingrédient hors catalogue.",
           ),
         quantityG: z
           .number()

@@ -1,16 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
-import { INGREDIENT_PICTO, ingredientPicto } from "@/lib/ingredients";
+import {
+  INGREDIENT_PICTO,
+  ingredientName,
+  ingredientPicto,
+  normalizeName,
+} from "@/lib/ingredients";
 import { IngredientRecipesModal } from "@/components/ingredient-recipes-modal";
 import { cn } from "@/lib/utils";
 
 type Ingredient = {
   id: string;
-  name: string;
+  nameFr: string;
+  nameEn: string;
   category: IngredientCategory;
   proteinPer100g: number;
   picto: string | null;
@@ -41,15 +47,21 @@ export function IngredientBrowser({
   canSave: boolean;
 }) {
   const t = useTranslations("ingredients");
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<IngredientCategory | null>(null);
   const [selected, setSelected] = useState<Ingredient | null>(null);
 
-  const search = query.trim().toLowerCase();
+  // Search BOTH names through the same key the chef resolves with: an English user typing
+  // "poulet" (or a French one typing "chicken") still finds the row, and normalizeName
+  // strips accents so "epinards" matches "Épinards".
+  const search = normalizeName(query);
   const filtered = ingredients.filter(
     (ing) =>
       (!category || ing.category === category) &&
-      (!search || ing.name.toLowerCase().includes(search)),
+      (!search ||
+        normalizeName(ing.nameFr).includes(search) ||
+        normalizeName(ing.nameEn).includes(search)),
   );
   const presentCategories = CATEGORY_ORDER.filter((c) =>
     ingredients.some((ing) => ing.category === c),
@@ -123,7 +135,9 @@ export function IngredientBrowser({
                 {/* Name breathes (no truncation) with the category below; the protein is a
                     compact badge so it can't crowd the name out on a narrow cell. */}
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium leading-tight">{ing.name}</span>
+                  <span className="block font-medium leading-tight">
+                    {ingredientName(ing, locale)}
+                  </span>
                   <span className="block text-xs text-muted-foreground">
                     {t(`categories.${ing.category}`)}
                   </span>

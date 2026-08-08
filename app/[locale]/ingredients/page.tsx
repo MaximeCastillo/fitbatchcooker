@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { IngredientBrowser } from "@/components/ingredient-browser";
@@ -9,13 +9,21 @@ export const dynamic = "force-dynamic";
 // seed). Tapping an ingredient opens the recipes that use it (reverse search).
 export default async function IngredientsPage() {
   const t = await getTranslations("ingredients");
+  const locale = await getLocale();
   const [user, ingredients] = await Promise.all([
     getCurrentUser(),
     prisma.ingredient.findMany({
-      orderBy: [{ category: "asc" }, { name: "asc" }],
+      // Sort in Postgres, just on the reader's column. Category keeps its ENUM
+      // declaration order (what `category: "asc"` already means) — re-sorting in JS with
+      // localeCompare would silently turn it alphabetical and reshuffle the filter chips.
+      orderBy: [
+        { category: "asc" },
+        locale === "fr" ? { nameFr: "asc" } : { nameEn: "asc" },
+      ],
       select: {
         id: true,
-        name: true,
+        nameFr: true,
+        nameEn: true,
         category: true,
         proteinPer100g: true,
         picto: true,

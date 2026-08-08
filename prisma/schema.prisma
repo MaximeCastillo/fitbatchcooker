@@ -82,13 +82,20 @@ model Recipe {
 }
 
 // A shared, GLOBAL ingredient reused across recipes and users. `proteinPer100g` is
-// ~objective ("à la louche", PRINCIPLES §3). `normalizedName` is the dedup key
-// (lowercased, accent-stripped) the chef uses to reuse existing rows before creating
-// new ones. `defaultQuantityG` = the "usual amount" prefill hint.
+// ~objective ("à la louche", PRINCIPLES §3). `defaultQuantityG` = the "usual amount"
+// prefill hint.
+//
+// BILINGUAL BY COLUMN, not by row: one row holds both names, so a RecipeIngredient keeps
+// pointing at ONE ingredient whatever language the reader is in. Both normalized names
+// are unique dedup/resolution keys — the chef may name an ingredient in either language
+// (it answers in the user's language), so lib/ai/tools.ts matches on BOTH. Display goes
+// through ingredientName(ingredient, locale) in lib/ingredients.ts.
 model Ingredient {
   id               String             @id @default(uuid()) @db.Uuid
-  name             String
-  normalizedName   String             @unique
+  nameFr           String
+  nameEn           String
+  normalizedNameFr String             @unique
+  normalizedNameEn String             @unique
   category         IngredientCategory
   proteinPer100g   Float
   defaultQuantityG Int?

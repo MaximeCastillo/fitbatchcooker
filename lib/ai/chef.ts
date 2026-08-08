@@ -20,7 +20,10 @@ protéines/part) et demande confirmation. N'appelle l'outil create_recipe QU'APR
 « oui / ok / confirme » explicite — jamais avant. Le catalogue d'ingrédients est FERMÉ :
 compose UNIQUEMENT avec des ingrédients existants, trouvés via search_ingredients (n'invente
 jamais un ingrédient ni une valeur de protéines). Si un ingrédient souhaité n'existe pas,
-choisis-en un proche qui existe. Les protéines sont des estimations « à la louche » —
+choisis-en un proche qui existe. Le catalogue est BILINGUE : search_ingredients accepte le
+français comme l'anglais et renvoie les deux noms de chaque ingrédient. Nomme les ingrédients
+dans la langue de la conversation, et passe à create_recipe l'un des deux noms renvoyés,
+copié exactement. Les protéines sont des estimations « à la louche » —
 présente-les comme telles.`;
 
 // Human-readable language name per supported locale — steers the model's reply language.

@@ -1,16 +1,17 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import type { IngredientCategory, MealType } from "@/lib/generated/prisma/enums";
-import { ingredientPicto } from "@/lib/ingredients";
+import { ingredientName, ingredientPicto } from "@/lib/ingredients";
 import { createRecipe } from "@/app/[locale]/recipes/actions";
 import { cn } from "@/lib/utils";
 
 type CatalogItem = {
   id: string;
-  name: string;
+  nameFr: string;
+  nameEn: string;
   category: IngredientCategory;
   picto: string | null;
 };
@@ -24,6 +25,7 @@ const inputClass =
 
 export function RecipeForm({ catalog }: { catalog: CatalogItem[] }) {
   const t = useTranslations("recipes");
+  const locale = useLocale();
   const [pending, startTransition] = useTransition();
   const keyRef = useRef(2); // stable, monotonic id source for row/step React keys
 
@@ -164,7 +166,7 @@ export function RecipeForm({ catalog }: { catalog: CatalogItem[] }) {
               <option value="">{t("form.pickIngredient")}</option>
               {catalog.map((ing) => (
                 <option key={ing.id} value={ing.id}>
-                  {ingredientPicto(ing)} {ing.name}
+                  {ingredientPicto(ing)} {ingredientName(ing, locale)}
                 </option>
               ))}
             </select>

@@ -27,10 +27,24 @@ export function ingredientPicto(ingredient: {
   return ingredient.picto ?? INGREDIENT_PICTO[ingredient.category];
 }
 
+// The name to show for an ingredient, in the reader's language. The catalog is bilingual
+// (nameFr / nameEn) and EVERY display site goes through this helper, so no caller has to
+// remember which column holds which language. Unknown locale → English (the app's
+// defaultLocale, see i18n/routing.ts).
+// Structural param type (like ingredientPicto) so any `select` pulling both names fits,
+// and a plain `locale: string` so this stays usable from Server Components, Client
+// Components, the seed and tests alike — no next-intl import.
+export function ingredientName(
+  ingredient: { nameFr: string; nameEn: string },
+  locale: string,
+): string {
+  return locale === "fr" ? ingredient.nameFr : ingredient.nameEn;
+}
+
 // Dedup key for the shared ingredient catalog: lowercased, accent-stripped, whitespace
-// collapsed. The chef normalizes a proposed ingredient name to this before deciding to
-// reuse an existing row or create a new one; it also backs the `normalizedName @unique`
-// column. So "Blanc de poulet ", "blanc de POULET" and "Blanc  de  Poulet" all match.
+// collapsed. Backs BOTH `normalizedNameFr` and `normalizedNameEn` (@unique), and the chef
+// normalizes a proposed name to this to resolve it against either language.
+// So "Blanc de poulet ", "blanc de POULET" and "Blanc  de  Poulet" all match.
 export function normalizeName(raw: string): string {
   return raw
     .normalize("NFD")
