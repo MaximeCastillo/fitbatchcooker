@@ -331,3 +331,63 @@ Et le « Encas + Petit-déj » qui manquait est là. 14/14 tests E2E au vert.
 1. **Phase B — encas** (`Recipe.kind` + onglets palette + seed) *(à re-situer : le multi-select
    couvre peut-être déjà une partie du besoin)*.
 2. **« Ajouter à mon batch »** depuis les cartes recettes (2ᵉ point d'entrée).
+
+---
+
+## Session 7 — 2026-08-08 — Claude Code en profondeur (Remote Control) + mot de passe oublié + langue du chef
+
+**Première session dans Claude Code Desktop** (avant : uniquement le terminal). Moitié
+outillage (comprendre les surfaces + Remote Control), moitié produit (feature d'auth livrée
++ bug corrigé).
+
+### Ce qu'on a construit
+- **Démo live du chef** dans le navigateur intégré : création de recette via **tool calling**,
+  avec le **garde-fou catalogue verrouillé** qui refuse les ingrédients inventés — le modèle
+  s'**auto-corrige** tout seul (boucle agentique, `stopWhen: stepCountIs(5)`).
+- **Flow « mot de passe oublié »** complet : lien sur `/login` → `/forgot-password` (réponse
+  **neutre** anti-énumération) → email → `/api/auth/callback` (échange du `code` **PKCE**) →
+  `/reset-password`. Bilingue FR/EN, validé bout-en-bout **localhost + Vercel**.
+- **Bug langue du chef corrigé** : le client envoie sa locale (`useLocale`) dans le body de
+  `/api/chat` ; le serveur la privilégie (puis cookie, puis défaut).
+- **Doc** : décision « on reste sur Supabase (pas Neon) » actée dans `DECISIONS.md`.
+
+### Concepts appris (🆕)
+- **Surfaces de Claude Code** : CLI · Desktop · web (claude.ai/code) · mobile · extension IDE
+  — chacune a son **historique de sessions séparé**. Le pont entre surfaces, c'est le **repo
+  git**, pas la session.
+- **Remote Control** : piloter une session locale depuis un autre appareil. **La machine reste
+  le moteur** (exécution + fichiers en local) ; seul le **transcript** monte dans le cloud.
+  ≠ sauvegarde Steam (le Mac doit rester réveillé). Deux saveurs : **spawn mode** (démarrer de
+  *nouvelles* sessions à distance : `same-dir` vs `worktree`) et **attach** (`/remote-control`
+  enrôle la session *courante*).
+- **Cloud sessions** vs Remote Control : cloud = exécution côté serveur (Mac peut dormir), mais
+  part du **repo git**, pas des fichiers locaux.
+- **Policy d'org pas prise à chaud** : une règle changée côté admin nécessite un **re-login**
+  (`claude auth login`) pour que la CLI relise les entitlements.
+- **PKCE** : le `code` d'un lien email ne suffit pas à voler la session — il faut le **verifier**
+  stocké en cookie (le « talon de vestiaire »). D'où le « même appareil » du reset.
+- **Anti-énumération** : réponse neutre systématique, ne jamais révéler quels emails ont un compte.
+- **Allow-list de redirect Supabase** : Supabase compare le `redirectTo` **complet** ; une query
+  en trop → pas de match → **fallback sur la Site URL**. Moindre privilège = URL exacte, query-less.
+- **Supabase = Postgres + Auth** (Neon = Postgres seul) → migrer casserait toute l'auth.
+- **Locale hors segment `[locale]`** : une route `/api` ne connaît pas la locale de l'UI → le
+  client l'envoie, sinon fallback cookie/défaut.
+
+### Pièges rencontrés & résolus
+- **Remote Control bloqué par la policy d'org** → activé par l'admin, puis **re-login** pour que
+  la CLI relise la règle.
+- **Sessions Remote Control qui décrochent** (vue distante figée pendant que le CLI tourne) : bug
+  connu de la feature en research preview → update Claude Code + `/rc` / ré-ouvrir l'URL de session.
+- **Reset Vercel qui redirigeait vers localhost** : mon `redirectTo` avec `?next=…` ne matchait pas
+  l'entrée d'allow-list exacte → Supabase retombait sur la Site URL (localhost). Fix : `redirectTo`
+  **query-less** (le `next` était du YAGNI — le callback ne sert que le reset).
+
+### Victoires
+🎉 Entré de plain-pied dans **Claude Code Desktop + Remote Control** (pilotage multi-appareils),
+et livré une **vraie feature d'auth en prod** avec ses fondamentaux sécu (PKCE, anti-énumération,
+moindre privilège). Et débogué le fallback Supabase **toi-même** en lisant la doc.
+
+### Prochaine session
+1. **Confirmer en live** la langue du chef (réponse FR sur UI FR) après reconnexion.
+2. **Enrichir le catalogue d'ingrédients** (+ rugosité « chercher avant de proposer »).
+3. **Phase C — images de plat** (Supabase Storage) ou **BYO key / Paramètres**.

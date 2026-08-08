@@ -51,12 +51,6 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
     quantités. Ni l'un ni l'autre n'existe.
 
 ## ⏭️ Court terme
-- 🐛 **Langue du chef** : le chef doit répondre **dans la langue à laquelle on s'adresse à lui**,
-  au minimum celle de l'UI. Bug repéré le 2026-07-27 : UI en FR mais chef en EN. Cause —
-  `app/api/chat/route.ts` résout la locale via le **seul cookie `NEXT_LOCALE`** et retombe sur
-  `defaultLocale = "en"` quand il est absent (device détecté par `Accept-Language`, cookie non
-  posé tant qu'on n'a pas touché au sélecteur). Fix : résoudre la locale comme les pages (prendre
-  aussi `Accept-Language`), voire détecter la langue du message lui-même.
 - 🥕 **Enrichir le catalogue d'ingrédients** : trop maigre. Démo du 2026-07-27 — le chef a dû
   réduire une recette à poulet + brocoli seuls (huile d'olive, ail, crème, fromage, paprika,
   herbes de Provence tous absents), d'où 3 allers-retours de refus. Le garde-fou marche (catalogue
@@ -88,6 +82,10 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Langue du chef corrigée** : le chef répond dans la langue de l'UI. Le client envoie sa
+  locale (`useLocale`) dans le body de `/api/chat` ; le serveur la privilégie (puis cookie,
+  puis défaut). Avant : la route, hors segment `[locale]`, ne lisait que le cookie `NEXT_LOCALE`
+  et retombait sur EN sur un device FR sans cookie.
 - **Mot de passe oublié** : lien sur `/login` → `/forgot-password` (réponse **neutre**
   anti-énumération) → email → `/api/auth/callback` (échange du `code` **PKCE** contre une
   session) → `/reset-password`. Bout-en-bout validé **localhost + Vercel**, i18n FR/EN.
