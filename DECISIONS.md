@@ -444,3 +444,10 @@ requête et non en colonne `NOT NULL`.
   régler le besoin réel (isoler dev/prod côté données) — qui resterait de toute façon sur
   Supabase pour l'auth. Séparation dev/prod le jour venu : 2ᵉ projet Supabase gratuit (dev)
   ou Branching (Pro). Stack `CLAUDE.md` réaffirmée.
+- **Langue du chef = celle de l'utilisateur, pas seulement l'UI (option C).** Le prompt suit
+  la langue du **dernier message** ; repli sur la locale de l'UI si le message est trop
+  court/ambigu. **Pourquoi :** un user qui écrit en FR veut une réponse FR même si l'UI est en
+  EN (l'option « toujours l'UI » s'est révélée trop rigide en test). Détail technique : la route
+  `/api/chat` vit hors du segment `[locale]` → elle ne connaît pas la locale ; le **client
+  l'envoie** dans le body (`useLocale`), et le prompt suit la langue du message. Erreurs d'auth
+  Supabase désormais **traduites** (`login/actions.ts`, seul endroit qui affichait du brut).
