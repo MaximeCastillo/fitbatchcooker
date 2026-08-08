@@ -52,16 +52,15 @@ export function IngredientBrowser({
   const [category, setCategory] = useState<IngredientCategory | null>(null);
   const [selected, setSelected] = useState<Ingredient | null>(null);
 
-  // Search BOTH names through the same key the chef resolves with: an English user typing
-  // "poulet" (or a French one typing "chicken") still finds the row, and normalizeName
-  // strips accents so "epinards" matches "Épinards".
+  // Search ONLY the displayed language: matching the hidden one would surface rows whose
+  // visible name doesn't contain what you typed, which reads as a bug. (The chef's
+  // search_ingredients IS bilingual — it resolves names, it doesn't filter a list a human
+  // is looking at.) normalizeName still applies, so "epinards" matches "Épinards".
   const search = normalizeName(query);
   const filtered = ingredients.filter(
     (ing) =>
       (!category || ing.category === category) &&
-      (!search ||
-        normalizeName(ing.nameFr).includes(search) ||
-        normalizeName(ing.nameEn).includes(search)),
+      (!search || normalizeName(ingredientName(ing, locale)).includes(search)),
   );
   const presentCategories = CATEGORY_ORDER.filter((c) =>
     ingredients.some((ing) => ing.category === c),
