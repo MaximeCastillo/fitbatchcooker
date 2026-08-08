@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { INGREDIENTS } from "./ingredients";
 // Relative, like seed.ts: this module lives outside the `@/` alias root.
-import { normalizeName } from "../../lib/ingredients";
+import { normalizeName } from "@/lib/ingredients";
 
 // Guards on the hand-written catalog. A reviewer can spot an implausible number in a
 // one-entry-per-line diff; a reviewer CANNOT spot a cross-language key collision between
