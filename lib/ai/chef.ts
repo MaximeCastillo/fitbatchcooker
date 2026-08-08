@@ -44,7 +44,10 @@ export function buildChefSystemPrompt(
   locale: string,
 ): string {
   const language = LOCALE_LANGUAGE[locale] ?? "French";
-  let prompt = `${BASE_PROMPT}\n\nIMPORTANT: Always reply to the user in ${language}.`;
+  // Follow the language the user writes in; fall back to the UI language only when a
+  // message is too short/ambiguous to tell. A French UI user who writes in English (or
+  // vice versa) gets answered in the language they chose to use.
+  let prompt = `${BASE_PROMPT}\n\nIMPORTANT: Reply in the same language as the user's latest message. If a message is too short or ambiguous to tell (a greeting, "ok", an emoji), reply in ${language} (the app's current language).`;
 
   if (firstName) {
     prompt += `\n\nL'utilisateur s'appelle ${firstName}. Accueille-le et adresse-toi à lui par son prénom quand c'est naturel.`;
