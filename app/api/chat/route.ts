@@ -23,15 +23,22 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages, locale: bodyLocale }: {
+    messages: UIMessage[];
+    locale?: string;
+  } = await req.json();
 
-  // This route lives outside the [locale] segment, so we read the active UI locale from
-  // the cookie next-intl maintains (NEXT_LOCALE), falling back to the default locale.
+  // This route lives outside the [locale] segment, so it can't resolve the UI locale on
+  // its own. Prefer the locale the client sends (it renders inside [locale], so it knows
+  // for sure); fall back to the NEXT_LOCALE cookie, then the default. Without this, a
+  // French device with no cookie fell back to English and the chef replied in English.
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
-  const locale = hasLocale(routing.locales, cookieLocale)
-    ? cookieLocale
-    : routing.defaultLocale;
+  const locale = hasLocale(routing.locales, bodyLocale)
+    ? bodyLocale
+    : hasLocale(routing.locales, cookieLocale)
+      ? cookieLocale
+      : routing.defaultLocale;
 
   // Recall: load what we know about this user and inject it into the prompt (spec §5).
   const preferences = await prisma.preference.findMany({

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useChat } from "@ai-sdk/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 // Client Component: manages the chat state and streams the chef's replies.
@@ -11,12 +11,16 @@ export function ChatBox({ greeting }: { greeting: string }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat();
   const t = useTranslations("chat");
+  // The chat route lives outside the [locale] segment, so it can't resolve the UI locale
+  // on its own. We know it for sure here (this component renders inside [locale]), so we
+  // send it along and the chef answers in the language the UI is actually shown in.
+  const locale = useLocale();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const text = input.trim();
     if (!text) return;
-    sendMessage({ text });
+    sendMessage({ text }, { body: { locale } });
     setInput("");
   };
 
