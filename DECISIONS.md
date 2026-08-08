@@ -423,3 +423,24 @@ requête et non en colonne `NOT NULL`.
   `.claude/settings.json` reste à la **config Claude par défaut** (pas d'override).
 - **« Ajouter à mon batch » depuis les cartes recettes : écarté.** On n'en veut pas pour
   l'instant ; l'ajout se fait uniquement depuis le composeur. Déplacé en « Plus tard ».
+
+## 2026-08-08 — Mot de passe oublié + on reste sur Supabase (pas de Neon)
+- **Flow « mot de passe oublié » livré** : `/forgot-password` → email → `/api/auth/callback`
+  (échange du `code` PKCE contre une session) → `/reset-password`. **Pourquoi ces choix :**
+  - **Callback sous `/api`** : le proxy next-intl ne réécrit pas les routes `/api` (pas de
+    segment `[locale]` à gérer).
+  - **Réponse neutre** sur `/forgot-password` (« si un compte existe… ») : anti-énumération,
+    on ne révèle jamais quels emails ont un compte.
+  - **Pas de re-vérif de l'ancien mot de passe** (contrairement à `/account`) : le lien email
+    EST la preuve d'identité. La page exige une session (créée par le callback) ; sans
+    session = lien invalide/expiré.
+  - **Caveat assumé** : PKCE **même appareil** (demande + clic depuis le même navigateur) ;
+    cross-device = durcissement post-MVP.
+  - **Config Supabase** : les Redirect URLs doivent lister `…/api/auth/callback` (localhost +
+    Vercel), sinon Supabase retombe sur la Site URL. Allow-list = **moindre privilège** (URL
+    exacte, pas de `/**`).
+- **Évalué Neon, on reste sur Supabase.** **Pourquoi :** Supabase = Postgres **+ Auth**,
+  Neon = Postgres seul. Migrer casserait toute l'auth (login/signup/reset/sessions) sans
+  régler le besoin réel (isoler dev/prod côté données) — qui resterait de toute façon sur
+  Supabase pour l'auth. Séparation dev/prod le jour venu : 2ᵉ projet Supabase gratuit (dev)
+  ou Branching (Pro). Stack `CLAUDE.md` réaffirmée.
