@@ -391,3 +391,83 @@ moindre privilège). Et débogué le fallback Supabase **toi-même** en lisant l
 1. **Confirmer en live** la langue du chef (réponse FR sur UI FR) après reconnexion.
 2. **Enrichir le catalogue d'ingrédients** (+ rugosité « chercher avant de proposer »).
 3. **Phase C — images de plat** (Supabase Storage) ou **BYO key / Paramètres**.
+
+---
+
+## Session 8 — 2026-08-08 (suite) — Le catalogue d'ingrédients devient bilingue (157 → 420)
+
+**Objectif affiché :** « enrichir énormément le catalogue, et chaque ingrédient doit être
+bilingue ». **Ce qu'on a vraiment trouvé :** le catalogue n'était pas trop maigre — il était
+**monolingue**, et c'était ça, le bug.
+
+### L'enquête (le moment clé de la session)
+Avant d'écrire une ligne, vérification du seed ligne à ligne : `Huile d'olive`, `Ail`,
+`Crème fraîche`, `Parmesan` — les quatre ingrédients que le chef avait « pas trouvés » pendant
+la démo — **existaient déjà en base**. Ils échouaient parce que le chef répondait en anglais,
+proposait `Olive oil` / `Garlic` / `Cream`, et que la résolution ne connaissait que
+`normalizeName(nom français)`. Le diagnostic noté en ROADMAP (« catalogue trop maigre ») était
+**faux**. L'avoir cru aurait conduit à ajouter des doublons anglais en base — bien pire.
+
+### Ce qu'on a construit
+- **Schéma bilingue par colonne** : `nameFr`/`nameEn` + `normalizedNameFr`/`normalizedNameEn`
+  (deux clés uniques). Une seule ligne par ingrédient → un `RecipeIngredient` pointe toujours
+  vers UN ingrédient, quelle que soit la langue du lecteur.
+- **Outils du chef bilingues** : `search_ingredients` et `create_recipe` résolvent avec un `OR`
+  sur les deux colonnes. **Résultat mesuré sur la demande identique à la démo : 3 rejets → 0**,
+  2 ingrédients retenus → **les 6 demandés**.
+- **Catalogue 157 → 420**, tous les noms FR existants préservés à l'identique. CONDIMENT 14 → 79
+  (épices, herbes, sauces, bases cuisine), les nouilles (zéro avant), 25 fromages, `OTHER` activé
+  en rayon épicerie. Sorti dans `prisma/seed-data/ingredients.ts` (seed.ts : 800 → 457 lignes).
+- **Seed rendu non destructif d'abord** (commit séparé) — il supprimait les recettes bibliothèque,
+  ce qui cascade sur `BatchEntry`.
+- **Recherche UI repassée en mono-langue** après retour d'usage : voir « Chicken breast » sortir
+  quand on tape « poulet » en anglais, c'est déroutant.
+
+### Concepts appris (🆕)
+- **Le rename comme filet de sécurité.** Renommer `name` → `nameFr` (plutôt que juste ajouter
+  `nameEn`) transforme chaque site d'affichage oublié en **erreur `tsc`**. Le compilateur a listé
+  les 14 endroits exacts. Un simple ajout les aurait laissés afficher du français à un anglophone
+  **en silence** — la classe de bug qu'on corrigeait. Règle générale : *rendre l'erreur impossible
+  à rater plutôt que compter sur sa vigilance*.
+- **Migration en deux temps sur une base partagée.** Une colonne dont la valeur n'est pas dérivable
+  ne peut pas être `NOT NULL` d'emblée : M1 (colonnes nullables + `RENAME COLUMN`) → `db seed`
+  (backfill) → M2 (`NOT NULL` + index unique). M2 porte une **garde SQL** qui dit quoi faire au
+  lieu d'échouer sur une erreur cryptique.
+- **`RENAME COLUMN` vs ce que Prisma génère.** Prisma (déclaratif) voit un rename comme
+  `DROP + ADD` → il aurait effacé les 157 noms. Migration écrite à la main, comme pour le rename
+  `MealPlan` → `Batch` en session 3. `RENAME COLUMN` conserve l'index ; seul son **nom** devient
+  périmé, d'où le `ALTER INDEX ... RENAME`.
+- **`migrate deploy` ≠ `migrate dev`.** `deploy` applique les migrations existantes (prod) ;
+  `dev` veut *générer* la migration manquante et passe par une shadow DB.
+- **Résoudre AVANT de fusionner.** Avec deux langues, un modèle proposant `Ail` **et** `Garlic`
+  créait deux liens vers le même ingrédient → violation de `@@unique([recipeId, ingredientId])`.
+  L'ordre des opérations est une décision de conception, pas un détail.
+- **Résoudre ≠ filtrer.** Le chef *résout un nom* vers une ligne (bilingue = le fix) ; la barre
+  de recherche *filtre une liste qu'un humain regarde* (mono-langue, sinon ça paraît buggé).
+  Deux comportements opposés, tous deux corrects — parce que les usages diffèrent.
+- **Ce qu'un test attrape et qu'une relecture ne peut pas.** Une collision de noms entre deux
+  entrées à 200 lignes d'écart, en deux langues, est invisible en revue et corrompt silencieusement
+  catégorie + protéines. → garde-fou qui **empêche le seed de tourner**. À l'inverse, une valeur
+  protéine douteuse *se voit* dans un diff à une ligne par entrée → simple test Vitest.
+- **Le garde-fou n'était pas en cause.** Le catalogue verrouillé faisait exactement son travail :
+  il refusait des noms qu'il ne savait pas traduire. On a corrigé le **dictionnaire**, pas la règle.
+
+### Pièges rencontrés & résolus
+- **Serveur de dev avec l'ancien client Prisma** : le chef répondait « I can't find the
+  ingredients » alors que les requêtes marchaient en direct sur la base. `prisma generate` ne
+  suffit pas — il faut **redémarrer le serveur**. (Déjà croisé en session 2, re-croisé ici.)
+- **Alias `@/` absent sous Vitest** (pas de `vitest.config.ts`) → imports relatifs dans les tests,
+  comme le précédent `lib/nutrition.test.ts`.
+- **`npm test` jamais tout vert** : Vitest ramasse le spec Playwright. Pré-existant, isolé en
+  tâche de fond plutôt que bricolé au passage.
+
+### Victoires
+🎉 Un bug qu'on croyait comprendre s'est révélé être **autre chose** — et c'est la vérification,
+pas l'intuition, qui l'a montré. Le chef compose maintenant sans blocage dans les deux langues,
+avec preuve en base (6 ingrédients liés, protéines dérivées côté serveur). Et le seed ne peut
+plus vider un batch.
+
+### Prochaine session
+1. **Phase C — images de plat** (Supabase Storage) — dernier morceau des « recettes riches ».
+2. **BYO key / page Paramètres** (+ comptes admin).
+3. Rugosité du chef : « chercher avant de proposer » (prompt ou modèle plus costaud).
