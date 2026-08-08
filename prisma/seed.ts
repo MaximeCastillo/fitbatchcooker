@@ -8,10 +8,11 @@
 // ingredient AS WEIGHED / AS PURCHASED — raw meat & fish, dry rice/pasta/oats/quinoa,
 // cooked/canned-drained legumes — matching PRINCIPLES §3 (blanc de poulet ~22 g/100 g raw).
 //
-// Idempotent: ingredients are upserted by normalizedName; the shared starter library
-// (recipes with userId = null) is RESET to exactly this set on each run — so every
-// library recipe has ingredients + a derived protein/part. User-owned recipes are
-// untouched.
+// Idempotent and NON-DESTRUCTIVE: ingredients are upserted by normalizedName; the shared
+// starter library (recipes with userId = null) is refreshed IN PLACE, matched by title,
+// so each recipe keeps its id and stays in whatever batches reference it (BatchEntry is
+// onDelete Cascade — deleting would silently empty users' batches). User-owned recipes
+// are untouched.
 import "dotenv/config";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -661,15 +662,19 @@ async function main() {
     ingredientRows.map((row) => [row.normalizedName, row.id]),
   );
 
-  // 2. Reset the shared starter library: wipe template recipes (userId = null) and
-  //    recreate them from RECIPES, so the library is always exactly this curated set —
-  //    every recipe has ingredients + a derived protein/part. deleteMany cascades to
-  //    their RecipeIngredient (and any BatchEntry pointing at them); fine in this
-  //    prototype where the shared library is ours to reset. User-owned recipes
-  //    (userId != null) are untouched.
-  await prisma.recipe.deleteMany({ where: { userId: null } });
+  // 2. Refresh the shared starter library (userId = null) IN PLACE, matched by title.
+  //    We deliberately do NOT delete-and-recreate: BatchEntry.recipe is onDelete Cascade,
+  //    so wiping a library recipe would silently remove it from users' saved batches.
+  //    Updating keeps the recipe's id — batches keep pointing at it. User-owned recipes
+  //    (userId != null) are untouched either way.
+  const libraryRows = await prisma.recipe.findMany({
+    where: { userId: null },
+    select: { id: true, title: true },
+  });
+  const libraryIdByTitle = new Map(libraryRows.map((row) => [row.title, row.id]));
 
   let created = 0;
+  let updated = 0;
   for (const recipe of RECIPES) {
     // Derive protein/part from the linked ingredients (never hardcoded).
     const proteinPerServingG = recipeProteinG(
@@ -684,30 +689,59 @@ async function main() {
       }),
     );
 
-    await prisma.recipe.create({
-      data: {
-        userId: null, // shared starter library, visible to everyone
-        title: recipe.title,
-        summary: recipe.summary,
-        steps: recipe.steps,
-        mealType: recipe.mealType,
-        imageUrl: recipe.imageUrl ?? null,
-        proteinPerServingG,
-        ingredients: {
-          create: recipe.ingredients.map((link) => {
-            const ingredientId = idByNormalized.get(normalizeName(link.name));
-            if (!ingredientId) {
-              throw new Error(`Missing ingredient row for "${link.name}".`);
-            }
-            return { ingredientId, quantityG: link.quantityG };
-          }),
-        },
-      },
+    const links = recipe.ingredients.map((link) => {
+      const ingredientId = idByNormalized.get(normalizeName(link.name));
+      if (!ingredientId) {
+        throw new Error(`Missing ingredient row for "${link.name}".`);
+      }
+      return { ingredientId, quantityG: link.quantityG };
     });
-    created++;
+
+    const data = {
+      title: recipe.title,
+      summary: recipe.summary,
+      steps: recipe.steps,
+      mealType: recipe.mealType,
+      imageUrl: recipe.imageUrl ?? null,
+      proteinPerServingG,
+    };
+
+    const existingId = libraryIdByTitle.get(recipe.title);
+    if (existingId) {
+      // Replace the ingredient links only (they have no meaning outside the recipe),
+      // then refresh the recipe's own fields. The recipe row — and its id — survives.
+      await prisma.recipeIngredient.deleteMany({ where: { recipeId: existingId } });
+      await prisma.recipe.update({
+        where: { id: existingId },
+        data: { ...data, ingredients: { create: links } },
+      });
+      updated++;
+    } else {
+      await prisma.recipe.create({
+        data: { userId: null, ...data, ingredients: { create: links } },
+      });
+      created++;
+    }
   }
 
-  console.log(`Recipes: reset shared library, created ${created}.`);
+  // Drop library recipes we no longer ship — but only those nobody placed in a batch,
+  // mirroring the stale-ingredient guard below. A dropped recipe still sitting in a
+  // user's batch is left alone rather than silently vanishing from it.
+  const keptTitles = new Set(RECIPES.map((recipe) => recipe.title));
+  const staleLibrary = await prisma.recipe.findMany({
+    where: { userId: null, title: { notIn: [...keptTitles] } },
+    select: { id: true, _count: { select: { batchEntries: true } } },
+  });
+  const removableIds = staleLibrary
+    .filter((recipe) => recipe._count.batchEntries === 0)
+    .map((recipe) => recipe.id);
+  if (removableIds.length > 0) {
+    await prisma.recipe.deleteMany({ where: { id: { in: removableIds } } });
+  }
+
+  console.log(
+    `Recipes: library refreshed (${created} created, ${updated} updated, ${removableIds.length} removed).`,
+  );
 
   // 3. Remove stale ingredients (renamed/dropped from the list) that nothing references
   //    anymore — keeps the locked catalog clean after a generalization pass (e.g. old
