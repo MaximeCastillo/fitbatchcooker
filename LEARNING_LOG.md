@@ -480,9 +480,10 @@ Session courte, une seule cible : les deux dettes laissées en tâche de fond en
 (« `npm test` jamais tout vert », « alias `@/` absent sous Vitest »). Zéro produit.
 
 ### Ce qu'on a construit
-- **`vitest.config.ts`** (le projet n'en avait aucun) : `exclude: [...configDefaults.exclude,
-  "e2e/**"]` + `resolve.alias` pour `@/`. **`npm test` : 4 fichiers / 47 tests, tout vert.**
-  `playwright test --list` retrouve bien ses 15 tests — les deux runners ne se croisent plus.
+- **`vitest.config.ts`** (le projet n'en avait aucun) : `exclude` étendu à `**/e2e/**` et
+  `.claude/worktrees/**`, + `resolve.alias` pour `@/`. **`npm test` : 4 fichiers / 47 tests,
+  tout vert dans les deux checkouts.** `playwright test --list` retrouve bien ses 15 tests —
+  les deux runners ne se croisent plus.
 - Alias **prouvé, pas seulement déclaré** : `prisma/seed-data/ingredients.test.ts` passe de
   `../../lib/ingredients` à `@/lib/ingredients`.
 
@@ -507,6 +508,12 @@ Session courte, une seule cible : les deux dettes laissées en tâche de fond en
 - **`main` avait avancé** pendant la session (le bilan 8 + un correctif recherche) → **rebase**
   de la branche worktree avant d'atterrir, puis re-run des tests *après* rebase — un rebase
   propre ne garantit pas un code qui marche.
+- **Le « vert » n'était vrai que dans le worktree.** Premier fix déclaré bon après un `npm test`
+  lancé *depuis le worktree seulement* ; depuis `main`, toujours rouge. Deux causes :
+  `"e2e/**"` n'ancre qu'à la **racine** (il faut `**/e2e/**` pour un `e2e/` imbriqué), et
+  surtout **un worktree vit dans le repo** (`.claude/worktrees/`) → un run depuis le checkout
+  principal ramassait les deux checkouts, soit **94 tests = 47 × 2**. Leçon : *vérifier là où
+  la commande sera réellement lancée*, pas seulement là où on travaille.
 
 ### Victoire
 🎉 Petit commit, effet durable : `npm test` est redevenu un **gate** exploitable. À partir de
