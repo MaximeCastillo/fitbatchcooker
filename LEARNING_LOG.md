@@ -484,8 +484,10 @@ Session courte, une seule cible : les deux dettes laissées en tâche de fond en
   `.claude/worktrees/**`, + `resolve.alias` pour `@/`. **`npm test` : 4 fichiers / 47 tests,
   tout vert dans les deux checkouts.** `playwright test --list` retrouve bien ses 15 tests —
   les deux runners ne se croisent plus.
-- Alias **prouvé, pas seulement déclaré** : `prisma/seed-data/ingredients.test.ts` passe de
-  `../../lib/ingredients` à `@/lib/ingredients`.
+- Alias vérifié puis **laissé inutilisé pour l'instant** : les tests actuels importent leur
+  voisin direct (`./nutrition`), ce qui est déjà la bonne forme, et ceux sous `prisma/` gardent
+  le relatif **exprès** (le seed tourne sous `tsx`, qui ne résout pas `@/`). L'alias servira au
+  premier test qui traverse l'arbo.
 
 ### Concepts appris (🆕)
 - **Vitest et Playwright parlent le même mot, `test()`, depuis deux bibliothèques différentes.**
