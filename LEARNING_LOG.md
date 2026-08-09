@@ -471,3 +471,43 @@ plus vider un batch.
 1. **Phase C — images de plat** (Supabase Storage) — dernier morceau des « recettes riches ».
 2. **BYO key / page Paramètres** (+ comptes admin).
 3. Rugosité du chef : « chercher avant de proposer » (prompt ou modèle plus costaud).
+
+---
+
+## Session 9 — 2026-08-09 — `npm test` redevient un vrai filet (petite session outillage)
+
+Session courte, une seule cible : les deux dettes laissées en tâche de fond en session 8
+(« `npm test` jamais tout vert », « alias `@/` absent sous Vitest »). Zéro produit.
+
+### Ce qu'on a construit
+- **`vitest.config.ts`** (le projet n'en avait aucun) : `exclude: [...configDefaults.exclude,
+  "e2e/**"]` + `resolve.alias` pour `@/`. **`npm test` : 4 fichiers / 47 tests, tout vert.**
+  `playwright test --list` retrouve bien ses 15 tests — les deux runners ne se croisent plus.
+- Alias **prouvé, pas seulement déclaré** : `prisma/seed-data/ingredients.test.ts` passe de
+  `../../lib/ingredients` à `@/lib/ingredients`.
+
+### Concepts appris (🆕)
+- **Vitest et Playwright parlent le même mot, `test()`, depuis deux bibliothèques différentes.**
+  Sans config, Vitest scanne tout le repo, ramasse `e2e/*.spec.ts` et exécute un `test()`
+  Playwright hors de son runner. En Rails, `spec/` vs `test/` est réglé par convention ; côté
+  JS, la frontière doit être **écrite**.
+- **`paths` dans `tsconfig.json` ne résout rien à l'exécution.** TypeScript vérifie les types
+  puis s'efface. Chaque outil qui *exécute* du code (Next, Vitest, …) doit apprendre `@/`
+  séparément. Rien à voir avec l'autoload Zeitwerk, qui vaut pour tout le processus Rails.
+- **Le spread dans une config est un garde-fou.** `exclude: ["e2e/**"]` seul **écrase** les
+  défauts (`node_modules`, `dist`) ; il faut `[...configDefaults.exclude, …]` pour étendre.
+- **Un test rouge en permanence est pire que pas de test** : on apprend à ignorer le signal,
+  et une vraie régression passe inaperçue.
+
+### Pièges rencontrés & résolus
+- **Deux échecs, pas un.** Le second n'avait rien à voir : le client Prisma n'était pas généré
+  dans ce **worktree** (`lib/generated/` est gitignored, `.env` aussi — donc rien ne suit un
+  nouveau worktree). Réflexe : `cp ../../../.env . && npx prisma generate`. Le fix de config
+  seul n'aurait pas donné le vert.
+- **`main` avait avancé** pendant la session (le bilan 8 + un correctif recherche) → **rebase**
+  de la branche worktree avant d'atterrir, puis re-run des tests *après* rebase — un rebase
+  propre ne garantit pas un code qui marche.
+
+### Victoire
+🎉 Petit commit, effet durable : `npm test` est redevenu un **gate** exploitable. À partir de
+maintenant, rouge = quelque chose est réellement cassé.

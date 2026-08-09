@@ -81,6 +81,9 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **`npm test` redevenu vert** : `vitest.config.ts` exclut `e2e/**` (Vitest ramassait le spec
+  Playwright et échouait toujours) et déclare l'alias `@/` pour les tests. 47 tests verts ;
+  `npm run e2e` inchangé.
 - **Catalogue d'ingrédients bilingue (FR/EN) + 157 → 420** : `nameFr`/`nameEn` +
   `normalizedNameFr`/`normalizedNameEn` (2 clés uniques), les outils du chef résolvent dans
   **les deux langues**. Corrige le vrai bug de la démo : « Olive oil » ne matchait pas
