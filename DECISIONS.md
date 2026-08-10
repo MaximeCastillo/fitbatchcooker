@@ -485,3 +485,45 @@ requête et non en colonne `NOT NULL`.
   `/api/chat` vit hors du segment `[locale]` → elle ne connaît pas la locale ; le **client
   l'envoie** dans le body (`useLocale`), et le prompt suit la langue du message. Erreurs d'auth
   Supabase désormais **traduites** (`login/actions.ts`, seul endroit qui affichait du brut).
+
+## 2026-08-10 — Onboarding : écran de bienvenue, empty state, visite guidée
+
+- **Le vrai blocage était une donnée manquante, pas un manque d'explications.** Sans poids,
+  `dailyProteinTargetG()` renvoie `null` → toutes les jauges à 0 → aucun jour scellé au vert
+  possible, donc **aucune activation**. On répare la cause (écran de bienvenue) avant de faire
+  visiter l'app. La bulle « règle ta cible » prévue dans la visite a donc disparu : on enseigne
+  le résultat, pas le menu.
+- **Zéro migration, zéro colonne.** Le premier jet ajoutait `onboardedAt` + `tourSeenAt`. Les deux
+  sont inutiles : `signup` **redirige** vers `/welcome` (l'écran n'est pas une garde sur l'app,
+  donc rien à mémoriser), la visite est armée **uniquement** par `?tour=1`, et la relance « règle
+  ta cible » se déduit de `dailyProteinTargetG(user) === null` — la condition **est** l'état
+  produit réel, et elle se résout d'elle-même. Règle générale : avant d'ajouter une colonne pour
+  un état, vérifier s'il n'est pas déjà déductible de la donnée existante (sinon = deux sources à
+  garder cohérentes).
+  - Effets de bord évités : aucune décision sur la base Supabase partagée dev/prod, aucun compte
+    existant impacté, et **les 15 tests e2e existants passent sans modification** (ils ne visitent
+    jamais une URL portant `?tour=1`).
+  - Pas dans la table `Preference` non plus : `lib/ai/chef.ts` injecte **toutes** les préférences
+    dans le prompt du chef — un flag technique y finirait en phrase adressée au modèle.
+- **`@base-ui/react` plutôt qu'une lib de visite.** Déjà installé, et déjà la lib de primitives du
+  projet (`components/ui/button.tsx` est construit dessus) → **0 nouvelle dépendance, 0 ligne de
+  CSS**, dark mode gratuit via les tokens. **Shepherd.js et Intro.js écartés pour la licence :**
+  tous deux passés en **AGPL-3.0** dual-license, licence commerciale payante obligatoire pour un
+  SaaS générant du revenu. driver.js (MIT, très bon) aurait imposé ~110 lignes de surcharges CSS
+  tierces, des `z-index` à 10000+ hors de la convention plate `z-50`, et des boutons vendor à
+  13 px (viole les 44 px de PRINCIPLES §5).
+- **Voile `pointer-events-none`, `modal={false}`, pas de `Popover.Backdrop`.** Rien de ce que rend
+  la visite ne peut avaler un tap → le scroll mobile survit et le `TouchSensor` du composeur est
+  intouché. Vérifié dans `node_modules` : scroll lock et backdrop interne sont tous deux gatés sur
+  `modal === true`.
+- **Ancrage responsive** : les deux navs (sidebar desktop `hidden md:flex` + bande mobile) sont
+  dans le DOM en même temps. La visite résout la cible avec `checkVisibility()` (et non
+  `offsetParent`, qui est aussi `null` pour un élément `position:fixed` visible). Validé en 375 px :
+  c'est bien la bande mobile qui est ciblée.
+- **La visite se ferme sur tout clic extérieur** (en plus de Passer/Terminé et Échap) : l'utilisateur
+  qui reprend la main gagne toujours, et c'est rejouable depuis `/account`. Conséquence utile : comme
+  toute server action de la page exige un tel clic, un `revalidatePath` ne peut jamais atterrir
+  pendant que la visite est ouverte. Le composant est quand même rendu **inconditionnellement** avec
+  `autoStart` figé dans un `useState` (défense en profondeur contre un démontage en cours de route).
+- **`?tour=1` nettoyé au démarrage** via `history.replaceState` (pas `router.replace`, qui
+  refetcherait l'arbre RSC) : un rechargement ne rejoue pas et l'URL reste propre.

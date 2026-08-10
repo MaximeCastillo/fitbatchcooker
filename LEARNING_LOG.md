@@ -520,3 +520,82 @@ Session courte, une seule cible : les deux dettes laissées en tâche de fond en
 ### Victoire
 🎉 Petit commit, effet durable : `npm test` est redevenu un **gate** exploitable. À partir de
 maintenant, rouge = quelque chose est réellement cassé.
+
+---
+
+## Session 10 — 2026-08-10 — L'onboarding : réparer la cause avant d'expliquer
+
+Session partie d'une demande de visite guidée, qui s'est transformée en autre chose une fois
+posée la bonne question : **quel est le moment « aha » ?**
+
+### Ce qu'on a construit
+- **`/welcome`** — où atterrit toute nouvelle inscription. Prénom + poids, deux questions, et la
+  **jauge signature se remplit en direct** pendant la frappe (78 kg → 156 g, scellée en vert).
+  Skippable. `components/welcome-form.tsx` + `app/[locale]/welcome/{page,actions}.tsx`.
+- **Empty state de `/batch`** — le `<p>` gris devient trois jauges, un titre, le CTA, et la relance
+  cible protéines. Une visite se zappe ; un empty state, jamais.
+- **Visite guidée 4 bulles** en `@base-ui/react` — accueil → le chef → les recettes → nouveau batch.
+  `lib/tour.ts` (pur, 12 tests) + `components/product-tour.tsx`. Rejouable depuis `/account`.
+- Au passage : `lib/profile.ts` (parsing factorisé entre les deux formulaires), CTA « Nouveau
+  batch » passé à 44 px, les deux relances « règle ta cible » pointent vers `/welcome`.
+- **69 tests unitaires, 22 e2e** (7 nouveaux) — les 15 anciens **inchangés**.
+
+### Concepts appris (🆕)
+- **TTFV et activation, le vocabulaire du métier.** L'onboarding ne sert qu'une métrique : le temps
+  entre « je m'inscris » et « je vois à quoi ça sert ». Et l'indicateur n'est jamais « a fini la
+  visite » (on peut cliquer 5 fois sur *Suivant* sans rien comprendre) mais **l'activation** : le %
+  de nouveaux qui atteignent le moment « aha ». Ici : **le premier jour scellé au vert**, dont la
+  fonction `isDayComplete()` existait déjà en code.
+- **La visite guidée est la brique la plus demandée et la moins efficace.** Elle arrive au pire
+  moment : l'utilisateur n'a pas encore de problème, donc pas de question. Classement réel :
+  empty states > checklist > tooltips contextuels ≈ centre d'aide > visite. Elle règle une chose
+  utile — la **découvrabilité** — mais ne doit jamais être seule.
+- **Pourquoi une boîte paye un DAP (Stonly, Pendo, Appcues) alors qu'une visite = 150 lignes.**
+  On n'achète pas la technique : on achète le **découplage du cycle de release** (une PM modifie
+  un guide en prod à 15h sans déployer), le ciblage par segment, les analytics de funnel. Même
+  logique qu'un CMS headless ou un feature-flag manager. Solo dev = cet argument s'évapore → une lib.
+- **Vérifier la licence AVANT `npm install`.** Shepherd.js et Intro.js sont passés en **AGPL-3.0**
+  dual-license : le copyleft le plus contaminant (servi sur un réseau ⇒ publie ton source), donc
+  licence commerciale payante pour un SaaS. En Rails on ne croise quasiment que du MIT ; ici c'est
+  un réflexe à prendre.
+- **Le meilleur onboarding demande ce que l'utilisateur sait, et calcule ce dont on a besoin.**
+  Personne ne connaît sa cible protéines en grammes ; tout le monde connaît son poids. Et on
+  justifie la question *dans* la question (« pour calculer ta cible, ~2 g/kg ») — le poids est une
+  donnée intime.
+- **Avant d'ajouter une colonne pour un état, vérifie s'il n'est pas déductible.** Le premier jet
+  ajoutait `onboardedAt` + `tourSeenAt`. Les deux étaient inutiles : une **redirection** remplace
+  « déjà onboardé » (l'écran n'est pas une garde), `?tour=1` remplace « visite vue », et
+  `dailyProteinTargetG(user) === null` **est** l'état produit réel. Zéro migration → aucune
+  décision sur la base partagée dev/prod, et **les 15 e2e existants passent sans y toucher**.
+  Une colonne redondante = une deuxième source de vérité à garder cohérente.
+- **Base UI était déjà là.** `components/ui/button.tsx` est construit sur `@base-ui/react` : c'est
+  la lib de primitives du projet, pas un « DIY ». Elle donne le positionnement Floating UI,
+  `role="dialog"` + aria, Échap, le suivi de l'ancre. Le seul morceau vraiment dur — le trou dans
+  le voile — fait **8 lignes** de `clip-path: polygon(...)` (anneau extérieur horaire, trou
+  anti-horaire), l'astuce que Base UI utilise elle-même en interne.
+
+### Pièges rencontrés & résolus
+- **`style.display = ""` retombe sur la classe `hidden`.** L'anneau vert restait invisible : vider
+  un style inline ne fait pas disparaître l'utilitaire Tailwind en dessous. Il faut `"block"`.
+- **Un popover sans `Popover.Trigger` atterrit à 0,0.** L'étape d'accueil n'a pas d'ancre → Base UI
+  se positionnait contre un trigger inexistant. Corrigé par une **ancre virtuelle** (rect 0×0 au
+  centre du viewport), ce qui garde un seul chemin de code.
+- **Un test peut prouver autre chose que ce qu'on croit.** Je voulais vérifier qu'un refresh RSC ne
+  tue pas la visite, en cliquant le sélecteur de langue. La visite s'est fermée — mais à cause du
+  **clic extérieur**, pas du refresh. Isolé en cliquant un `<h1>` neutre (qui ne déclenche aucun
+  refresh) : elle se ferme aussi. Le test initial ne prouvait rien. Conclusion utile au passage :
+  comme toute server action de la page exige un clic extérieur, le scénario « `revalidatePath`
+  démonte la visite » est **inatteignable**.
+- **Le lint React Compiler refuse `setState` synchrone dans un effet.** Le vrai correctif n'était
+  pas de contourner la règle mais de supprimer le state : le voile et l'anneau changent à chaque
+  frame de scroll, donc ils sont écrits **directement en DOM** via des refs. Moins de renders, et
+  c'est exactement ce que la règle suggère (« mettre à jour un système externe »).
+- **`checkVisibility()` plutôt qu'`offsetParent`.** Les deux navs (sidebar desktop + bande mobile)
+  cohabitent dans le DOM, l'une masquée en CSS. `offsetParent` marcherait pour `display:none` mais
+  renvoie aussi `null` pour un élément `position:fixed` **visible** — piège silencieux le jour où
+  le header mobile passe en `fixed`.
+
+### Victoire
+🎉 La demande de départ était « une visite guidée ». Ce qui est livré débloque surtout **l'activation** :
+un nouvel inscrit a maintenant une cible protéines *avant* d'avoir vu son premier batch, et voit la
+jauge se remplir dans les dix secondes. Et le tout sans migration ni nouvelle dépendance.

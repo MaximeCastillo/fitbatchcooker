@@ -61,8 +61,25 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - **Comptes admin** : rôle `admin` (gérer les limites, voir l'usage) — introduit avec le point ci-dessus.
 - **Compte — suppression** : bouton « supprimer mon compte » (différé — destructif, nécessite la
   *service-role key* côté serveur pour supprimer l'utilisateur Supabase Auth + cascade des données).
-- **Onboarding léger** : réutiliser l'écran Profil (étape 1) + **empty states** qui guident.
-- **Guide** : product-tour léger ("clique ici") + **chef contextuel** (aide par page).
+- **Bulle « ? » / centre d'aide** : la brique *durable* de l'onboarding (elle sert à J+200, pas
+  seulement à J0). La carte « Visite guidée » sur `/account` en est le germe minimal. Ensuite :
+  recherche, guides courts, **chef contextuel** (aide par page).
+- **Checklist « 3 étapes pour démarrer »** : effet Zeigarnik, la 2ᵉ brique la plus efficace après
+  les empty states. Quand on voudra pousser l'activation.
+- **Mesurer l'activation** : `isDayComplete()` **est** l'événement « aha » (premier jour scellé au
+  vert), mais rien ne l'enregistre. Ça, ce serait une vraie colonne.
+- **Empty states restants** : `/recipes`, `/ingredients`, `/chat` sont encore des `<p>` gris nus
+  (celui de `/batch` est fait). Voir « Livré récemment ».
+- **Chef en bulle globale** (fenêtre en bas à droite sur tout le site) — **projet séparé, différé.**
+  Prérequis nommés, dans l'ordre : (1) le chat est aujourd'hui **sans état**, `useChat` meurt à
+  chaque navigation → il faut soit persister la conversation (nouveau modèle Prisma), soit un
+  provider client au-dessus du router ; (2) **rate limiting / BYO key** (`PROD_CHECKLIST.md`) —
+  une bulle présente partout multiplie l'exposition d'un endpoint sans limite sur clé partagée ;
+  (3) injecter le **contexte de page** dans `buildChefSystemPrompt`, qui ne reçoit aujourd'hui que
+  prénom + préférences + locale et ne peut donc pas savoir ce qui est à l'écran. Point de
+  convergence : la dernière bulle de la visite pourra dire « et si tu bloques, le chef est là ».
+- **Second tour sur le composeur** `/batch/[id]` (jauge, palette, tap-to-add) : à traiter seul,
+  c'est la zone la plus fragile (dnd-kit + `TouchSensor`).
 
 ## 🔭 Plus tard / idées
 - **« Ajouter à mon batch » depuis les cartes recettes** (2ᵉ point d'entrée) — **écarté le 2026-07-26**, on n'en veut pas pour l'instant. Le seul chemin reste le composeur (glisser depuis la palette, ou « + » → « quel jour ? »).
@@ -81,6 +98,14 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Onboarding, 3 briques** : (1) **écran de bienvenue** `/welcome` où l'inscription atterrit —
+  prénom + poids, et la **jauge signature se remplit en direct** pendant la frappe (le moment « aha »
+  arrive *pendant* l'onboarding) ; (2) **empty state de `/batch`** qui porte le CTA et relance sur la
+  cible protéines ; (3) **visite guidée 4 bulles** (accueil → le chef → les recettes → nouveau batch),
+  armée par `?tour=1`, rejouable depuis `/account`. **Zéro migration, zéro nouvelle dépendance** —
+  détail et pourquoi : `DECISIONS.md` (2026-08-10). Au passage : CTA « Nouveau batch » passé à 44 px
+  (violation PRINCIPLES §5 préexistante), parsing du profil factorisé (`lib/profile.ts`), et les deux
+  relances « règle ta cible » pointent désormais vers `/welcome`. 22 tests e2e verts (7 nouveaux).
 - **`npm test` redevenu vert** : `vitest.config.ts` exclut `**/e2e/**` (Vitest ramassait le spec
   Playwright et échouait toujours) **et `.claude/worktrees/**`** (sinon un run depuis le checkout
   principal collecte chaque test deux fois), et déclare l'alias `@/` pour les tests. 47 tests
