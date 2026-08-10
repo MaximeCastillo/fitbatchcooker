@@ -40,7 +40,8 @@ Comment prouver que ça marche (build + test réel sur le dev server + spécifiq
 
 - Si l'issue implique une **migration Prisma** : l'écrire en tête du body
   (`⚠️ Migration de schéma — voir Mode 2`).
-- Titre court à l'impératif, en anglais (comme les commits).
+- Issue entièrement en **français** (titre court à l'impératif + body). Seuls les
+  commits et le code restent en anglais.
 
 ## Mode 2 — Réaliser les issues `ready`
 
