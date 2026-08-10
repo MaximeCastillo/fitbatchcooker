@@ -55,33 +55,3 @@ export function clampStepIndex(index: number, total: number): number {
   return Math.min(Math.max(index, 0), total - 1);
 }
 
-export type CutoutRect = {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-};
-
-// A full-viewport polygon with a rectangular hole, so the veil dims everything except the
-// highlighted element. Same trick Base UI uses internally: the outer ring is wound
-// clockwise and the hole counter-clockwise. `clip-path` also clips hit-testing, so the hole
-// stays tappable.
-export function cutoutPolygon(rect: CutoutRect, pad = 6): string {
-  const top = Math.round(rect.top - pad);
-  const right = Math.round(rect.right + pad);
-  const bottom = Math.round(rect.bottom + pad);
-  const left = Math.round(rect.left - pad);
-
-  return [
-    "polygon(0% 0%",
-    "100% 0%",
-    "100% 100%",
-    "0% 100%",
-    "0% 0%",
-    `${left}px ${top}px`,
-    `${left}px ${bottom}px`,
-    `${right}px ${bottom}px`,
-    `${right}px ${top}px`,
-    `${left}px ${top}px)`,
-  ].join(",");
-}

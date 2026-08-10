@@ -92,9 +92,40 @@ test("the tour walks four steps and then closes", async ({ page }) => {
   const tour = page.getByRole("dialog");
   await expect(tour.getByText("1/4")).toBeVisible();
 
-  for (const step of ["2/4", "3/4", "4/4"]) {
+  for (const [step, selector] of [
+    ["2/4", '[data-tour="nav-chat"]'],
+    ["3/4", '[data-tour="nav-recipes"]'],
+    ["4/4", '[data-tour="batch-new"]'],
+  ] as const) {
     await tour.getByRole("button", { name: /Next|Suivant/i }).click();
     await expect(tour.getByText(step)).toBeVisible();
+
+    // The spotlight must end up concentric with the highlighted element and share its
+    // rounding — otherwise square corners of undimmed page stick out past the green outline.
+    // (Wait out the 300ms glide between targets first.)
+    await page.waitForTimeout(500);
+    const geometry = await page.evaluate((sel) => {
+      const target = [...document.querySelectorAll<HTMLElement>(sel)].find((el) =>
+        el.checkVisibility({ checkVisibilityCSS: true }),
+      )!;
+      const spot = [...document.body.querySelectorAll("div[aria-hidden]")].find(
+        (el) => (el as HTMLElement).style.boxShadow?.includes("9999px"),
+      ) as HTMLElement;
+      const t = target.getBoundingClientRect();
+      const s = spot.getBoundingClientRect();
+      return {
+        dTop: s.top - t.top,
+        dLeft: s.left - t.left,
+        dWidth: s.width - t.width,
+        radiusGap:
+          Number.parseFloat(spot.style.borderRadius) -
+          Number.parseFloat(getComputedStyle(target).borderTopLeftRadius),
+      };
+    }, selector);
+    expect(geometry.dTop).toBeCloseTo(-6, 0);
+    expect(geometry.dLeft).toBeCloseTo(-6, 0);
+    expect(geometry.dWidth).toBeCloseTo(12, 0);
+    expect(geometry.radiusGap).toBeCloseTo(6, 1);
   }
 
   // Last step offers Done instead of Next/Skip.

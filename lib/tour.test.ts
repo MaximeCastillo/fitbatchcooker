@@ -3,7 +3,6 @@ import {
   TOUR_STEPS,
   resolveTourSteps,
   clampStepIndex,
-  cutoutPolygon,
   type TourStepId,
 } from "./tour";
 
@@ -51,43 +50,5 @@ describe("clampStepIndex", () => {
 
   it("returns 0 when there is no step at all", () => {
     expect(clampStepIndex(2, 0)).toBe(0);
-  });
-});
-
-describe("cutoutPolygon", () => {
-  it("pads the hole around the highlighted rect", () => {
-    const polygon = cutoutPolygon(
-      { top: 100, right: 300, bottom: 140, left: 200 },
-      10,
-    );
-    // Hole corners: left/top = 190/90, right/bottom = 310/150.
-    expect(polygon).toContain("190px 90px");
-    expect(polygon).toContain("310px 150px");
-  });
-
-  it("hugs the rect exactly with no padding", () => {
-    const polygon = cutoutPolygon(
-      { top: 10, right: 60, bottom: 40, left: 20 },
-      0,
-    );
-    expect(polygon).toContain("20px 10px");
-    expect(polygon).toContain("60px 40px");
-  });
-
-  it("covers the whole viewport with the outer ring", () => {
-    const polygon = cutoutPolygon({ top: 0, right: 1, bottom: 1, left: 0 });
-    expect(polygon.startsWith("polygon(0% 0%,100% 0%,100% 100%,0% 100%")).toBe(
-      true,
-    );
-    expect(polygon.endsWith(")")).toBe(true);
-  });
-
-  it("closes the hole path back on its first corner", () => {
-    const polygon = cutoutPolygon(
-      { top: 100, right: 300, bottom: 140, left: 200 },
-      0,
-    );
-    const corners = polygon.match(/200px 100px/g);
-    expect(corners).toHaveLength(2);
   });
 });

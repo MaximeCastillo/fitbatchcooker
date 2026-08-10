@@ -8,14 +8,13 @@ import { Button } from "@/components/ui/button";
 import {
   TOUR_STEPS,
   clampStepIndex,
-  cutoutPolygon,
   resolveTourSteps,
   type TourStep,
   type TourStepId,
 } from "@/lib/tour";
 
 const DESKTOP_QUERY = "(min-width: 48rem)";
-const RING_PAD = 6;
+const SPOTLIGHT_PAD = 6;
 
 // Returns the element for a selector only if it's actually rendered on screen. The shell
 // keeps BOTH navs in the DOM (desktop `hidden md:flex`, mobile strip) and CSS-hides one, so a
@@ -52,8 +51,7 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
   const [steps, setSteps] = useState<TourStep[]>([]);
   const [isDesktop, setIsDesktop] = useState(true);
 
-  const veilRef = useRef<HTMLDivElement | null>(null);
-  const ringRef = useRef<HTMLDivElement | null>(null);
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
 
   const t = useTranslations("tour");
 
@@ -95,34 +93,30 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
   const step = steps[clampStepIndex(index, steps.length)];
   const selector = step?.selector ?? null;
 
-  // The veil's hole and the highlight ring are written straight to the DOM instead of being
-  // held in state: they change on every scroll/resize frame, and re-rendering the tour that
-  // often would be wasteful (and would fight the popover's own positioning).
+  // Only the spotlight's GEOMETRY is written straight to the DOM: it changes on every
+  // scroll/resize frame, and re-rendering the tour that often would be wasteful (and would
+  // fight the popover's own positioning). Which of the two overlays exists stays declarative —
+  // driving that from here was a bug, because `selector` is already null before the steps
+  // resolve, so the effect never re-ran for the anchorless greeting and its veil stayed hidden.
   useEffect(() => {
-    if (!open) return;
+    if (!open || !selector) return;
 
     const paint = () => {
-      const veil = veilRef.current;
-      const ring = ringRef.current;
-      if (!veil || !ring) return;
-
-      const element = selector ? visibleElement(selector) : null;
-      if (!element) {
-        // No anchor (the greeting step): dim everything, hide the ring.
-        veil.style.clipPath = "";
-        ring.style.display = "none";
-        return;
-      }
+      const spotlight = spotlightRef.current;
+      const element = visibleElement(selector);
+      if (!spotlight || !element) return;
 
       const rect = element.getBoundingClientRect();
-      veil.style.clipPath = cutoutPolygon(rect, RING_PAD);
-      // Explicit "block", not "": clearing the inline style would fall back to the `hidden`
-      // utility class and leave the ring invisible.
-      ring.style.display = "block";
-      ring.style.top = `${rect.top - RING_PAD}px`;
-      ring.style.left = `${rect.left - RING_PAD}px`;
-      ring.style.width = `${rect.width + RING_PAD * 2}px`;
-      ring.style.height = `${rect.height + RING_PAD * 2}px`;
+      spotlight.style.top = `${rect.top - SPOTLIGHT_PAD}px`;
+      spotlight.style.left = `${rect.left - SPOTLIGHT_PAD}px`;
+      spotlight.style.width = `${rect.width + SPOTLIGHT_PAD * 2}px`;
+      spotlight.style.height = `${rect.height + SPOTLIGHT_PAD * 2}px`;
+      // Follow the target's own rounding (nav items are rounded-xl, the CTA rounded-lg) and
+      // grow it by the padding so the hole stays concentric with the highlighted element —
+      // otherwise square corners of undimmed page show outside the rounded outline.
+      const radius =
+        Number.parseFloat(getComputedStyle(element).borderTopLeftRadius) || 0;
+      spotlight.style.borderRadius = `${radius + SPOTLIGHT_PAD}px`;
     };
 
     const frame = requestAnimationFrame(paint);
@@ -160,23 +154,31 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
 
   return (
     <>
-      {/* Veil + highlight ring, both pointer-events-none — and there is deliberately no
-          Popover.Backdrop. Nothing the tour renders may swallow a tap: that keeps page
+      {/* Exactly one of these shows at a time: the plain veil for the anchorless greeting, the
+          spotlight for every anchored step. Both pointer-events-none — and there is deliberately
+          no Popover.Backdrop. Nothing the tour renders may swallow a tap: that keeps page
           scrolling alive on touch and leaves the composer's press-and-hold drag sensor
           (PRINCIPLES §5) untouched. */}
       {createPortal(
-        <>
+        selector === null ? (
+          // Greeting step: nothing to point at, so just dim the screen.
           <div
-            ref={veilRef}
             aria-hidden
-            className="pointer-events-none fixed inset-0 z-40 bg-black/50 motion-safe:transition-[clip-path] motion-safe:duration-300"
+            className="pointer-events-none fixed inset-0 z-40 bg-black/50"
           />
+        ) : (
+          // The hole IS this element's own box, so the dimming can no longer have square
+          // corners the highlight doesn't: an oversized box-shadow spread paints everything
+          // around the box, and a box-shadow follows border-radius. The green edge is an
+          // `outline` rather than `ring`, because Tailwind's ring is itself a box-shadow and
+          // would collide with the spread.
           <div
-            ref={ringRef}
+            ref={spotlightRef}
             aria-hidden
-            className="pointer-events-none fixed z-40 hidden rounded-xl ring-2 ring-primary"
+            style={{ boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.5)" }}
+            className="pointer-events-none fixed z-40 outline-2 outline-primary motion-safe:transition-[top,left,width,height] motion-safe:duration-300"
           />
-        </>,
+        ),
         document.body,
       )}
 
