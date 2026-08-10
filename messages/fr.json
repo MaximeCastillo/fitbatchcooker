@@ -220,6 +220,24 @@
     "submit": "C'est parti",
     "skip": "Je le ferai plus tard"
   },
+  "tour": {
+    "sectionTitle": "Visite guidée",
+    "sectionHint": "Un rappel des trois endroits qui comptent.",
+    "replay": "Relancer la visite",
+    "progress": "{current}/{total}",
+    "next": "Suivant",
+    "done": "Terminé",
+    "skip": "Passer",
+    "close": "Fermer la visite",
+    "welcomeTitle": "Trois endroits à connaître",
+    "welcomeBody": "Trente secondes, et tu sauras où aller pour remplir tes journées.",
+    "chatTitle": "Le chef",
+    "chatBody": "Dis-lui ce que tu aimes, il te compose des recettes et retient tes goûts.",
+    "recipesTitle": "Les recettes",
+    "recipesBody": "Une bibliothèque est déjà là. Mets tes préférées de côté pour les retrouver vite.",
+    "newBatchTitle": "Ton premier batch",
+    "newBatchBody": "Crée un lot, pose des recettes sur tes jours, et regarde les jauges se remplir."
+  },
   "account": {
     "title": "Mon compte",
     "connectedAs": "Connecté en tant que",

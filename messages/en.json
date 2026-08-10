@@ -220,6 +220,24 @@
     "submit": "Let's go",
     "skip": "I'll do it later"
   },
+  "tour": {
+    "sectionTitle": "Guided tour",
+    "sectionHint": "A reminder of the three places that matter.",
+    "replay": "Replay the tour",
+    "progress": "{current}/{total}",
+    "next": "Next",
+    "done": "Done",
+    "skip": "Skip",
+    "close": "Close the tour",
+    "welcomeTitle": "Three places to know",
+    "welcomeBody": "Thirty seconds, and you'll know where to go to fill your days.",
+    "chatTitle": "The chef",
+    "chatBody": "Tell it what you like — it writes recipes for you and remembers your tastes.",
+    "recipesTitle": "Recipes",
+    "recipesBody": "A library is already there. Bookmark your favourites to find them fast.",
+    "newBatchTitle": "Your first batch",
+    "newBatchBody": "Create a batch, drop recipes onto your days, and watch the gauges fill."
+  },
   "account": {
     "title": "My account",
     "connectedAs": "Signed in as",
