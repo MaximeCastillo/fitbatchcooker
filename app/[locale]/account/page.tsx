@@ -99,7 +99,9 @@ export default async function AccountPage({
 
       {/* Logout — infrequent action, kept visually secondary at the bottom. */}
       <form action={logout} className="mt-2">
-        <Button type="submit" variant="outline" className="w-full">
+        {/* h-11 = 44px tap target (the default Button is h-8) — this app is tap-first
+            (PRINCIPLES §5). */}
+        <Button type="submit" variant="outline" className="h-11 w-full text-base">
           {t("nav.logout")}
         </Button>
       </form>
