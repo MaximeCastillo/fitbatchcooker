@@ -211,6 +211,14 @@
     "save": "Enregistrer",
     "saved": "Profil enregistré ✓"
   },
+  "welcome": {
+    "title": "Bienvenue !",
+    "subtitle": "Deux infos, et tes jauges protéines s'allument.",
+    "targetLabel": "Ta cible quotidienne",
+    "targetEmpty": "Saisis ton poids pour voir ta cible.",
+    "submit": "C'est parti",
+    "skip": "Je le ferai plus tard"
+  },
   "account": {
     "title": "Mon compte",
     "connectedAs": "Connecté en tant que",

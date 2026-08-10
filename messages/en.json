@@ -211,6 +211,14 @@
     "save": "Save",
     "saved": "Profile saved ✓"
   },
+  "welcome": {
+    "title": "Welcome!",
+    "subtitle": "Two details, and your protein gauges light up.",
+    "targetLabel": "Your daily goal",
+    "targetEmpty": "Enter your weight to see your goal.",
+    "submit": "Let's go",
+    "skip": "I'll do it later"
+  },
   "account": {
     "title": "My account",
     "connectedAs": "Signed in as",
