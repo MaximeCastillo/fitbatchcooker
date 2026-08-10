@@ -527,3 +527,25 @@ requête et non en colonne `NOT NULL`.
   `autoStart` figé dans un `useState` (défense en profondeur contre un démontage en cours de route).
 - **`?tour=1` nettoyé au démarrage** via `history.replaceState` (pas `router.replace`, qui
   refetcherait l'arbre RSC) : un rechargement ne rejoue pas et l'URL reste propre.
+
+## 2026-08-10 — Deux correctifs sur l'onboarding
+
+- **Un lien stylé en bouton reste un lien.** `<Button render={<Link/>} nativeButton={false}>` faisait
+  annoncer « bouton » par un lecteur d'écran pour un `<a href>` qui navigue : `useButton` applique
+  `role: 'button'` **inconditionnellement** dès que `nativeButton` est faux, sans échappatoire — son
+  propre warning dev nomme d'ailleurs ce `role` comme un attribut « unintended ». Remplacé par
+  `components/button-link.tsx` : un vrai `<Link>` stylé par `buttonVariants`. On récupère au passage
+  ce que le navigateur offre gratuitement à un lien (Entrée, clic milieu, cmd-clic, « ouvrir dans un
+  nouvel onglet », « copier l'adresse »). Appliqué aux 4 sites d'appel. Gardé par un test dans
+  `e2e/smoke.spec.ts`.
+- **Le trou du voile épouse la forme de la cible.** Le `clip-path: polygon()` ne faisait que des
+  rectangles à angles droits → des coins de page non assombrie dépassaient du contour vert arrondi.
+  Remplacé par un `box-shadow` de spread démesuré sur une boîte positionnée : **le trou EST la boîte**,
+  et une ombre suit le `border-radius`. Le rayon est lu sur la cible (`getComputedStyle`) + la marge,
+  donc chaque étape est concentrique quelle que soit la cible (nav `rounded-xl`, CTA `rounded-lg`).
+  Bordure en `outline` et non `ring` (le `ring` de Tailwind est lui-même un box-shadow → collision).
+  `cutoutPolygon` et ses tests supprimés, devenus du code mort.
+  - **Piège corrigé au passage** : piloter la visibilité du voile en DOM était un bug — `selector` vaut
+    déjà `null` avant la résolution des étapes, donc l'effet ne se rejouait jamais pour l'étape
+    d'accueil et son voile restait sur sa classe `hidden`. La visibilité est redevenue **déclarative** ;
+    seule la géométrie est écrite en DOM.
