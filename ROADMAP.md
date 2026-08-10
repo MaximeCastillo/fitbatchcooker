@@ -70,6 +70,13 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
   vert), mais rien ne l'enregistre. Ça, ce serait une vraie colonne.
 - **Empty states restants** : `/recipes`, `/ingredients`, `/chat` sont encore des `<p>` gris nus
   (celui de `/batch` est fait). Voir « Livré récemment ».
+- **Finir le balayage 44 px** (`PRINCIPLES.md` §5). Corrigés : CTA « Nouveau batch », déconnexion.
+  **Restent 4 boutons sous la cible** — `components/chat-box.tsx:56` (envoi du chat, `h-8`),
+  `app/[locale]/login/page.tsx:84` (submit login/signup, `h-8`), les 2 CTA de la home en `size="lg"`
+  (`h-9` = 36 px) et `components/auth-topbar-action.tsx` en `size="sm"` (`h-7` = 28 px). Le fond du
+  problème est le **défaut du composant** : `size="default"` vaut `h-8`, donc chaque site d'appel doit
+  penser à surcharger — à décider s'il faut plutôt changer le défaut dans `components/ui/button.tsx`
+  (mais c'est du territoire shadcn, régénérable).
 - **Chef en bulle globale** (fenêtre en bas à droite sur tout le site) — **projet séparé, différé.**
   Prérequis nommés, dans l'ordre : (1) le chat est aujourd'hui **sans état**, `useChat` meurt à
   chaque navigation → il faut soit persister la conversation (nouveau modèle Prisma), soit un

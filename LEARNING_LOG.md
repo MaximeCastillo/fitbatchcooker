@@ -599,3 +599,25 @@ posée la bonne question : **quel est le moment « aha » ?**
 🎉 La demande de départ était « une visite guidée ». Ce qui est livré débloque surtout **l'activation** :
 un nouvel inscrit a maintenant une cible protéines *avant* d'avoir vu son premier batch, et voit la
 jauge se remplir dans les dix secondes. Et le tout sans migration ni nouvelle dépendance.
+
+### Addendum même jour — deux correctifs post-livraison
+
+- **Un lien stylé en bouton reste un lien.** `<Button render={<Link/>}>` faisait annoncer « bouton »
+  pour un `<a href>` qui navigue. Base UI n'a **aucune** échappatoire (`useButton` pose
+  `role: 'button'` dès que `nativeButton` est faux) — et son propre warning dev nomme ce `role`
+  comme un attribut « unintended ». D'où `components/button-link.tsx`. 🆕 Le réflexe à garder :
+  **le rôle ARIA doit décrire ce que l'élément FAIT**, pas à quoi il ressemble. Un lecteur d'écran
+  n'annonçait pas la bonne action, et on perdait aussi le clic milieu / cmd-clic / « ouvrir dans un
+  nouvel onglet » que le navigateur donne gratuitement à un lien.
+- **`clip-path: polygon()` ne fait que des angles droits.** Le trou du voile de la visite avait des
+  coins carrés qui dépassaient du contour vert arrondi. Remplacé par un `box-shadow` de spread
+  démesuré : **le trou EST la boîte**, et une ombre suit le `border-radius`. Le rayon est lu sur la
+  cible + la marge, donc c'est concentrique quelle que soit la cible.
+- **Deux pièges de vérification, coup sur coup.** (1) En rendant la visibilité du voile pilotée en
+  DOM, j'ai cassé l'étape d'accueil : `selector` vaut déjà `null` avant la résolution des étapes,
+  donc l'effet ne se rejouait jamais et le voile restait `hidden`. Leçon : **la visibilité est
+  déclarative (React), seule la géométrie va en DOM.** (2) Mon assertion sur le rayon passait alors
+  que le spotlight était visiblement au mauvais endroit — il était capturé **en pleine transition**
+  de 300 ms, et le rayon n'est pas animé. Un test vert qui mesure la mauvaise chose est pire qu'un
+  test absent : j'ai durci en comparant le rectangle final à celui de la cible.
+- Balayage 44 px : bouton de déconnexion corrigé. **Restent 4 boutons sous la cible** (voir ROADMAP).
