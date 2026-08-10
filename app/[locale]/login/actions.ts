@@ -59,7 +59,9 @@ export async function signup(formData: FormData) {
     back(taken ? t("emailTaken") : t("error"));
   }
 
-  redirect({ href: "/batch", locale });
+  // New accounts go through the welcome screen: without a weight there is no protein
+  // target, so every gauge stays at 0. Returning users go straight to /batch (above).
+  redirect({ href: "/welcome", locale });
 }
 
 export async function logout() {
