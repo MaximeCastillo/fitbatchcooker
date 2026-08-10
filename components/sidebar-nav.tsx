@@ -43,6 +43,9 @@ export function SidebarNav({
           <Link
             key={href}
             href={href}
+            // Anchor for the guided tour. Both navs (desktop sidebar + mobile strip) carry
+            // it; the tour picks whichever one is actually visible.
+            data-tour={`nav-${key}`}
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
               active

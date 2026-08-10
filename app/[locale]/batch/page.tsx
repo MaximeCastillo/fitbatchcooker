@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { createBatch } from "./actions";
 import { BatchList } from "@/components/batch-list";
+import { ProductTour } from "@/components/product-tour";
 import { Button } from "@/components/ui/button";
 import { dailyProteinTargetG } from "@/lib/nutrition";
 import { redirect } from "@/i18n/navigation";
@@ -11,9 +12,15 @@ import { redirect } from "@/i18n/navigation";
 export const dynamic = "force-dynamic";
 
 // "Mes batchs" — the library of saved batches. Scoped to the current user (spec §7).
-export default async function BatchListPage() {
+export default async function BatchListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tour?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user) return redirect({ href: "/login", locale: await getLocale() });
+
+  const { tour } = await searchParams;
 
   const t = await getTranslations("batch");
 
@@ -39,7 +46,11 @@ export default async function BatchListPage() {
         <form action={createBatch}>
           {/* h-11 = 44px tap target (the default Button is h-8) — this app is tap-first
               (PRINCIPLES §5). */}
-          <Button type="submit" className="h-11 px-4 text-base">
+          <Button
+            type="submit"
+            data-tour="batch-new"
+            className="h-11 px-4 text-base"
+          >
             <Plus className="size-4" aria-hidden />
             {t("new")}
           </Button>
@@ -50,6 +61,10 @@ export default async function BatchListPage() {
         initialBatches={initialBatches}
         hasTarget={dailyProteinTargetG(user) !== null}
       />
+
+      {/* Rendered unconditionally so a server re-render (createBatch calls revalidatePath)
+          can't unmount a tour in progress — the component snapshots autoStart on mount. */}
+      <ProductTour autoStart={tour === "1"} />
     </main>
   );
 }
