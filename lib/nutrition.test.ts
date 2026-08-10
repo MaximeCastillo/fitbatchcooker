@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   dayProteinG,
   dailyProteinTargetG,
+  targetFromWeightInput,
   isDayComplete,
   dayProgressPct,
   batchQuota,
@@ -45,6 +46,30 @@ describe("dailyProteinTargetG", () => {
   it("returns null when neither target nor weight is set", () => {
     expect(dailyProteinTargetG({})).toBeNull();
     expect(dailyProteinTargetG({ proteinTargetG: 0, weightKg: 0 })).toBeNull();
+  });
+});
+
+describe("targetFromWeightInput", () => {
+  it("derives 2 g/kg from a typed weight", () => {
+    expect(targetFromWeightInput("78")).toBe(156);
+  });
+
+  it("rounds a decimal weight", () => {
+    expect(targetFromWeightInput("77.4")).toBe(155);
+  });
+
+  it("returns null while the field is still empty", () => {
+    expect(targetFromWeightInput("")).toBeNull();
+    expect(targetFromWeightInput("   ")).toBeNull();
+  });
+
+  it("returns null instead of NaN for nonsense input", () => {
+    expect(targetFromWeightInput("abc")).toBeNull();
+  });
+
+  it("rejects zero and negative weights", () => {
+    expect(targetFromWeightInput("0")).toBeNull();
+    expect(targetFromWeightInput("-70")).toBeNull();
   });
 });
 

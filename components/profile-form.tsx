@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { updateProfile } from "@/app/[locale]/account/actions";
 import { Button } from "@/components/ui/button";
+import { targetFromWeightInput } from "@/lib/nutrition";
 import { cn } from "@/lib/utils";
 
 const inputClasses =
@@ -29,11 +30,7 @@ export function ProfileForm({
   const [customTarget, setCustomTarget] = useState(user.proteinTargetG != null);
   const [target, setTarget] = useState(user.proteinTargetG?.toString() ?? "");
 
-  const weightNum = Number(weight);
-  const autoTarget =
-    weight.trim() !== "" && Number.isFinite(weightNum) && weightNum > 0
-      ? Math.round(weightNum * 2)
-      : null;
+  const autoTarget = targetFromWeightInput(weight);
 
   return (
     <form action={updateProfile} className="flex flex-col gap-4">

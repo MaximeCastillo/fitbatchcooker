@@ -31,6 +31,15 @@ export function dailyProteinTargetG(user: {
   return null;
 }
 
+// Same 2 g/kg rule as above, but from a raw form input string: the profile and welcome
+// forms both derive the goal live while the user types. Empty or nonsense input → null
+// (nothing to show yet), never NaN.
+export function targetFromWeightInput(weight: string): number | null {
+  const kg = Number(weight);
+  if (weight.trim() === "" || !Number.isFinite(kg) || kg <= 0) return null;
+  return Math.round(kg * 2);
+}
+
 // A day turns "green" once it reaches the target.
 export function isDayComplete(totalG: number, targetG: number | null): boolean {
   return targetG != null && targetG > 0 && totalG >= targetG;
