@@ -64,3 +64,55 @@ test("skipping the welcome screen still guides from the empty batch list", async
     page.getByRole("button", { name: /New batch|Nouveau batch/i }),
   ).toHaveCount(2);
 });
+
+// ---------------- Guided tour ----------------
+// The tour is armed by `?tour=1` only, never by a DB flag — which is also why the smoke
+// suite (whose accounts never visit that URL) can't be intercepted by it.
+
+test("completing the welcome screen opens the guided tour", async ({ page }) => {
+  await signUp(page);
+  await page.locator('input[name="weightKg"]').fill("78");
+  await page.getByRole("button", { name: /Let's go|C'est parti/i }).click();
+  await page.waitForURL(/\/batch/, { timeout: 10_000 });
+
+  const tour = page.getByRole("dialog");
+  await expect(tour).toBeVisible();
+  await expect(tour.getByText("1/4")).toBeVisible();
+
+  // `?tour=1` is stripped on start so a reload doesn't replay it.
+  await expect(page).not.toHaveURL(/tour=1/);
+  await page.reload();
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
+test("the tour walks four steps and then closes", async ({ page }) => {
+  await signUp(page);
+  await page.goto("/batch?tour=1");
+
+  const tour = page.getByRole("dialog");
+  await expect(tour.getByText("1/4")).toBeVisible();
+
+  for (const step of ["2/4", "3/4", "4/4"]) {
+    await tour.getByRole("button", { name: /Next|Suivant/i }).click();
+    await expect(tour.getByText(step)).toBeVisible();
+  }
+
+  // Last step offers Done instead of Next/Skip.
+  await expect(tour.getByRole("button", { name: /Skip|Passer/i })).toHaveCount(0);
+  await tour.getByRole("button", { name: /Done|Terminé/i }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
+test("the tour is relaunchable from the account page", async ({ page }) => {
+  await signUp(page);
+  await page.goto("/account");
+
+  // An <a href> that Base UI's Button gives role="button" (the repo's existing
+  // button-as-link convention, see app/[locale]/page.tsx).
+  await page
+    .getByRole("button", { name: /Replay the tour|Relancer la visite/i })
+    .click();
+
+  await page.waitForURL(/\/batch/, { timeout: 10_000 });
+  await expect(page.getByRole("dialog")).toBeVisible();
+});
