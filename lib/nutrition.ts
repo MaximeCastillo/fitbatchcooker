@@ -40,6 +40,14 @@ export function targetFromWeightInput(weight: string): number | null {
   return Math.round(kg * 2);
 }
 
+// A custom target typed by the user is ALREADY in grams — no 2 g/kg conversion, just
+// the same empty/nonsense → null validation as above.
+export function parseTargetInput(target: string): number | null {
+  const grams = Number(target);
+  if (target.trim() === "" || !Number.isFinite(grams) || grams <= 0) return null;
+  return Math.round(grams);
+}
+
 // A day turns "green" once it reaches the target.
 export function isDayComplete(totalG: number, targetG: number | null): boolean {
   return targetG != null && targetG > 0 && totalG >= targetG;

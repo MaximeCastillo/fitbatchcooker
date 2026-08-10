@@ -13,6 +13,12 @@ export default async function WelcomePage() {
   const user = await getCurrentUser();
   if (!user) return redirect({ href: "/login", locale: await getLocale() });
 
+  // Already onboarded (a weight or an explicit target exists) → this page has nothing
+  // left to ask; profile edits live on /account. Keeps a stale bookmark/URL out of it.
+  if (user.weightKg != null || user.proteinTargetG != null) {
+    return redirect({ href: "/batch", locale: await getLocale() });
+  }
+
   const t = await getTranslations("welcome");
 
   return (

@@ -3,6 +3,7 @@ import {
   dayProteinG,
   dailyProteinTargetG,
   targetFromWeightInput,
+  parseTargetInput,
   isDayComplete,
   dayProgressPct,
   batchQuota,
@@ -70,6 +71,30 @@ describe("targetFromWeightInput", () => {
   it("rejects zero and negative weights", () => {
     expect(targetFromWeightInput("0")).toBeNull();
     expect(targetFromWeightInput("-70")).toBeNull();
+  });
+});
+
+describe("parseTargetInput", () => {
+  it("keeps a typed target as-is — grams, never converted", () => {
+    expect(parseTargetInput("140")).toBe(140);
+  });
+
+  it("rounds a decimal target", () => {
+    expect(parseTargetInput("140.6")).toBe(141);
+  });
+
+  it("returns null while the field is still empty", () => {
+    expect(parseTargetInput("")).toBeNull();
+    expect(parseTargetInput("   ")).toBeNull();
+  });
+
+  it("returns null instead of NaN for nonsense input", () => {
+    expect(parseTargetInput("abc")).toBeNull();
+  });
+
+  it("rejects zero and negative targets", () => {
+    expect(parseTargetInput("0")).toBeNull();
+    expect(parseTargetInput("-140")).toBeNull();
   });
 });
 
