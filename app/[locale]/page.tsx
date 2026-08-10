@@ -1,9 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { CalendarPlus, Gauge, CookingPot } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/button-link";
 import { ProteinGauge } from "@/components/protein-gauge";
 import { getCurrentUser } from "@/lib/auth";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 
 const stepIcons = [CalendarPlus, Gauge, CookingPot];
 
@@ -28,21 +28,12 @@ export default async function Home() {
             {t("subtitle")}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button
-              render={<Link href="/login?mode=signup" />}
-              size="lg"
-              nativeButton={false}
-            >
+            <ButtonLink href="/login?mode=signup" size="lg">
               {t("ctaPrimary")}
-            </Button>
-            <Button
-              render={<Link href="/recipes" />}
-              size="lg"
-              variant="outline"
-              nativeButton={false}
-            >
+            </ButtonLink>
+            <ButtonLink href="/recipes" size="lg" variant="outline">
               {t("ctaSecondary")}
-            </Button>
+            </ButtonLink>
           </div>
         </div>
 

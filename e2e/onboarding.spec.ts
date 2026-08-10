@@ -107,10 +107,8 @@ test("the tour is relaunchable from the account page", async ({ page }) => {
   await signUp(page);
   await page.goto("/account");
 
-  // An <a href> that Base UI's Button gives role="button" (the repo's existing
-  // button-as-link convention, see app/[locale]/page.tsx).
   await page
-    .getByRole("button", { name: /Replay the tour|Relancer la visite/i })
+    .getByRole("link", { name: /Replay the tour|Relancer la visite/i })
     .click();
 
   await page.waitForURL(/\/batch/, { timeout: 10_000 });

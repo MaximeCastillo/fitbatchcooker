@@ -18,6 +18,22 @@ for (const path of PUBLIC_ROUTES) {
   });
 }
 
+// Controls that navigate must expose the link role, not the button role. They're styled as
+// buttons via ButtonLink; the previous `<Button render={<Link/>}>` made them announce as
+// buttons because Base UI forces role="button" once nativeButton is false.
+test("public: buttons that navigate are exposed as links", async ({ page }) => {
+  await page.goto("/");
+
+  for (const name of [
+    /Create an account|Créer un compte/i,
+    /See the recipes|Voir les recettes/i,
+    /Sign in|Se connecter/i,
+  ]) {
+    await expect(page.getByRole("link", { name }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name })).toHaveCount(0);
+  }
+});
+
 test("public: ingredient reverse-search modal opens", async ({ page }) => {
   await page.goto("/ingredients");
   await page.locator("main ul li button").first().click();

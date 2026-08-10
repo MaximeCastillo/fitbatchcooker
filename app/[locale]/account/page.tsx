@@ -11,7 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link, redirect } from "@/i18n/navigation";
+import { ButtonLink } from "@/components/button-link";
+import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -65,14 +66,13 @@ export default async function AccountPage({
           <CardDescription>{t("tour.sectionHint")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button
+          <ButtonLink
+            href={{ pathname: "/batch", query: { tour: "1" } }}
             variant="outline"
-            render={<Link href={{ pathname: "/batch", query: { tour: "1" } }} />}
-            nativeButton={false}
             className="h-11 w-full text-base"
           >
             {t("tour.replay")}
-          </Button>
+          </ButtonLink>
         </CardContent>
       </Card>
 
