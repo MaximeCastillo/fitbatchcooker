@@ -80,7 +80,7 @@ export default async function BatchPage({
         <p className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
           {t("noTarget")}
           <Link
-            href="/account"
+            href="/welcome"
             className="font-semibold text-primary hover:underline"
           >
             {t("setTarget")}

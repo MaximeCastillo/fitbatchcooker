@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createBatch } from "./actions";
 import { BatchList } from "@/components/batch-list";
 import { Button } from "@/components/ui/button";
+import { dailyProteinTargetG } from "@/lib/nutrition";
 import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
@@ -36,14 +37,19 @@ export default async function BatchListPage() {
           <p className="mt-1 text-muted-foreground">{t("subtitle")}</p>
         </div>
         <form action={createBatch}>
-          <Button type="submit">
+          {/* h-11 = 44px tap target (the default Button is h-8) — this app is tap-first
+              (PRINCIPLES §5). */}
+          <Button type="submit" className="h-11 px-4 text-base">
             <Plus className="size-4" aria-hidden />
             {t("new")}
           </Button>
         </form>
       </div>
 
-      <BatchList initialBatches={initialBatches} />
+      <BatchList
+        initialBatches={initialBatches}
+        hasTarget={dailyProteinTargetG(user) !== null}
+      />
     </main>
   );
 }

@@ -44,3 +44,23 @@ test("completing the welcome screen stores the goal and opens the batch list", a
   await expect(page.locator('input[name="weightKg"]')).toHaveValue("78");
   await expect(page.locator('input[name="proteinTargetG"]')).toHaveValue("156");
 });
+
+test("skipping the welcome screen still guides from the empty batch list", async ({
+  page,
+}) => {
+  await signUp(page);
+
+  await page.getByRole("link", { name: /I'll do it later|plus tard/i }).click();
+  await page.waitForURL(/\/batch/, { timeout: 10_000 });
+
+  // Skipping is not a dead end: the empty state carries both the CTA and the goal nudge.
+  await expect(
+    page.getByRole("heading", { name: /Nothing to cook|Rien à cuisiner/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Set my goal|Régler ma cible/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /New batch|Nouveau batch/i }),
+  ).toHaveCount(2);
+});
