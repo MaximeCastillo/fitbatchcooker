@@ -549,3 +549,16 @@ requête et non en colonne `NOT NULL`.
     déjà `null` avant la résolution des étapes, donc l'effet ne se rejouait jamais pour l'étape
     d'accueil et son voile restait sur sa classe `hidden`. La visibilité est redevenue **déclarative** ;
     seule la géométrie est écrite en DOM.
+
+## 2026-08-10 — Workflow "dev autonome" piloté par issues GitHub
+
+- **L'issue devient le contrat** : un skill `/issues` (forger + réaliser) transforme les retours
+  bruts (démo, idées) en issues GitHub cadrées en session — exploration du code et questions
+  d'arbitrage AVANT création, pour que la réalisation soit autonome. Règle de découpage :
+  regrouper un max de petits retours par issue, une issue = une PR reviewable en ~10 min.
+- **Une branche par issue** (`issue/<n>-slug`), PR courte avec screenshots, `Closes #n`.
+  `main` reste le seul chemin vers la prod (Vercel) → review humaine obligatoire au merge.
+- Labels : `ready` (cadrée, prenable) / `in-progress` (verrou). Migration Prisma jamais
+  appliquée depuis une branche (DB partagée avec la prod) : commitée + signalée en tête de PR.
+- Niveau cloud (GitHub Action `@claude`, agents planifiés) : plus tard, si le pipeline prouve
+  sa valeur en local.
