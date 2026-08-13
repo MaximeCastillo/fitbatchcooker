@@ -47,7 +47,10 @@ Comment prouver que ça marche (build + test réel sur le dev server + spécifiq
 
 Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
 
-1. **Verrou** : ajouter le label `in-progress`, retirer `ready`.
+1. **Verrou** : ajouter le label `in-progress`, retirer `ready`. Ce contrôle vaut
+   aussi pour une issue demandée explicitement (« traite #N ») : si elle est
+   fermée, `in-progress` ou `to-review`, ne PAS la traiter — expliquer pourquoi
+   et s'arrêter (quelqu'un s'en occupe déjà, ou c'est déjà livré).
 2. **Branche** depuis un `main` à jour : `issue/<n>-<slug>`. Ne jamais commiter
    sur `main` dans ce mode.
 3. **Implémenter** en suivant le body de l'issue — le « Hors scope » implicite :
