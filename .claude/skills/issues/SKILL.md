@@ -66,8 +66,8 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
 9. **Merge** : jamais sans validation explicite de Maxime (sa recette = tous les
-   critères cochés). Quand il valide : `gh pr merge --merge --delete-branch`
-   (merge commit — les petits commits racontent l'avancement, pas de squash).
+   critères cochés). Quand il valide : `gh pr merge --squash --delete-branch`
+   (squash — `main` lit « 1 commit = 1 issue » ; le détail vit dans la PR).
    Le `Closes #<n>` ferme l'issue automatiquement. Puis `git pull` sur `main`.
 
 Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : paralléliser —
