@@ -45,4 +45,6 @@ else
   echo "DIRECT_URL not set at setup time — run 'npx prisma generate' in-session"
 fi
 
-npx playwright install chromium --with-deps
+# No --with-deps: it runs apt-get update, which dies on the image's broken
+# third-party PPAs (403 via proxy). The image already ships the system libs.
+npx playwright install chromium
