@@ -74,5 +74,11 @@ Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : parallél
 un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
 worktree : `.env` à copier, `prisma generate`, port dev dédié).
 
+**Environnement cloud sans `.env`** (session claude.ai/code, GitHub Action) : les
+e2e, le dev server et les screenshots sont impossibles sans les variables
+Supabase. Repli : lint + tests unitaires + build seulement, le dire clairement
+dans la PR (« vérifié : lint/units/build — recette visuelle via la preview
+Vercel »), et ne PAS bloquer dessus.
+
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).
