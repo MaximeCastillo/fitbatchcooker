@@ -572,3 +572,17 @@ requête et non en colonne `NOT NULL`.
   (Node 24.x) échoue immédiatement avec un message explicite, au lieu d'un bug
   indéchiffrable trois étapes plus loin. Tout environnement (cloud, CI, GHA) doit
   fournir Node 24, point.
+
+## 2026-08-13 — Environnement cloud claude.ai/code : validé, avec une frontière nette
+
+- `fitbatchcooker-full` opérationnel : `scripts/cloud-setup.sh` (versionné, appelé par
+  `cd /home/user/fitbatchcooker && bash scripts/cloud-setup.sh`) installe Node 24 par
+  tarball (nvm casse en mode strict), diffère `prisma generate` (les env vars n'existent
+  pas en phase de setup), installe Chromium sans `--with-deps` (PPAs cassés de l'image).
+  Accès réseau passé à « Complet » (la liste « De confiance » bloque cdn.playwright.dev ;
+  « Personnalisé » remplace la liste au lieu de la compléter).
+- **Frontière découverte : l'egress cloud est HTTPS-via-proxy uniquement.** Le Postgres
+  brut est bloqué → depuis la VM : e2e locaux, dev server authentifié, migrate, studio
+  impossibles, même avec les variables. Supabase Auth (HTTPS) passe, lui.
+- Conséquence process : en cloud, vérif = lint + units + build ; la recette complète vit
+  sur la preview Vercel (option future : e2e pointés dessus via `E2E_BASE_URL`).

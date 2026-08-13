@@ -77,11 +77,16 @@ Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : parallél
 un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
 worktree : `.env` à copier, `prisma generate`, port dev dédié).
 
-**Environnement cloud sans `.env`** (session claude.ai/code, GitHub Action) : les
-e2e, le dev server et les screenshots sont impossibles sans les variables
-Supabase. Repli : lint + tests unitaires + build seulement, le dire clairement
-dans la PR (« vérifié : lint/units/build — recette visuelle via la preview
-Vercel »), et ne PAS bloquer dessus.
+**Environnement cloud** (session claude.ai/code, GitHub Action) : même avec les
+variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
+Postgres brut (5432/6543) est bloqué**, donc e2e locaux, dev server authentifié,
+migrate et studio sont impossibles (validé le 2026-08-13). Repli : lint + tests
+unitaires + build, le dire clairement dans la PR (« vérifié : lint/units/build —
+recette visuelle via la preview Vercel »), et ne PAS bloquer dessus. Piste pour
+les e2e complets depuis le cloud : `E2E_BASE_URL=<preview Vercel> npx playwright
+test` (HTTPS seulement, la config saute le webServer) — nécessite la preview
+déployée et sa protection d'accès réglée ; la purge des comptes de test ne
+tourne alors pas (DB injoignable), à faire en local.
 
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).
