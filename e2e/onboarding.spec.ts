@@ -28,6 +28,40 @@ test("typing a weight derives and previews the protein goal", async ({ page }) =
   await expect(page.getByText("156 g")).toBeVisible();
 });
 
+test("a custom target is shown as typed, never converted like a weight", async ({
+  page,
+}) => {
+  await signUp(page);
+
+  // Regression: this value used to go through the 2 g/kg weight→target rule (140 → 280 g).
+  await page.getByRole("checkbox", { name: /Customize|Personnaliser/i }).check();
+  await page.locator('input[name="proteinTargetG"]').fill("140");
+
+  await expect(page.getByText("140 g")).toBeVisible();
+  await expect(page.getByText("280 g")).toHaveCount(0);
+});
+
+test("the welcome screen focuses the first field, not the weight", async ({
+  page,
+}) => {
+  await signUp(page);
+
+  await expect(page.locator('input[name="firstName"]')).toBeFocused();
+});
+
+test("revisiting the welcome screen once onboarded redirects to the batch list", async ({
+  page,
+}) => {
+  await signUp(page);
+  await page.locator('input[name="weightKg"]').fill("78");
+  await page.getByRole("button", { name: /Let's go|C'est parti/i }).click();
+  await page.waitForURL(/\/batch/, { timeout: 10_000 });
+
+  // A stale bookmark/URL must not reopen onboarding; profile edits live on /account.
+  await page.goto("/welcome");
+  await page.waitForURL(/\/batch$/, { timeout: 10_000 });
+});
+
 test("completing the welcome screen stores the goal and opens the batch list", async ({
   page,
 }) => {

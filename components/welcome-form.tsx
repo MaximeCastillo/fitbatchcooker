@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { completeOnboarding } from "@/app/[locale]/welcome/actions";
 import { ProteinGauge } from "@/components/protein-gauge";
 import { Button } from "@/components/ui/button";
-import { targetFromWeightInput } from "@/lib/nutrition";
+import { parseTargetInput, targetFromWeightInput } from "@/lib/nutrition";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +33,7 @@ export function WelcomeForm({
   const [target, setTarget] = useState(user.proteinTargetG?.toString() ?? "");
 
   const autoTarget = targetFromWeightInput(weight);
-  const shownTarget = customTarget ? targetFromWeightInput(target) : autoTarget;
+  const shownTarget = customTarget ? parseTargetInput(target) : autoTarget;
 
   return (
     <form action={completeOnboarding} className="flex flex-col gap-6">
@@ -68,6 +68,9 @@ export function WelcomeForm({
           name="firstName"
           defaultValue={user.firstName ?? ""}
           autoComplete="given-name"
+          // Focus follows reading order: the first name is the first field, so focusing
+          // the weight instead invited people to submit without any name.
+          autoFocus
           className={inputClasses}
         />
       </label>
@@ -80,7 +83,6 @@ export function WelcomeForm({
           min={0}
           step="0.1"
           inputMode="decimal"
-          autoFocus
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           className={inputClasses}
