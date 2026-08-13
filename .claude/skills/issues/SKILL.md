@@ -57,12 +57,22 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
 5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
    les commiter sous `.github/pr-assets/issue-<n>/` sur la branche.
 6. **PR** : description **très courte** — 2-4 lignes (quoi + comment vérifier),
-   les screenshots embarqués, et `Closes #<n>`. Retirer `in-progress`.
+   les critères d'acceptation en cases à cocher (la recette de Maxime), les
+   screenshots embarqués, et `Closes #<n>`. Sur l'issue : retirer `in-progress`,
+   poser `to-review`.
 7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
+9. **Merge** : jamais sans validation explicite de Maxime (sa recette = tous les
+   critères cochés). Quand il valide : `gh pr merge --merge --delete-branch`
+   (merge commit — les petits commits racontent l'avancement, pas de squash).
+   Le `Closes #<n>` ferme l'issue automatiquement. Puis `git pull` sur `main`.
+
+Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : paralléliser —
+un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
+worktree : `.env` à copier, `prisma generate`, port dev dédié).
 
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).
