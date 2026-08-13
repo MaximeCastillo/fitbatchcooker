@@ -36,5 +36,13 @@ fi
 node -v && npm -v
 
 npm ci
-npx prisma generate
+
+# Env vars are injected when Claude Code starts, NOT during this setup phase —
+# and prisma.config.ts requires DIRECT_URL at load time. Defer when absent.
+if [ -n "${DIRECT_URL:-}" ]; then
+  npx prisma generate
+else
+  echo "DIRECT_URL not set at setup time — run 'npx prisma generate' in-session"
+fi
+
 npx playwright install chromium --with-deps
