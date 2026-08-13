@@ -562,3 +562,13 @@ requête et non en colonne `NOT NULL`.
   appliquée depuis une branche (DB partagée avec la prod) : commitée + signalée en tête de PR.
 - Niveau cloud (GitHub Action `@claude`, agents planifiés) : plus tard, si le pipeline prouve
   sa valeur en local.
+
+## 2026-08-13 — engine-strict : le Node du projet fait loi
+
+- La VM cloud par défaut (Node 22) lisait notre lockfile npm 11 et échouait sur un
+  « Missing from lock file » cryptique. Le lockfile était sain : c'est l'algorithme de
+  résolution qui diffère entre npm majeurs.
+- Décision : `.npmrc` avec `engine-strict=true` — une machine hors de `engines`
+  (Node 24.x) échoue immédiatement avec un message explicite, au lieu d'un bug
+  indéchiffrable trois étapes plus loin. Tout environnement (cloud, CI, GHA) doit
+  fournir Node 24, point.
