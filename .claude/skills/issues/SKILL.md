@@ -35,7 +35,9 @@ toujours (i18n en parité, scoping user, commits gitmoji, coach).
 Fichiers concernés, pattern existant à suivre.
 
 ## Vérification
-Comment prouver que ça marche (build + test réel sur le dev server + spécifique).
+Uniquement le scénario fonctionnel SPÉCIFIQUE à cette issue (quoi tester).
+Le « comment » générique (lint, units, build, recette, screenshots) vit dans
+le Mode 2 de ce skill — ne pas le recopier dans l'issue.
 ```
 
 - Si l'issue implique une **migration Prisma** : l'écrire en tête du body
@@ -89,7 +91,13 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
 2. **Recette locale de ce qui est recettable sans DB** : dev server avec un
    `.env` factice — les pages publiques (login, reset-password…) rendent
    parfaitement. Playwright en local (localhost marche, lui) pour vérifier le
-   comportement + screenshots commités dans la PR.
+   comportement + screenshots. **Protocole screenshots** : les commiter sous
+   `.github/pr-assets/issue-<n>/`, noter le SHA (`git rev-parse HEAD`), puis les
+   **retirer dans le commit suivant** (`git rm -r .github/pr-assets`) — ainsi le
+   squash ne les emporte jamais dans `main`. Dans la PR, les référencer par
+   `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
+   au SHA, elles survivent à la suppression de la branche). JAMAIS
+   `raw.githubusercontent.com` : 404 sur un repo privé.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose, c'est OK.
