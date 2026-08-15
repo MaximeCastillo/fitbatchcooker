@@ -600,3 +600,13 @@ et casse la parité de connexion avec la prod. YAGNI tant que le dev sans Mac re
 occasionnel. **Critère de bascule explicite :** dev sans Mac devenu régulier ET
 boucle preview (push→build→recette, ~2-3 min) visiblement coûteuse → on branche
 Accelerate.
+
+## 2026-08-16 — Recette cloud, correction : le navigateur de la VM est hors ligne
+**Découverte (session cloud #10) :** Chromium n'a aucun réseau sortant depuis la VM
+(`ERR_CONNECTION_RESET` même via proxy explicite, `curl` passe) → la recette de la
+preview Vercel depuis la VM (décision du 16/08, plus haut) ne fonctionne pas.
+**Décision :** l'agent cloud recette en local ce qui ne touche pas la DB (dev server +
+`.env` factice : pages publiques, screenshots Playwright sur localhost) ; la recette du
+déployé (preview Vercel) revient à Maxime. Skill `/issues` mis à jour.
+**Validé au passage :** premier ticket 100 % cloud livré (issue #10 → PR #12) — dev,
+vérifs, screenshots, PR conformes au skill, limites annoncées honnêtement.

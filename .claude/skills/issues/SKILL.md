@@ -82,16 +82,20 @@ variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
 Postgres brut (5432/6543) est bloqué**, donc dev server authentifié, e2e locaux,
 migrate et studio sont impossibles (validé le 2026-08-13, voir DECISIONS).
 
-La recette « utilisateur réel » se fait donc **sur la preview Vercel de la PR** :
-1. Implémenter, vérifier lint + tests unitaires + build, pousser, ouvrir la PR.
-2. Attendre que la preview soit prête (`gh pr checks` / le commentaire du bot
-   Vercel donne l'URL). C'est le même agent qui attend — pas besoin d'en
-   déclencher un autre.
-3. Recetter la preview via Playwright : `E2E_BASE_URL=<url-preview> npx
-   playwright test` pour la suite, et/ou un script Playwright ciblé qui rejoue
-   le scénario de la section Vérification de l'issue (+ screenshots pour la PR).
-4. Si la preview répond 401/403 (protection Vercel) ou est indisponible : le
-   dire dans la PR et se limiter à lint/units/build — ne PAS bloquer.
+⚠️ **Chromium n'a aucun réseau sortant depuis la VM** (vérifié 2026-08-16 :
+`ERR_CONNECTION_RESET` partout, proxy ou pas, alors que `curl` passe) → recetter
+la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
+1. Implémenter, puis lint + tests unitaires + build.
+2. **Recette locale de ce qui est recettable sans DB** : dev server avec un
+   `.env` factice — les pages publiques (login, reset-password…) rendent
+   parfaitement. Playwright en local (localhost marche, lui) pour vérifier le
+   comportement + screenshots commités dans la PR.
+3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
+   label `to-review`. En session cloud, la branche assignée `claude/…` remplace
+   `issue/<n>-slug` — la plateforme l'impose, c'est OK.
+4. Dans la PR, séparer explicitement « vérifié (et comment) » de « à recetter
+   par Maxime sur la preview » (tout ce qui exige auth ou DB). Donner l'URL de
+   la preview dès qu'elle est verte.
 5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
    injoignable) : le signaler, purge faite en local plus tard.
 
