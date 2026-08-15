@@ -610,3 +610,19 @@ preview Vercel depuis la VM (décision du 16/08, plus haut) ne fonctionne pas.
 déployé (preview Vercel) revient à Maxime. Skill `/issues` mis à jour.
 **Validé au passage :** premier ticket 100 % cloud livré (issue #10 → PR #12) — dev,
 vérifs, screenshots, PR conformes au skill, limites annoncées honnêtement.
+
+## 2026-08-15 — Page `/admin` : un pansement assumé sur « une seule base pour dev et prod »
+**Décision :** un booléen `User.isAdmin` (posé à la main en SQL, aucune UI de promotion) et
+une page `/admin` : liste des comptes, suppression multiple derrière une **modale de
+confirmation obligatoire**, purge des comptes `e2e+…@example.com`. Suppression = Supabase
+Auth (*service-role key*, serveur only) **puis** nos tables (cascade depuis `User`) — cet
+ordre-là, pour qu'un échec côté Auth laisse le compte intact plutôt qu'un login vivant sans
+données. Garde-fou : un admin ne peut pas se supprimer lui-même (serveur **et** checkbox).
+`/admin` répond **404** aux non-admins (pas de redirect, pas de lien dans la nav).
+**Pourquoi ça existe :** les comptes de test e2e sont créés **dans la base de prod**, parce
+qu'on n'a **qu'une seule base Supabase (plan free)** pour dev et prod. C'est la vraie cause ;
+la page admin est le pansement. Consigné dans `PROD_CHECKLIST.md` (1ᵉʳ point) : le jour où les
+bases sont séparées, la purge n'a plus lieu d'être côté prod.
+**Écarté :** un rôle/enum de rôles (YAGNI — un booléen suffit), et une action serveur dédiée
+« purger » (le bouton **présélectionne** les comptes de test et passe par la même modale, donc
+un seul chemin de suppression à auditer).
