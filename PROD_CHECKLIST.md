@@ -4,9 +4,13 @@ Décisions **volontairement provisoires** prises pour aller vite en MVP/dev. À 
 **avant** d'ouvrir l'app à de vrais utilisateurs. Chaque point renvoie à son entrée
 dans `DECISIONS.md`.
 
-- [ ] **Séparer les bases dev / prod.** Aujourd'hui une seule base Supabase pour les deux.
-      Créer une base prod dédiée (2ᵉ projet Supabase ou branching) **+** un GitHub Action
-      `prisma migrate deploy` comme étape de release. _(DECISIONS — 2026-07-17)_
+- [ ] **Séparer les bases dev / prod.** Aujourd'hui une seule base Supabase (plan free)
+      pour les deux. Créer une base prod dédiée (2ᵉ projet Supabase ou branching) **+** un
+      GitHub Action `prisma migrate deploy` comme étape de release. _(DECISIONS — 2026-07-17)_
+      **Conséquence directe :** les comptes de test end-to-end (`e2e+…@example.com`) sont
+      créés **dans la base de prod**, d'où le besoin de les purger à la main (page `/admin`,
+      issue #11). Le jour où les bases sont séparées, cette purge n'a plus de raison d'être
+      côté prod — c'est la vraie correction, la page admin n'est qu'un pansement.
 - [ ] **Réactiver la confirmation par email** (Supabase → Authentication → Providers →
       Email). Désactivée en dev pour un signup immédiat. _(DECISIONS — 2026-07-20)_
 - [ ] **Rate limiting du bot** (par user) sur `/api/chat` — éviter le spam / détournement
