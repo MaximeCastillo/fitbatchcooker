@@ -110,7 +110,10 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    `raw.githubusercontent.com` : 404 sur un repo privé.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
-   `issue/<n>-slug` — la plateforme l'impose, c'est OK.
+   `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
+   c'est OK : le squash + suppression de branche la rend éphémère. Le slug
+   dérive du premier prompt de la session → un prompt court et descriptif
+   (« Traite l'issue #7 : bouton précédent du guide ») donne un slug lisible.
 4. La PR suit le format du Mode 2 (Résumé / ✅ Vérifié par l'agent /
    🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
    tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est
