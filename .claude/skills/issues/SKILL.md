@@ -9,6 +9,13 @@ Deux modes selon ce que demande le mainteneur : **forger** (retours → issues) 
 **réaliser** (issues `ready` → PRs). Les conventions de `CLAUDE.md` s'appliquent
 toujours (i18n en parité, scoping user, commits gitmoji, coach).
 
+**Prérequis repo** (à vérifier/poser à la première utilisation sur un projet) :
+- Labels : `ready`, `in-progress`, `to-review` (`gh label create …`).
+- Suppression auto des branches au merge :
+  `gh api repos/<owner>/<repo> -X PATCH -f delete_branch_on_merge=true`
+  (indispensable : les agents cloud ne peuvent pas supprimer une ref).
+- Des previews par PR (Vercel ou équivalent) pour la recette du déployé.
+
 **Invocation rapide** : `/issues <numéro>` → Mode 2 directement sur cette issue
 (l'usage normal d'une session cloud : une session par numéro). `/issues` avec
 des retours collés → Mode 1. `/issues` sans argument en session cloud → prendre
