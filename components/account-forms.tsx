@@ -8,6 +8,7 @@ import {
   type FormState,
 } from "@/app/[locale]/account/actions";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { cn } from "@/lib/utils";
 
 const initialFormState: FormState = { status: "idle", message: "" };
@@ -84,8 +85,7 @@ export function PasswordForm() {
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {t("currentPassword")}
-        <input
-          type="password"
+        <PasswordInput
           name="currentPassword"
           required
           autoComplete="current-password"
@@ -95,8 +95,7 @@ export function PasswordForm() {
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {t("newPassword")}
-        <input
-          type="password"
+        <PasswordInput
           name="newPassword"
           required
           minLength={8}
@@ -107,8 +106,7 @@ export function PasswordForm() {
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {t("confirmPassword")}
-        <input
-          type="password"
+        <PasswordInput
           name="confirmPassword"
           required
           minLength={8}

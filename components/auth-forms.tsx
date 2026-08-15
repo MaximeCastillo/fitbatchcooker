@@ -6,6 +6,7 @@ import { requestPasswordReset } from "@/app/[locale]/forgot-password/actions";
 import { resetPassword } from "@/app/[locale]/reset-password/actions";
 import { type FormState } from "@/app/[locale]/account/actions";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { cn } from "@/lib/utils";
 
 // Client Components so we can show inline success/error feedback via React 19's
@@ -75,8 +76,7 @@ export function ResetPasswordForm() {
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {t("newPassword")}
-        <input
-          type="password"
+        <PasswordInput
           name="newPassword"
           required
           minLength={8}
@@ -87,8 +87,7 @@ export function ResetPasswordForm() {
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {t("confirmPassword")}
-        <input
-          type="password"
+        <PasswordInput
           name="confirmPassword"
           required
           minLength={8}

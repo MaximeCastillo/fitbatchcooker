@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { login, signup } from "./actions";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { BrandIcon } from "@/components/brand-icon";
 import { APP_NAME } from "@/lib/constants";
 import { Link } from "@/i18n/navigation";
@@ -69,8 +70,7 @@ export default async function LoginPage({
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-medium">
               {t("password")}
-              <input
-                type="password"
+              <PasswordInput
                 name="password"
                 required
                 minLength={6}
