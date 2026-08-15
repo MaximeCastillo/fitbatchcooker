@@ -94,8 +94,12 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    sur `main`.
 
 Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : paralléliser —
-un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
-worktree : `.env` à copier, `prisma generate`, port dev dédié).
+un agent par issue. En local : chacun dans son **worktree** isolé (voir la
+mémoire worktree : `.env` à copier, `prisma generate`, port dev dédié). En
+cloud : **une session = une branche = une issue** (le push y est verrouillé
+sur la branche de session) — paralléliser = lancer plusieurs sessions, jamais
+plusieurs issues dans une même session. Ne pas non plus traiter la file en
+séquence dans une session : tout finirait dans la même PR.
 
 **Environnement cloud** (session claude.ai/code, GitHub Action) : même avec les
 variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
