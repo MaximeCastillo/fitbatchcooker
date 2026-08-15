@@ -152,5 +152,22 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
 5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
    injoignable) : le signaler, purge faite en local plus tard.
 
+## Posture dans le chat (en réalisant)
+
+Le mainteneur lance des agents précisément pour ne PAS devoir les suivre :
+
+- **Travailler en silence.** Ne l'interpeller que bloqué sur un choix produit ou
+  d'archi que l'issue ne tranche pas — et d'abord chercher la réponse soi-même
+  (code, `PROJECT_SPEC.md`, `DECISIONS.md`), comme un bon dev autonome.
+- **Message final minimal** : lien de la PR + ce qui attend le mainteneur
+  (recette, migration, secret). Tout le reste — démarche, vérifications, choix —
+  vit dans la PR : c'est l'historique du code, pas le chat.
+- **Pédagogie dans la PR, pas dans le chat.** Le mainteneur apprend la stack :
+  les choix non évidents et concepts intéressants vont dans un bloc repliable en
+  fin de Résumé — `<details><summary>📚 Choix & concepts</summary>…</details>` —
+  qu'il ouvre quand il en a envie, sans friction.
+- **Commentaires de code au strict minimum** (cf. CLAUDE.md) : une contrainte que
+  le code ne peut pas montrer, jamais de narration ni de justification du diff.
+
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).

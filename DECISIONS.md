@@ -610,3 +610,11 @@ preview Vercel depuis la VM (décision du 16/08, plus haut) ne fonctionne pas.
 déployé (preview Vercel) revient à Maxime. Skill `/issues` mis à jour.
 **Validé au passage :** premier ticket 100 % cloud livré (issue #10 → PR #12) — dev,
 vérifs, screenshots, PR conformes au skill, limites annoncées honnêtement.
+
+## 2026-08-15 — Posture silencieuse des agents `/issues`
+**Décision :** en mode réalisation, l'agent travaille en silence — il n'interpelle le
+mainteneur que bloqué sur un choix produit/archi. Chat final minimal (PR + ce qui
+l'attend) ; démarche et vérifications dans la PR ; pédagogie dans un bloc repliable
+`📚 Choix & concepts` en fin de PR ; commentaires de code au strict minimum.
+**Pourquoi :** le round 2 (3 sessions parallèles, ~15 min) a montré que la valeur est
+dans l'empreinte GitHub, pas dans le chat. Moins de friction = plus d'agents lançables.
