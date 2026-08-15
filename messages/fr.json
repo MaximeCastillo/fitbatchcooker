@@ -2,6 +2,8 @@
   "common": {
     "undo": "Annuler",
     "changeLanguage": "Changer de langue",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
     "proteinPerDay": "{grams} g / jour"
   },
   "notFound": {
