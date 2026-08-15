@@ -5,13 +5,13 @@ description: Transformer des retours bruts (démo, idées, bugs) en issues GitHu
 
 # Issues — forger & réaliser
 
-Deux modes selon ce que demande Maxime : **forger** (retours → issues) ou
+Deux modes selon ce que demande le mainteneur : **forger** (retours → issues) ou
 **réaliser** (issues `ready` → PRs). Les conventions de `CLAUDE.md` s'appliquent
 toujours (i18n en parité, scoping user, commits gitmoji, coach).
 
 ## Mode 1 — Forger des issues depuis des retours bruts
 
-1. **Collecte** : Maxime colle ses retours/idées en vrac. Ne rien créer encore.
+1. **Collecte** : le mainteneur colle ses retours/idées en vrac. Ne rien créer encore.
 2. **Exploration** : localiser dans le code ce que chaque retour touche
    (fichiers, composants, patterns existants à imiter).
 3. **Découpage — la règle clé** : regrouper un **maximum de petits retours dans
@@ -19,7 +19,7 @@ toujours (i18n en parité, scoping user, commits gitmoji, coach).
    - domaines vraiment différents (ex. UI recettes vs logique du bot) ;
    - une partie dépend d'une autre (alors 2 issues liées « dépend de #N ») ;
    - la fournée dépasse ce qu'une PR reviewable en ~10 min peut porter.
-4. **Arbitrage AVANT création** : poser à Maxime les questions ambiguës
+4. **Arbitrage AVANT création** : poser au mainteneur les questions ambiguës
    (comportement attendu, priorité, « on garde ou on jette »). Une issue créée
    doit être réalisable **sans lui**.
 5. **Création** via `gh issue create`, label `ready`, body sur ce template :
@@ -78,9 +78,9 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **Merge** : le signal formel est la review GitHub **Approve** de Maxime
+9. **Merge** : le signal formel est la review GitHub **Approve** du mainteneur
    (bloc « À recetter » tout coché + revue du code s'il le souhaite). Jamais de
-   merge sans elle. Ensuite : squash-merge par Maxime lui-même, ou par l'agent
+   merge sans elle. Ensuite : squash-merge par le mainteneur lui-même, ou par l'agent
    sur son « merge » (`gh pr merge --squash --delete-branch` — `main` lit
    « 1 commit = 1 issue » ; le détail vit dans la PR). Le `Closes #<n>` ferme
    l'issue automatiquement. Puis `git pull` sur `main`.
