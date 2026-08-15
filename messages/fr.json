@@ -265,5 +265,22 @@
     "passwordTooShort": "Le nouveau mot de passe doit faire au moins 8 caractères.",
     "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
     "passwordError": "Impossible de changer le mot de passe pour l'instant. Réessaie."
+  },
+  "admin": {
+    "title": "Gestion des comptes",
+    "accountCount": "{count, plural, one {# compte} other {# comptes}}",
+    "selectTestAccounts": "Sélectionner les comptes de test ({count})",
+    "deleteSelection": "Supprimer la sélection ({count})",
+    "onboarded": "profil complété",
+    "notOnboarded": "profil non complété",
+    "testBadge": "test",
+    "youBadge": "toi",
+    "confirmTitle": "Supprimer définitivement ?",
+    "confirmWarning": "{count, plural, one {Ce compte et toutes ses données (recettes, batches, préférences) seront supprimés définitivement. C'est irréversible.} other {Ces # comptes et toutes leurs données (recettes, batches, préférences) seront supprimés définitivement. C'est irréversible.}}",
+    "cancel": "Annuler",
+    "confirmDelete": "Supprimer définitivement",
+    "deletedNotice": "{count, plural, one {# compte supprimé.} other {# comptes supprimés.}}",
+    "failedNotice": "{count, plural, one {# compte n'a pas pu être supprimé.} other {# comptes n'ont pas pu être supprimés.}}",
+    "configError": "Suppression impossible : la clé de service Supabase est absente ou invalide. Aucun compte n'a été touché."
   }
 }

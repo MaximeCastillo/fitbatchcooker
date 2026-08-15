@@ -265,5 +265,22 @@
     "passwordTooShort": "The new password must be at least 8 characters.",
     "passwordMismatch": "The two passwords don't match.",
     "passwordError": "Can't change the password right now. Try again."
+  },
+  "admin": {
+    "title": "Account management",
+    "accountCount": "{count, plural, one {# account} other {# accounts}}",
+    "selectTestAccounts": "Select test accounts ({count})",
+    "deleteSelection": "Delete selection ({count})",
+    "onboarded": "profile completed",
+    "notOnboarded": "profile not completed",
+    "testBadge": "test",
+    "youBadge": "you",
+    "confirmTitle": "Delete permanently?",
+    "confirmWarning": "{count, plural, one {This account and all its data (recipes, batches, preferences) will be permanently deleted. This can't be undone.} other {These # accounts and all their data (recipes, batches, preferences) will be permanently deleted. This can't be undone.}}",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete permanently",
+    "deletedNotice": "{count, plural, one {# account deleted.} other {# accounts deleted.}}",
+    "failedNotice": "{count, plural, one {# account could not be deleted.} other {# accounts could not be deleted.}}",
+    "configError": "Deletion impossible: the Supabase service key is missing or invalid. No account was touched."
   }
 }
