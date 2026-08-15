@@ -621,3 +621,31 @@ jauge se remplir dans les dix secondes. Et le tout sans migration ni nouvelle d�
   de 300 ms, et le rayon n'est pas animé. Un test vert qui mesure la mauvaise chose est pire qu'un
   test absent : j'ai durci en comparant le rectangle final à celui de la cible.
 - Balayage 44 px : bouton de déconnexion corrigé. **Restent 4 boutons sous la cible** (voir ROADMAP).
+
+## Session 11 — 2026-08-10 → 2026-08-16 — Le dev autonome : issues, agents cloud, et une frontière réseau
+
+**Construit :** le workflow « dev autonome » complet — skill `/issues` (forger des issues
+depuis des retours bruts, les réaliser branche-par-issue), labels `ready`/`in-progress`/
+`to-review`, premier cycle complet validé de bout en bout (retours → issue #6 → branche →
+fix + tests → screenshots → PR #9 → squash-merge → issue fermée). Puis l'environnement
+cloud claude.ai/code (`fitbatchcooker-full`) : `scripts/cloud-setup.sh` versionné,
+débogué en cinq itérations réelles (cwd du setup ≠ checkout, nvm incompatible mode
+strict, variables absentes au setup, PPAs cassés, allowlist réseau).
+
+**La découverte structurante :** l'egress des VM cloud est HTTPS-via-proxy uniquement
+(anti-exfiltration) → le Postgres brut ne sortira jamais. Décision : la recette
+« utilisateur réel » se fait sur la **preview Vercel** (Playwright dans la VM navigue la
+preview) ; Prisma Accelerate documenté comme bascule si le besoin durcit. Issue #11
+(page admin) créée pour purger les comptes de test que le cloud ne peut pas nettoyer.
+
+**Concepts appris :** proxy et egress (le gardien qui ne transporte que du courrier) ;
+protocole Postgres vs HTTPS (l'appel téléphonique vs la lettre) ; lockfile lu
+différemment selon la version de npm (+ `engine-strict` pour échouer vite et clair) ;
+snapshot/cache d'environnement (provisionner une fois, instancier depuis la photo) ;
+archi internationale (le cache près des gens, la donnée chez elle) ; l'échelle des
+permissions (booléen → enum → RBAC → policies) ; et deux leçons d'agents : un diagnostic
+confiant peut reposer sur un clone périmé, et piloter un agent cloud depuis une session
+locale via Chrome, ça marche.
+
+**Victoire :** trois heures « perdues » vendredi transformées en carte complète de ce que
+le cloud sait faire — écrite dans DECISIONS, le skill et le script, plus jamais à payer.
