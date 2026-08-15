@@ -79,14 +79,21 @@ worktree : `.env` à copier, `prisma generate`, port dev dédié).
 
 **Environnement cloud** (session claude.ai/code, GitHub Action) : même avec les
 variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
-Postgres brut (5432/6543) est bloqué**, donc e2e locaux, dev server authentifié,
-migrate et studio sont impossibles (validé le 2026-08-13). Repli : lint + tests
-unitaires + build, le dire clairement dans la PR (« vérifié : lint/units/build —
-recette visuelle via la preview Vercel »), et ne PAS bloquer dessus. Piste pour
-les e2e complets depuis le cloud : `E2E_BASE_URL=<preview Vercel> npx playwright
-test` (HTTPS seulement, la config saute le webServer) — nécessite la preview
-déployée et sa protection d'accès réglée ; la purge des comptes de test ne
-tourne alors pas (DB injoignable), à faire en local.
+Postgres brut (5432/6543) est bloqué**, donc dev server authentifié, e2e locaux,
+migrate et studio sont impossibles (validé le 2026-08-13, voir DECISIONS).
+
+La recette « utilisateur réel » se fait donc **sur la preview Vercel de la PR** :
+1. Implémenter, vérifier lint + tests unitaires + build, pousser, ouvrir la PR.
+2. Attendre que la preview soit prête (`gh pr checks` / le commentaire du bot
+   Vercel donne l'URL). C'est le même agent qui attend — pas besoin d'en
+   déclencher un autre.
+3. Recetter la preview via Playwright : `E2E_BASE_URL=<url-preview> npx
+   playwright test` pour la suite, et/ou un script Playwright ciblé qui rejoue
+   le scénario de la section Vérification de l'issue (+ screenshots pour la PR).
+4. Si la preview répond 401/403 (protection Vercel) ou est indisponible : le
+   dire dans la PR et se limiter à lint/units/build — ne PAS bloquer.
+5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
+   injoignable) : le signaler, purge faite en local plus tard.
 
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).

@@ -586,3 +586,17 @@ requête et non en colonne `NOT NULL`.
   impossibles, même avec les variables. Supabase Auth (HTTPS) passe, lui.
 - Conséquence process : en cloud, vérif = lint + units + build ; la recette complète vit
   sur la preview Vercel (option future : e2e pointés dessus via `E2E_BASE_URL`).
+
+## 2026-08-16 — Recette cloud sur la preview Vercel ; Prisma Accelerate écarté (pour l'instant)
+**Décision :** depuis une VM cloud, la recette « utilisateur réel » se fait sur la
+**preview Vercel de la PR** (Playwright pointé dessus via `E2E_BASE_URL`), pas sur un
+dev server dans la VM. Procédure dans le skill `/issues`.
+**Pourquoi :** l'egress cloud est HTTPS-only (proxy de sécurité anti-exfiltration) ;
+la preview est en plus l'artefact le plus proche de la prod — recetter ça est plus
+probant qu'un dev server.
+**Alternative écartée :** Prisma Accelerate (la base parlée en HTTPS 443) rendrait le
+dev server possible dans la VM, mais ajoute un 3ᵉ service dans la chaîne des données
+et casse la parité de connexion avec la prod. YAGNI tant que le dev sans Mac reste
+occasionnel. **Critère de bascule explicite :** dev sans Mac devenu régulier ET
+boucle preview (push→build→recette, ~2-3 min) visiblement coûteuse → on branche
+Accelerate.
