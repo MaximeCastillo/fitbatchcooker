@@ -76,7 +76,10 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    section Vérification sur le dev server.
 5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
    les commiter sous `.github/pr-assets/issue-<n>/` sur la branche.
-6. **PR** — trois blocs, dans cet ordre :
+6. **PR** — titre en **anglais, gitmoji, formulé comme un commit** (au squash,
+   GitHub en fait le message du commit sur `main` — un titre français y
+   violerait la convention commits-en-anglais). Le **corps** reste en français.
+   Trois blocs, dans cet ordre :
    - **Résumé** : 2-3 lignes (quoi + pourquoi), `Closes #<n>`, ⚠️ migration
      éventuelle en tête. Screenshots embarqués, URL de preview.
    - **✅ Vérifié par l'agent** : compte rendu compact de ce qui a été vérifié
@@ -133,7 +136,8 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    **retirer dans le commit suivant** (`git rm -r .github/pr-assets`) — ainsi le
    squash ne les emporte jamais dans `main`. Dans la PR, les référencer par
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
-   au SHA, elles survivent à la suppression de la branche). JAMAIS
+   au SHA, elles survivent à la suppression de la branche) — URL **nue** dans
+   l'attribut `src`, jamais entourée de backticks (image cassée sinon). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
