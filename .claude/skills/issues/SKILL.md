@@ -78,10 +78,13 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **Merge** : le signal formel est la review GitHub **Approve** du mainteneur
-   (bloc « À recetter » tout coché + revue du code s'il le souhaite). Jamais de
-   merge sans elle. Ensuite : squash-merge par le mainteneur lui-même, ou par l'agent
-   sur son « merge » (`gh pr merge --squash --delete-branch` — `main` lit
+9. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
+   tout coché + revue du code s'il le souhaite). La forme du signal dépend de
+   qui a ouvert la PR : la review GitHub **Approve** si le mainteneur n'en est
+   pas l'auteur ; sinon (agent publiant sous son identité — GitHub interdit
+   d'approuver sa propre PR) un **commentaire ou message explicite** (« recette
+   OK, merge »). Ensuite : squash-merge par le mainteneur lui-même, ou par
+   l'agent sur son ordre (`gh pr merge --squash --delete-branch` — `main` lit
    « 1 commit = 1 issue » ; le détail vit dans la PR). Le `Closes #<n>` ferme
    l'issue automatiquement. Puis `git pull` sur `main`.
 
