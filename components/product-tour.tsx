@@ -149,6 +149,7 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
 
   if (!open || steps.length === 0 || !step) return null;
 
+  const isFirst = index <= 0;
   const isLast = index >= steps.length - 1;
   const side = isDesktop ? step.side.desktop : step.side.mobile;
 
@@ -229,6 +230,18 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
                       className="h-11 px-3"
                     >
                       {t("skip")}
+                    </Button>
+                  )}
+                  {/* Stepping back re-runs the same effects as stepping forward, so the
+                      spotlight and the bubble follow along on their own. */}
+                  {!isFirst && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIndex((i) => i - 1)}
+                      className="h-11 px-3"
+                    >
+                      {t("previous")}
                     </Button>
                   )}
                   <Button
