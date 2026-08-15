@@ -83,10 +83,15 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    qui a ouvert la PR : la review GitHub **Approve** si le mainteneur n'en est
    pas l'auteur ; sinon (agent publiant sous son identité — GitHub interdit
    d'approuver sa propre PR) un **commentaire ou message explicite** (« recette
-   OK, merge »). Ensuite : squash-merge par le mainteneur lui-même, ou par
-   l'agent sur son ordre (`gh pr merge --squash --delete-branch` — `main` lit
-   « 1 commit = 1 issue » ; le détail vit dans la PR). Le `Closes #<n>` ferme
-   l'issue automatiquement. Puis `git pull` sur `main`.
+   OK, merge »). **Dérogation** : le mainteneur peut merger avec une recette
+   incomplète s'il le dit explicitement (« recette partielle, merge quand
+   même ») — l'agent rappelle alors en une ligne ce qui reste non recetté,
+   le note dans la PR, puis obéit. Un simple « merge » sans recette ni
+   dérogation explicite reste refusé. Ensuite : squash-merge par le mainteneur
+   lui-même, ou par l'agent sur son ordre (`gh pr merge --squash
+   --delete-branch` — `main` lit « 1 commit = 1 issue » ; le détail vit dans
+   la PR). Le `Closes #<n>` ferme l'issue automatiquement. Puis `git pull`
+   sur `main`.
 
 Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : paralléliser —
 un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
