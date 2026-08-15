@@ -9,6 +9,14 @@ Deux modes selon ce que demande le mainteneur : **forger** (retours → issues) 
 **réaliser** (issues `ready` → PRs). Les conventions de `CLAUDE.md` s'appliquent
 toujours (i18n en parité, scoping user, commits gitmoji, coach).
 
+**Invocation rapide** : `/issues <numéro>` → Mode 2 directement sur cette issue
+(l'usage normal d'une session cloud : une session par numéro). `/issues` avec
+des retours collés → Mode 1. `/issues` sans argument en session cloud → prendre
+UNE seule issue `ready` (la première de la file) et dire pourquoi on s'arrête
+là : la session est verrouillée sur une branche, la file entière finirait dans
+une seule PR. GitHub supprime les branches au merge (réglage repo) — ne pas
+tenter de le faire depuis la VM, le proxy refuse la suppression de refs.
+
 ## Mode 1 — Forger des issues depuis des retours bruts
 
 1. **Collecte** : le mainteneur colle ses retours/idées en vrac. Ne rien créer encore.
