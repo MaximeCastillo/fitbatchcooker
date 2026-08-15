@@ -61,19 +61,29 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    section Vérification sur le dev server.
 5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
    les commiter sous `.github/pr-assets/issue-<n>/` sur la branche.
-6. **PR** : description **très courte** — 2-4 lignes (quoi + comment vérifier),
-   les critères d'acceptation en cases à cocher (la recette de Maxime), les
-   screenshots embarqués, et `Closes #<n>`. Sur l'issue : retirer `in-progress`,
-   poser `to-review`.
+6. **PR** — trois blocs, dans cet ordre :
+   - **Résumé** : 2-3 lignes (quoi + pourquoi), `Closes #<n>`, ⚠️ migration
+     éventuelle en tête. Screenshots embarqués, URL de preview.
+   - **✅ Vérifié par l'agent** : compte rendu compact de ce qui a été vérifié
+     et comment (tests, mesures, recette locale). C'est un rapport, PAS une
+     checklist — personne ne refait ces vérifications.
+   - **🧪 À recetter** : UNIQUEMENT les angles morts de l'agent (ce qu'il n'a
+     pas pu vérifier lui-même), en cases à cocher rédigées **comme un guide
+     utilisateur** : des actions simples groupées par page/parcours (« sur la
+     page X, clique Y → il se passe Z »), zéro jargon technique. Tout coché =
+     le recetteur peut approuver.
+   Sur l'issue : retirer `in-progress`, poser `to-review`.
 7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **Merge** : jamais sans validation explicite de Maxime (sa recette = tous les
-   critères cochés). Quand il valide : `gh pr merge --squash --delete-branch`
-   (squash — `main` lit « 1 commit = 1 issue » ; le détail vit dans la PR).
-   Le `Closes #<n>` ferme l'issue automatiquement. Puis `git pull` sur `main`.
+9. **Merge** : le signal formel est la review GitHub **Approve** de Maxime
+   (bloc « À recetter » tout coché + revue du code s'il le souhaite). Jamais de
+   merge sans elle. Ensuite : squash-merge par Maxime lui-même, ou par l'agent
+   sur son « merge » (`gh pr merge --squash --delete-branch` — `main` lit
+   « 1 commit = 1 issue » ; le détail vit dans la PR). Le `Closes #<n>` ferme
+   l'issue automatiquement. Puis `git pull` sur `main`.
 
 Issues indépendantes (aucun fichier partagé, déclaré au cadrage) : paralléliser —
 un agent par issue, chacun dans son **worktree** isolé (voir la mémoire
@@ -101,9 +111,10 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose, c'est OK.
-4. Dans la PR, séparer explicitement « vérifié (et comment) » de « à recetter
-   par Maxime sur la preview » (tout ce qui exige auth ou DB). Donner l'URL de
-   la preview dès qu'elle est verte.
+4. La PR suit le format du Mode 2 (Résumé / ✅ Vérifié par l'agent /
+   🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
+   tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est
+   verte.
 5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
    injoignable) : le signaler, purge faite en local plus tard.
 
