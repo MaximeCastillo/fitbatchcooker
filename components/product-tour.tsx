@@ -216,12 +216,15 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
                 {t(`${step.id}Body`)}
               </Popover.Description>
 
-              <div className="mt-4 flex items-center justify-between gap-3">
+              {/* Wraps rather than overflows: three controls plus the counter no longer fit
+                  on one line of a 20rem bubble in every language (French is the long one).
+                  `ml-auto` keeps the controls right-aligned on whichever line they land. */}
+              <div className="mt-4 flex flex-wrap items-center gap-y-3">
                 <span className="font-mono text-xs text-muted-foreground">
                   {t("progress", { current: index + 1, total: steps.length })}
                 </span>
                 {/* h-11 = 44px tap targets; the default Button is h-8 (PRINCIPLES §5). */}
-                <div className="flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-2">
                   {!isLast && (
                     <Button
                       type="button"
