@@ -195,6 +195,125 @@
   }
 }
 
+/* ---- Nav icons: one short hover animation per destination ----
+   Each lucide icon is a list of <path> elements emitted in declaration order, so the
+   sub-shapes of an icon are addressed with :nth-child. */
+
+/* Batchs: a ripple through the stack, bottom layer first. */
+@keyframes nav-stack {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Chef: each dot pops in with a small bounce, left to right — "he's writing". */
+@keyframes nav-typing-dot {
+  0% {
+    opacity: 0;
+    transform: translateY(1.5px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-1.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Recettes: fork and knife swing apart, then cross back. */
+@keyframes nav-cross-fork {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  45% {
+    transform: rotate(-10deg);
+  }
+}
+@keyframes nav-cross-knife {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  45% {
+    transform: rotate(10deg);
+  }
+}
+
+/* Ingrédients: the drumstick shakes. */
+@keyframes nav-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+  75% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* The typing dots exist only for the hover animation — invisible at rest, and hence
+   on touch devices and under reduced motion, where that animation never runs. */
+.nav-typing-dot {
+  opacity: 0;
+}
+
+/* Hover only (never :focus-visible, so the keyboard stays still) and gated on a real
+   pointer, so a mobile tap never fires these; `no-preference` is the reduced-motion
+   guard, which is why there is no separate `reduce` override below. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* Cubes: bottom-left = paths 1-4, bottom-right = 5-8, top = 9-12. */
+  .nav-link:hover [data-nav-icon="batch"] path {
+    animation: nav-stack 260ms ease-in-out;
+  }
+  .nav-link:hover [data-nav-icon="batch"] path:nth-child(n + 5):nth-child(-n + 8) {
+    animation-delay: 70ms;
+  }
+  .nav-link:hover [data-nav-icon="batch"] path:nth-child(n + 9) {
+    animation-delay: 140ms;
+  }
+
+  /* `forwards` keeps the dots on screen for as long as the link stays hovered. */
+  .nav-link:hover [data-nav-icon="chat"] .nav-typing-dot {
+    animation: nav-typing-dot 220ms ease-out forwards;
+  }
+  .nav-link:hover [data-nav-icon="chat"] .nav-typing-dot:nth-of-type(2) {
+    animation-delay: 90ms;
+  }
+  .nav-link:hover [data-nav-icon="chat"] .nav-typing-dot:nth-of-type(3) {
+    animation-delay: 180ms;
+  }
+
+  /* Fork = paths 1 and 4, knife = paths 2 and 3; both pivot around the icon center. */
+  .nav-link:hover [data-nav-icon="recipes"] path {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+  }
+  .nav-link:hover [data-nav-icon="recipes"] path:nth-child(1),
+  .nav-link:hover [data-nav-icon="recipes"] path:nth-child(4) {
+    animation: nav-cross-fork 340ms ease-in-out;
+  }
+  .nav-link:hover [data-nav-icon="recipes"] path:nth-child(2),
+  .nav-link:hover [data-nav-icon="recipes"] path:nth-child(3) {
+    animation: nav-cross-knife 340ms ease-in-out;
+  }
+
+  .nav-link:hover [data-nav-icon="ingredients"] {
+    animation: nav-wiggle 380ms ease-in-out;
+  }
+}
+
 /* Dialog: the backdrop fades, and the panel flies in from the source element that
    opened it (its center, passed as --dx/--dy relative to the viewport center) while
    scaling up — so you see "where it opened from". Defaults (--dx/--dy = 0) = a plain
