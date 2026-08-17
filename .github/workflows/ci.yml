@@ -36,6 +36,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Some unit tests import the generated Prisma client — it doesn't exist
+      # on a fresh runner until generated (the build step comes too late).
+      - name: Generate Prisma client
+        run: npx prisma generate
+
       - name: Unit tests
         run: npm test
 
