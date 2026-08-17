@@ -86,17 +86,34 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
      et comment (tests, mesures, recette locale). C'est un rapport, PAS une
      checklist — personne ne refait ces vérifications.
    - **🧪 À recetter** : UNIQUEMENT les angles morts de l'agent (ce qu'il n'a
-     pas pu vérifier lui-même), en cases à cocher rédigées **comme un guide
-     utilisateur** : des actions simples groupées par page/parcours (« sur la
-     page X, clique Y → il se passe Z »), zéro jargon technique. Tout coché =
-     le recetteur peut approuver.
+     pas pu vérifier lui-même), en cases à cocher **numérotées** (liste
+     ordonnée `1. [ ]` — la numérotation continue à travers les sous-sections,
+     pour que le mainteneur puisse dire « point 6 » pendant la recette),
+     rédigées **comme un guide utilisateur** : des actions simples groupées
+     par page/parcours (« sur la page X, clique Y → il se passe Z »), zéro
+     jargon technique. Tout coché = le recetteur peut approuver.
+   **Aucune mention d'IA dans la PR** — pas de footer « Generated with Claude
+   Code » ni lien de session ; si la plateforme l'ajoute à la création, le
+   retirer aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F
+   body=@body.md`).
    Sur l'issue : retirer `in-progress`, poser `to-review`.
 7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
+9. **La CI est l'arbitre.** Elle rejoue tout (lint, units, build, e2e) sur
+   chaque push — ses résultats priment sur les vérifications locales de
+   l'agent (auto-déclarées, et invalidées par un rebase). CI rouge : lire les
+   logs (`gh run view --log-failed`) et les traces Playwright en artefact
+   (`gh run download <run-id>`) — les deux passent en HTTPS, donc accessibles
+   même depuis une VM cloud. Corriger, pousser, laisser la CI rejouer.
+   **Deux tentatives max sur un même échec** : à la 3ᵉ rouge, s'arrêter,
+   commenter la PR (ce qui a été compris et tenté) et passer la main au
+   mainteneur. NB : une PR contenant une migration a des e2e rouges tant que
+   la migration n'est pas appliquée manuellement — c'est attendu, ne pas
+   « corriger ».
+10. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
    tout coché + revue du code s'il le souhaite). La forme du signal dépend de
    qui a ouvert la PR : la review GitHub **Approve** si le mainteneur n'en est
    pas l'auteur ; sinon (agent publiant sous son identité — GitHub interdit
