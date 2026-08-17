@@ -618,3 +618,12 @@ l'attend) ; démarche et vérifications dans la PR ; pédagogie dans un bloc rep
 `📚 Choix & concepts` en fin de PR ; commentaires de code au strict minimum.
 **Pourquoi :** le round 2 (3 sessions parallèles, ~15 min) a montré que la valeur est
 dans l'empreinte GitHub, pas dans le chat. Moins de friction = plus d'agents lançables.
+
+## 2026-08-17 — CI GitHub Actions cadrée : l'arbitre neutre (issue #17)
+**Décision :** une CI GHA sur chaque PR rejoue TOUT (lint, units, build, e2e) — y compris
+ce que l'agent a déjà passé : ses vérifs sont auto-déclarées et invalidées par un rebase,
+la CI juge le code final sur machine propre. Les runners ont l'egress libre → les e2e avec
+DB y tournent (l'impasse « cloud » n'en était pas une : c'était le mauvais étage).
+E2e contre la base partagée pour l'instant (pas de migrate en CI, jamais) ; base de test
+dédiée = évolution notée dans #17. Protocole CI rouge : l'agent lit logs + traces
+Playwright via `gh` (HTTPS), 2 tentatives de correction, puis handover commenté.
