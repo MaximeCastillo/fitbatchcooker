@@ -71,7 +71,10 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
 2. **Branche** depuis un `main` à jour : `issue/<n>-<slug>`. Ne jamais commiter
    sur `main` dans ce mode.
 3. **Implémenter** en suivant le body de l'issue — le « Hors scope » implicite :
-   ne rien faire qui n'est pas dans les critères d'acceptation.
+   ne rien faire qui n'est pas dans les critères d'acceptation. Si le code ajouté
+   n'existe qu'à cause d'une contrainte provisoire du projet (et que le projet
+   tient un registre de dette, ex. `PROD_CHECKLIST.md`), ajouter sa ligne au
+   registre **dans la même PR**.
 4. **Vérifier pour de vrai** : lint + tests + build, puis le scénario de la
    section Vérification sur le dev server.
 5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
