@@ -54,7 +54,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <div className="px-2 pb-4">
           <BrandMark />
         </div>
-        <SidebarNav />
+        <SidebarNav isAdmin={user.isAdmin} />
         {/* Chrome pinned to the bottom: quick preferences (theme + language) + the
             account chip. Controls, not nav destinations. */}
         <div className="mt-auto flex flex-col gap-2">
@@ -105,7 +105,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
           <div className="border-b px-2 py-1.5">
-            <SidebarNav orientation="horizontal" />
+            <SidebarNav orientation="horizontal" isAdmin={user.isAdmin} />
           </div>
         </div>
 

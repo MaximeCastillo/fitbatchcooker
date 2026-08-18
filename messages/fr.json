@@ -39,6 +39,7 @@
     "chat": "Le chef",
     "ingredients": "Ingrédients",
     "account": "Mon compte",
+    "admin": "Admin",
     "login": "Se connecter",
     "logout": "Se déconnecter"
   },

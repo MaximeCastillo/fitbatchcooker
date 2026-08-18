@@ -5,6 +5,7 @@ import {
   UtensilsCrossed,
   MessageCircle,
   Drumstick,
+  Shield,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,10 @@ const items = [
   { href: "/recipes", key: "recipes", icon: UtensilsCrossed },
   { href: "/ingredients", key: "ingredients", icon: Drumstick },
 ] as const;
+
+// Shown only to admins. Hiding it is convenience, not protection: /admin re-checks the
+// flag server-side and 404s for everyone else (app/[locale]/admin/accounts.ts).
+const adminItem = { href: "/admin", key: "admin", icon: Shield } as const;
 
 // Three "typing" dots inside the chat bubble. They are invisible at rest and only
 // revealed by the hover animation (see the nav icon rules in app/globals.css).
@@ -38,13 +43,16 @@ const typingDots = [8, 12, 16].map((cx) => (
 // Client Component so it can highlight the active route via usePathname.
 export function SidebarNav({
   orientation = "vertical",
+  isAdmin = false,
 }: {
   orientation?: "vertical" | "horizontal";
+  isAdmin?: boolean;
 }) {
   // next-intl's usePathname returns the pathname WITHOUT the locale prefix, so these
   // checks stay the same across locales.
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const destinations = isAdmin ? [...items, adminItem] : [...items];
 
   return (
     <nav
@@ -53,7 +61,7 @@ export function SidebarNav({
         orientation === "vertical" ? "flex-col" : "flex-row",
       )}
     >
-      {items.map(({ href, key, icon: Icon }) => {
+      {destinations.map(({ href, key, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Link
