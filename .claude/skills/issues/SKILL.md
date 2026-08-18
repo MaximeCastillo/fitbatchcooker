@@ -149,9 +149,7 @@ Postgres brut (5432/6543) est bloqué**, donc dev server authentifié, e2e locau
 migrate et studio sont impossibles (validé le 2026-08-13, voir DECISIONS).
 **La VM n'a pas `gh`** : toutes les opérations GitHub passent par le serveur
 MCP GitHub (`create_pull_request`, `update_pull_request`…) — transposer les
-commandes `gh` de ce skill. Ce chemin d'écriture **supprime les balises
-`<details>`/`<summary>`** des bodys de PR (vérifié 2026-08-18, deux essais) et
-**neutralise parfois les URLs d'images** (backticks) ; les `<img>` passent.
+commandes `gh` de ce skill vers ces outils.
 
 ⚠️ **Chromium n'a aucun réseau sortant depuis la VM** (vérifié 2026-08-16 :
 `ERR_CONNECTION_RESET` partout, proxy ou pas, alors que `curl` passe) → recetter
@@ -167,13 +165,9 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
    au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
-   ⚠️ **Se relire systématiquement après toute écriture de body contenant
-   des images** (relire la PR via l'outillage GitHub disponible, chercher des
-   backticks autour de `https://`) : le chemin MCP neutralise parfois les
-   URLs. Si neutralisé : retenter une fois ; si ça persiste, laisser tel quel
-   et signaler « vignettes à réactiver » dans le message final — une session
-   locale du mainteneur répare en un patch. Ne pas s'acharner : c'est
-   intermittent (perturbations côté GitHub possibles), pas systématique.
+   Après une écriture de body contenant des images, se relire une fois : si
+   les URLs ressortent altérées (ex. entourées de backticks — vu pendant des
+   incidents GitHub), réécrire le body une fois. C'est tout.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
@@ -189,8 +183,8 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
    tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est
    verte.
-5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
-   injoignable) : le signaler, purge faite en local plus tard.
+5. La purge des comptes de test e2e est automatique (teardown Playwright, qui
+   tourne aussi dans la CI) : ne pas s'en occuper depuis la VM.
 
 ## Posture dans le chat (en réalisant)
 
@@ -203,12 +197,10 @@ Le mainteneur lance des agents précisément pour ne PAS devoir les suivre :
   (recette, migration, secret). Tout le reste — démarche, vérifications, choix —
   vit dans la PR : c'est l'historique du code, pas le chat.
 - **Pédagogie dans la PR, pas dans le chat.** Le mainteneur apprend la stack :
-  les choix non évidents et concepts intéressants vont dans un bloc repliable en
-  fin de Résumé — `<details><summary>📚 Choix & concepts</summary>…</details>` —
-  qu'il ouvre quand il en a envie, sans friction. **Depuis une VM cloud** : le
-  chemin d'écriture MCP supprime les balises `<details>` — utiliser un simple
-  titre `### 📚 Choix & concepts` à la place, sans s'acharner ; une session
-  locale le rendra repliable si le mainteneur y tient.
+  les choix non évidents et concepts intéressants vont dans une section
+  `### 📚 Choix & concepts` en fin de Résumé — une section simple, PAS de bloc
+  repliable `<details>` (les balises HTML ne survivent pas à tous les chemins
+  d'écriture, et une règle qui marche partout bat une règle élégante).
 - **Commentaires de code au strict minimum** (cf. CLAUDE.md) : une contrainte que
   le code ne peut pas montrer, jamais de narration ni de justification du diff.
 
