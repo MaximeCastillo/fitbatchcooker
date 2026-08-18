@@ -5,8 +5,8 @@ import { listAccounts, requireAdmin } from "./accounts";
 export const dynamic = "force-dynamic";
 
 // Admin-only account management. The gate is requireAdmin() — server-side, like every
-// other authorization in this app (spec §7). Nothing links here: you reach /admin by
-// typing it, and anyone without the flag gets a 404.
+// other authorization in this app (spec §7). The nav entry that leads here is only
+// rendered for admins, but that is convenience: anyone without the flag gets a 404.
 export default async function AdminPage({
   searchParams,
 }: {
