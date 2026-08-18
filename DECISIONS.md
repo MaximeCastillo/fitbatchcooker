@@ -671,3 +671,14 @@ vrais comptes.
 préfixe seul). On supprime dans Auth sans confirmation, donc un vrai `e2e+perso@gmail.com`
 doit survivre. La règle vit dans `lib/test-accounts.ts`, unique source pour la suite qui
 crée les comptes et le teardown qui les efface (elle était dupliquée à trois endroits).
+
+## 2026-08-18 — Recette du round 2 terminée : trois règles affinées sur incidents réels
+Trois frictions vécues sur la PR #16, trois règles gravées dans le skill `/issues` :
+**Avenants** — quand le périmètre bouge en cours de dev/recette, l'écart se consigne en
+section `## Avenants` datée du body de l'issue (spec courante lisible d'un trait, pas de
+fil de commentaires ; la mémoire durable reste DECISIONS). **Confirmation de dérogation** —
+un ordre de merge avec des cases décochées ne vaut jamais dérogation implicite : l'agent
+liste les points décochés et attend confirmation (le « ok merge si CI verte » qui a fait
+passer 2 points non recettés en prod ne se reproduira pas). **Pas de commentaire GitHub
+depuis le cloud** — le serveur MCP y injecte un footer IA après coup, incontrôlable ;
+la règle « aucune mention d'IA » ne vaut que sur ce que l'agent contrôle.

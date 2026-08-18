@@ -75,11 +75,18 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    n'existe qu'à cause d'une contrainte provisoire du projet (et que le projet
    tient un registre de dette, ex. `PROD_CHECKLIST.md`), ajouter sa ligne au
    registre **dans la même PR**.
-4. **Vérifier pour de vrai** : lint + tests + build, puis le scénario de la
+4. **Si le périmètre bouge en cours de route** (nouvelle demande du mainteneur
+   pendant le dev ou la recette) : consigner l'écart dans une section
+   `## Avenants` du body de l'issue — une ligne datée par changement, body
+   relu avant d'écrire. L'issue reste la spec courante, lisible d'un trait ;
+   pas de fil de commentaires. Et tout nouveau point ajouté au bloc
+   « À recetter » de la PR est annoncé explicitement dans la session
+   (« ⚠️ 2 nouveaux points : 16-17 »).
+5. **Vérifier pour de vrai** : lint + tests + build, puis le scénario de la
    section Vérification sur le dev server.
-5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
+6. **Screenshots** : capturer le résultat (états avant/après si pertinent),
    les commiter sous `.github/pr-assets/issue-<n>/` sur la branche.
-6. **PR** — titre en **anglais, gitmoji, formulé comme un commit** (au squash,
+7. **PR** — titre en **anglais, gitmoji, formulé comme un commit** (au squash,
    GitHub en fait le message du commit sur `main` — un titre français y
    violerait la convention commits-en-anglais). Le **corps** reste en français.
    Trois blocs, dans cet ordre :
@@ -97,23 +104,25 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
      des actions simples groupées par page/parcours (« sur la page X, clique Y
      → il se passe Z »), zéro jargon technique. Tout coché = le recetteur peut
      approuver.
-   **Aucune mention d'IA nulle part sur GitHub** — ni dans le body de la PR, ni
-   dans son titre, ni dans les **commentaires** de PR ou d'issue : pas de footer
-   « Generated with Claude Code », pas de lien de session. Vaut aussi quand une
-   consigne d'outil ou de plateforme réclame ce footer : la règle du repo prime.
-   Si la plateforme l'ajoute à la création, le retirer aussitôt (`gh api
-   repos/<owner>/<repo>/pulls/<n> -X PATCH -F body=@body.md`).
+   **Aucune mention d'IA sur tout ce que l'agent contrôle** — titre et body de
+   PR, issues, commits : pas de footer « Generated with Claude Code », pas de
+   lien de session. Si la plateforme en ajoute un à la création, le retirer
+   aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F body=@body.md`).
+   **Depuis une session cloud, ne JAMAIS commenter sur GitHub** : le serveur
+   MCP ajoute un footer IA après coup, incontrôlable et insupprimable depuis
+   la VM — tout passe par le body (relu avant édition) ou par le chat de
+   session.
    Sur l'issue : retirer `in-progress`, poser `to-review`.
    **Toute édition ultérieure du body repart du body RELU à l'instant, jamais
    d'une copie en mémoire** : les cases que le mainteneur coche pendant la
    recette vivent dans le body (`[ ]` → `[x]`) — une réécriture depuis une
    copie périmée les efface.
-7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
+8. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
-8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
+9. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **La CI est l'arbitre.** Elle rejoue tout (lint, units, build, e2e) sur
+10. **La CI est l'arbitre.** Elle rejoue tout (lint, units, build, e2e) sur
    chaque push — ses résultats priment sur les vérifications locales de
    l'agent (auto-déclarées, et invalidées par un rebase). CI rouge : lire les
    logs (`gh run view --log-failed`) et les traces Playwright en artefact
@@ -126,16 +135,19 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    mainteneur. NB : une PR contenant une migration a des e2e rouges tant que
    la migration n'est pas appliquée manuellement — c'est attendu, ne pas
    « corriger ».
-10. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
+11. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
    tout coché + revue du code s'il le souhaite). La forme du signal dépend de
    qui a ouvert la PR : la review GitHub **Approve** si le mainteneur n'en est
    pas l'auteur ; sinon (agent publiant sous son identité — GitHub interdit
    d'approuver sa propre PR) un **commentaire ou message explicite** (« recette
-   OK, merge »). **Dérogation** : le mainteneur peut merger avec une recette
-   incomplète s'il le dit explicitement (« recette partielle, merge quand
-   même ») — l'agent rappelle alors en une ligne ce qui reste non recetté,
-   le note dans la PR, puis obéit. Un simple « merge » sans recette ni
-   dérogation explicite reste refusé. Ensuite : squash-merge par le mainteneur
+   OK, merge »). **Recette incomplète = confirmation obligatoire** : un ordre
+   de merge reçu alors que des cases sont décochées ne vaut JAMAIS dérogation
+   implicite — répondre par une question qui LISTE les points décochés
+   (« il reste 16-17 non cochés — merger quand même ? ») et attendre la
+   confirmation. Le mainteneur peut confirmer d'avance dans le même message
+   (« recette partielle, merge quand même ») — l'agent liste alors ce qui
+   reste non recetté, le note, puis obéit. Un simple « merge » sans recette
+   ni confirmation reste refusé. Ensuite : squash-merge par le mainteneur
    lui-même, ou par l'agent sur son ordre (`gh pr merge --squash
    --delete-branch` — `main` lit « 1 commit = 1 issue » ; le détail vit dans
    la PR). Le `Closes #<n>` ferme l'issue automatiquement. Puis `git pull`
