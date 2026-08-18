@@ -89,12 +89,14 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
      et comment (tests, mesures, recette locale). C'est un rapport, PAS une
      checklist — personne ne refait ces vérifications.
    - **🧪 À recetter** : UNIQUEMENT les angles morts de l'agent (ce qu'il n'a
-     pas pu vérifier lui-même), en cases à cocher **numérotées** (liste
-     ordonnée `1. [ ]` — la numérotation continue à travers les sous-sections,
-     pour que le mainteneur puisse dire « point 6 » pendant la recette),
-     rédigées **comme un guide utilisateur** : des actions simples groupées
-     par page/parcours (« sur la page X, clique Y → il se passe Z »), zéro
-     jargon technique. Tout coché = le recetteur peut approuver.
+     pas pu vérifier lui-même), en cases à cocher **numérotées au format
+     `- [ ] **1.** …`** (numéro en gras DANS la puce : une liste ordonnée
+     `1. [ ]` ne rend pas de case cochable sur GitHub). La numérotation
+     continue à travers les sous-sections, pour que le mainteneur puisse dire
+     « point 6 » pendant la recette. Rédigées **comme un guide utilisateur** :
+     des actions simples groupées par page/parcours (« sur la page X, clique Y
+     → il se passe Z »), zéro jargon technique. Tout coché = le recetteur peut
+     approuver.
    **Aucune mention d'IA dans la PR** — pas de footer « Generated with Claude
    Code » ni lien de session ; si la plateforme l'ajoute à la création, le
    retirer aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F
@@ -156,15 +158,27 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    **retirer dans le commit suivant** (`git rm -r .github/pr-assets`) — ainsi le
    squash ne les emporte jamais dans `main`. Dans la PR, les référencer par
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
-   au SHA, elles survivent à la suppression de la branche) — URL **nue** dans
-   l'attribut `src`, jamais entourée de backticks (image cassée sinon). JAMAIS
+   au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
+   ⚠️ **Le proxy de la VM neutralise les URLs d'images à CHAQUE écriture de
+   PR** (création comme édition : elles ressortent entourées de backticks,
+   donc cassées). Écrire le bloc d'images normalement malgré tout, et signaler
+   dans le message final « vignettes à réactiver par le mainteneur » — une
+   session locale les répare en un patch du body. Une fois réparées, **ne plus
+   réécrire la section images depuis la VM** ; les éditions ultérieures du
+   body sont possibles à condition de ne pas toucher aux zones contenant des
+   images.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
    c'est OK : le squash + suppression de branche la rend éphémère. Le slug
    dérive du premier prompt de la session → un prompt court et descriptif
-   (« Traite l'issue #7 : bouton précédent du guide ») donne un slug lisible.
+   (« /issues 7 — bouton Précédent du tour ») donne un slug ET un nom de
+   session lisibles quand plusieurs sessions tournent en parallèle. Si un
+   outil de renommage de session est disponible, se renommer
+   « #<issue> <titre court> » dès le verrou posé, puis « PR #<pr> · #<issue>
+   <titre court> » dès la PR ouverte — le mainteneur navigue entre ses
+   sessions par ces noms.
 4. La PR suit le format du Mode 2 (Résumé / ✅ Vérifié par l'agent /
    🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
    tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est

@@ -627,3 +627,13 @@ DB y tournent (l'impasse « cloud » n'en était pas une : c'était le mauvais �
 E2e contre la base partagée pour l'instant (pas de migrate en CI, jamais) ; base de test
 dédiée = évolution notée dans #17. Protocole CI rouge : l'agent lit logs + traces
 Playwright via `gh` (HTTPS), 2 tentatives de correction, puis handover commenté.
+
+## 2026-08-17 — Découverte : le proxy cloud neutralise les URLs d'images des PRs
+**Découverte (recette round 2) :** toute écriture de body de PR depuis une VM cloud
+ressort avec les URLs d'images entourées de backticks (anti-exfiltration) — c'était la
+cause des vignettes cassées du round 2, réparées samedi sans comprendre. Les blobs
+épinglés au SHA survivent, eux, au rebase comme à la suppression de branche.
+**Protocole (skill) :** l'agent écrit le bloc d'images normalement, signale « vignettes
+à réactiver », une session locale répare en un patch ; ne plus réécrire la section
+images depuis la VM ensuite. Bonus gravés au passage : checklist de recette au format
+`- [ ] **1.**` (cases cochables + numéros stables) et nommage des sessions cloud.
