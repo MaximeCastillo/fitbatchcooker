@@ -3,12 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 // Supabase client holding the SERVICE ROLE key — it bypasses every auth rule, so it must
 // never leave the server. Kept in its own module (no "use client" file may import it) and
 // read from a non-NEXT_PUBLIC_ env var, so it cannot be bundled for the browser by
-// accident. Only /admin uses it, to delete rows in auth.users.
-//
-// 🆕 Différence avec lib/supabase/server.ts : celui-là parle AU NOM de la personne
-// connectée (cookies de session, droits de l'utilisateur). Celui-ci parle au nom du
-// projet — l'équivalent d'une connexion `postgres` superuser en Rails : puissant, donc
-// jamais exposé et jamais utilisé pour du confort.
+// accident. Unlike lib/supabase/server.ts, it acts as the project, not as the signed-in
+// person — only /admin uses it, to delete rows in auth.users.
 function createSupabaseAdminClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {

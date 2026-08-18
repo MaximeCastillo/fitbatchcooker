@@ -45,6 +45,11 @@ par la base unique ajoute sa ligne ici, dans la même PR. (Balayage initial : 20
       aujourd'hui interdite.
 - [ ] `prisma/seed.ts` — prudence non-destructive calibrée pour des données réelles :
       relâchable sur une base dev jetable (garder la version prudente pour la prod).
+- [ ] `app/[locale]/admin/` + `lib/admin.ts` + `lib/supabase/admin.ts` — la page `/admin`
+      (issue #11) : le bouton « purger les comptes de test », le badge « test » et le
+      préfixe `e2e+` de `lib/admin.ts` n'existent que parce que les comptes e2e atterrissent
+      en prod. Bases séparées = ce pan de la page disparaît (la gestion des vrais comptes,
+      elle, reste légitime).
 
 **Garde-fous à lever :**
 - [ ] `.github/workflows/ci.yml` (en-tête) — « NEVER run prisma migrate here ».
