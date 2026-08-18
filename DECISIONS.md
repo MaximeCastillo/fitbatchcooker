@@ -640,3 +640,12 @@ SE RELIRE après toute écriture contenant des images ; retenter une fois si neu
 sinon seulement, signaler « vignettes à réactiver » (réparation locale en un patch).
 Bonus gravés au passage : checklist de recette au format `- [ ] **1.**` (cases cochables
 + numéros stables) et nommage des sessions cloud.
+
+## 2026-08-18 — Post-mortem images/HTML des PRs cloud : résolu
+**Cause identifiée (réponses des agents #7 et #11) :** les VM cloud n'ont pas `gh` —
+toutes les écritures GitHub passent par le serveur MCP GitHub. Ce chemin **supprime
+systématiquement les balises `<details>`/`<summary>`** des bodys de PR (2 essais) et
+**neutralise parfois les URLs d'images** (backticks, intermittent — perturbations
+GitHub plausibles en aggravation) ; les `<img>` passent. Skill adapté : depuis le
+cloud, pédagogie sous un titre `### 📚` (pas de repliable), auto-relecture après toute
+écriture avec images, transposition des commandes `gh` vers les outils MCP.

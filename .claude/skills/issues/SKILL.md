@@ -111,8 +111,10 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    chaque push — ses résultats priment sur les vérifications locales de
    l'agent (auto-déclarées, et invalidées par un rebase). CI rouge : lire les
    logs (`gh run view --log-failed`) et les traces Playwright en artefact
-   (`gh run download <run-id>`) — les deux passent en HTTPS, donc accessibles
-   même depuis une VM cloud. Corriger, pousser, laisser la CI rejouer.
+   (`gh run download <run-id>`) — en session cloud, `gh` n'existe pas :
+   transposer vers les outils du serveur MCP GitHub disponibles ; si les logs
+   restent hors de portée, le dire dans la PR plutôt que deviner. Corriger,
+   pousser, laisser la CI rejouer.
    **Deux tentatives max sur un même échec** : à la 3ᵉ rouge, s'arrêter,
    commenter la PR (ce qui a été compris et tenté) et passer la main au
    mainteneur. NB : une PR contenant une migration a des e2e rouges tant que
@@ -145,6 +147,11 @@ séquence dans une session : tout finirait dans la même PR.
 variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
 Postgres brut (5432/6543) est bloqué**, donc dev server authentifié, e2e locaux,
 migrate et studio sont impossibles (validé le 2026-08-13, voir DECISIONS).
+**La VM n'a pas `gh`** : toutes les opérations GitHub passent par le serveur
+MCP GitHub (`create_pull_request`, `update_pull_request`…) — transposer les
+commandes `gh` de ce skill. Ce chemin d'écriture **supprime les balises
+`<details>`/`<summary>`** des bodys de PR (vérifié 2026-08-18, deux essais) et
+**neutralise parfois les URLs d'images** (backticks) ; les `<img>` passent.
 
 ⚠️ **Chromium n'a aucun réseau sortant depuis la VM** (vérifié 2026-08-16 :
 `ERR_CONNECTION_RESET` partout, proxy ou pas, alors que `curl` passe) → recetter
@@ -160,17 +167,13 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
    au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
-   ⚠️ **Certaines écritures de PR depuis la VM ressortent avec les URLs
-   d'images neutralisées** (entourées de backticks, donc cassées). C'est
-   intermittent — observé sur certaines écritures, pas d'autres — et dépend
-   vraisemblablement du chemin d'écriture. Protocole : écrire le body via
-   `gh` avec `--body-file` (création) ou `gh api pulls/<n> -X PATCH -F
-   body=@file` (édition), puis **se relire systématiquement** après toute
-   écriture contenant des images (`gh api …/pulls/<n> --jq .body`, chercher
-   des backticks autour de `https://`). Si neutralisé : retenter une fois via
-   `gh api` ; si ça persiste, laisser tel quel et signaler « vignettes à
-   réactiver » dans le message final — une session locale du mainteneur
-   répare en un patch.
+   ⚠️ **Se relire systématiquement après toute écriture de body contenant
+   des images** (relire la PR via l'outillage GitHub disponible, chercher des
+   backticks autour de `https://`) : le chemin MCP neutralise parfois les
+   URLs. Si neutralisé : retenter une fois ; si ça persiste, laisser tel quel
+   et signaler « vignettes à réactiver » dans le message final — une session
+   locale du mainteneur répare en un patch. Ne pas s'acharner : c'est
+   intermittent (perturbations côté GitHub possibles), pas systématique.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
@@ -202,7 +205,10 @@ Le mainteneur lance des agents précisément pour ne PAS devoir les suivre :
 - **Pédagogie dans la PR, pas dans le chat.** Le mainteneur apprend la stack :
   les choix non évidents et concepts intéressants vont dans un bloc repliable en
   fin de Résumé — `<details><summary>📚 Choix & concepts</summary>…</details>` —
-  qu'il ouvre quand il en a envie, sans friction.
+  qu'il ouvre quand il en a envie, sans friction. **Depuis une VM cloud** : le
+  chemin d'écriture MCP supprime les balises `<details>` — utiliser un simple
+  titre `### 📚 Choix & concepts` à la place, sans s'acharner ; une session
+  locale le rendra repliable si le mainteneur y tient.
 - **Commentaires de code au strict minimum** (cf. CLAUDE.md) : une contrainte que
   le code ne peut pas montrer, jamais de narration ni de justification du diff.
 
