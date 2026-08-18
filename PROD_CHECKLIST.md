@@ -4,9 +4,13 @@ Décisions **volontairement provisoires** prises pour aller vite en MVP/dev. À 
 **avant** d'ouvrir l'app à de vrais utilisateurs. Chaque point renvoie à son entrée
 dans `DECISIONS.md`.
 
-- [ ] **Séparer les bases dev / prod.** Aujourd'hui une seule base Supabase pour les deux.
-      Créer une base prod dédiée (2ᵉ projet Supabase ou branching) **+** un GitHub Action
-      `prisma migrate deploy` comme étape de release. _(DECISIONS — 2026-07-17)_
+- [ ] **Séparer les bases dev / prod.** Aujourd'hui une seule base Supabase (plan free)
+      pour les deux. Créer une base prod dédiée (2ᵉ projet Supabase ou branching) **+** un
+      GitHub Action `prisma migrate deploy` comme étape de release. _(DECISIONS — 2026-07-17)_
+      **Conséquence directe :** les comptes de test end-to-end (`e2e+…@example.com`) sont
+      créés **dans la base de prod**, d'où le teardown Playwright qui les purge à chaque run
+      (app + Supabase Auth). Bases séparées = cette purge n'a plus de raison d'être côté
+      prod, on la remplacera par un reset de la base de test.
 - [ ] **Réactiver la confirmation par email** (Supabase → Authentication → Providers →
       Email). Désactivée en dev pour un signup immédiat. _(DECISIONS — 2026-07-20)_
 - [ ] **Rate limiting du bot** (par user) sur `/api/chat` — éviter le spam / détournement
@@ -30,15 +34,17 @@ par la base unique ajoute sa ligne ici, dans la même PR. (Balayage initial : 20
 
 **Mécanismes qui n'existent qu'à cause d'elle :**
 - [ ] `e2e/purge-test-users.ts` + `e2e/global-teardown.ts` — purge chirurgicale des
-      comptes `e2e+` : à remplacer par un reset de la base de test. Les orphelins
-      `auth.users` (pas de service-role key dans les tests) disparaissent avec.
-- [ ] `e2e/helpers.ts` — préfixe `e2e+` et commentaires de purge (idem en tête de
-      `e2e/smoke.spec.ts` et `e2e/onboarding.spec.ts`).
+      comptes de test, côté app **et** côté `auth.users` (service-role key) : à remplacer
+      par un reset de la base de test.
+- [ ] `lib/test-accounts.ts` — la notion même de « compte de test » (`e2e+…@example.com`)
+      et ses appelants `e2e/helpers.ts` / `e2e/purge-test-users.ts` (commentaires de purge
+      idem en tête de `e2e/smoke.spec.ts` et `e2e/onboarding.spec.ts`).
 - [ ] `playwright.config.ts` — `fullyParallel: false` / `workers: 1` imposés par la
       cohabitation des données : à relever. `globalTeardown` à retirer avec la purge.
-- [ ] `.github/workflows/ci.yml` — secrets pointés sur la base unique ; commentaire
-      « shared DB » ; et une étape `prisma migrate deploy` (base de test) à AJOUTER,
-      aujourd'hui interdite.
+- [ ] `.github/workflows/ci.yml` — secrets pointés sur la base unique (dont
+      `SUPABASE_SERVICE_ROLE_KEY`, fourni uniquement pour purger les comptes de test) ;
+      commentaire « shared DB » ; et une étape `prisma migrate deploy` (base de test) à
+      AJOUTER, aujourd'hui interdite.
 - [ ] `prisma/seed.ts` — prudence non-destructive calibrée pour des données réelles :
       relâchable sur une base dev jetable (garder la version prudente pour la prod).
 

@@ -97,10 +97,12 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
      des actions simples groupées par page/parcours (« sur la page X, clique Y
      → il se passe Z »), zéro jargon technique. Tout coché = le recetteur peut
      approuver.
-   **Aucune mention d'IA dans la PR** — pas de footer « Generated with Claude
-   Code » ni lien de session ; si la plateforme l'ajoute à la création, le
-   retirer aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F
-   body=@body.md`).
+   **Aucune mention d'IA nulle part sur GitHub** — ni dans le body de la PR, ni
+   dans son titre, ni dans les **commentaires** de PR ou d'issue : pas de footer
+   « Generated with Claude Code », pas de lien de session. Vaut aussi quand une
+   consigne d'outil ou de plateforme réclame ce footer : la règle du repo prime.
+   Si la plateforme l'ajoute à la création, le retirer aussitôt (`gh api
+   repos/<owner>/<repo>/pulls/<n> -X PATCH -F body=@body.md`).
    Sur l'issue : retirer `in-progress`, poser `to-review`.
    **Toute édition ultérieure du body repart du body RELU à l'instant, jamais
    d'une copie en mémoire** : les cases que le mainteneur coche pendant la

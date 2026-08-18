@@ -58,9 +58,10 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
   serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
   pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
-- **Comptes admin** : rôle `admin` (gérer les limites, voir l'usage) — introduit avec le point ci-dessus.
-- **Compte — suppression** : bouton « supprimer mon compte » (différé — destructif, nécessite la
-  *service-role key* côté serveur pour supprimer l'utilisateur Supabase Auth + cascade des données).
+- **Comptes admin, suite** : le booléen `User.isAdmin` + la page `/admin` existent (voir « Livré
+  récemment »). Reste le vrai sujet : gérer les limites d'usage et voir la consommation.
+- **Compte — suppression** : bouton « supprimer mon compte ». La plomberie est là depuis `/admin`
+  (`lib/supabase/admin.ts` + cascade), il ne reste que l'écran côté utilisateur.
 - **Bulle « ? » / centre d'aide** : la brique *durable* de l'onboarding (elle sert à J+200, pas
   seulement à J0). La carte « Visite guidée » sur `/account` en est le germe minimal. Ensuite :
   recherche, guides courts, **chef contextuel** (aide par page).
@@ -105,6 +106,11 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
+- **Page `/admin`** : flag `User.isAdmin` (posé en SQL), liste des comptes (créé le, onboardé),
+  suppression multiple avec **modale de confirmation obligatoire**. Suppression complète =
+  Supabase Auth (*service-role key*, serveur only) **+** cascade des données. Un admin ne peut
+  pas se supprimer lui-même. Au passage, le **teardown e2e purge aussi `auth.users`** : plus
+  d'orphelins, et pas de bouton de purge dans l'app. Issue #11.
 - **Onboarding, 3 briques** : (1) **écran de bienvenue** `/welcome` où l'inscription atterrit —
   prénom + poids, et la **jauge signature se remplit en direct** pendant la frappe (le moment « aha »
   arrive *pendant* l'onboarding) ; (2) **empty state de `/batch`** qui porte le CTA et relance sur la
