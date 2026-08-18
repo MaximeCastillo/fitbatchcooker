@@ -102,6 +102,11 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    retirer aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F
    body=@body.md`).
    Sur l'issue : retirer `in-progress`, poser `to-review`.
+   **Une fois la recette commencée, ne plus réécrire le body** : les cases que
+   le mainteneur coche VIVENT dans le body (`[ ]` → `[x]`), une réécriture
+   depuis une copie périmée les efface. Répondre aux retours de recette en
+   commentaire de PR (« point 7 corrigé en `<sha>` ») ; si une édition du body
+   s'impose vraiment, repartir du body relu à l'instant.
 7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
