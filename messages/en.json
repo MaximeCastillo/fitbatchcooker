@@ -227,6 +227,7 @@
     "sectionHint": "A reminder of the three places that matter.",
     "replay": "Replay the tour",
     "progress": "{current}/{total}",
+    "previous": "Previous",
     "next": "Next",
     "done": "Done",
     "skip": "Skip",

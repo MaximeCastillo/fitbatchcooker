@@ -149,6 +149,7 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
 
   if (!open || steps.length === 0 || !step) return null;
 
+  const isFirst = index <= 0;
   const isLast = index >= steps.length - 1;
   const side = isDesktop ? step.side.desktop : step.side.mobile;
 
@@ -162,7 +163,12 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
       {createPortal(
         selector === null ? (
           // Greeting step: nothing to point at, so just dim the screen.
+          // The key matters: without it React sees a <div> replacing a <div> in the same slot
+          // and REUSES the node, so the cutout's imperative top/left/width/height (written
+          // straight to the DOM below, invisible to React) survive onto the veil and shrink it
+          // to the previous step's target. Distinct keys force a real unmount.
           <div
+            key="veil"
             aria-hidden
             className="pointer-events-none fixed inset-0 z-40 bg-black/50"
           />
@@ -173,6 +179,7 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
           // `outline` rather than `ring`, because Tailwind's ring is itself a box-shadow and
           // would collide with the spread.
           <div
+            key="spotlight"
             ref={spotlightRef}
             aria-hidden
             style={{ boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.5)" }}
@@ -215,12 +222,15 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
                 {t(`${step.id}Body`)}
               </Popover.Description>
 
-              <div className="mt-4 flex items-center justify-between gap-3">
+              {/* Wraps rather than overflows: three controls plus the counter no longer fit
+                  on one line of a 20rem bubble in every language (French is the long one).
+                  `ml-auto` keeps the controls right-aligned on whichever line they land. */}
+              <div className="mt-4 flex flex-wrap items-center gap-y-3">
                 <span className="font-mono text-xs text-muted-foreground">
                   {t("progress", { current: index + 1, total: steps.length })}
                 </span>
                 {/* h-11 = 44px tap targets; the default Button is h-8 (PRINCIPLES §5). */}
-                <div className="flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-2">
                   {!isLast && (
                     <Button
                       type="button"
@@ -229,6 +239,18 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
                       className="h-11 px-3"
                     >
                       {t("skip")}
+                    </Button>
+                  )}
+                  {/* Stepping back re-runs the same effects as stepping forward, so the
+                      spotlight and the bubble follow along on their own. */}
+                  {!isFirst && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIndex((i) => i - 1)}
+                      className="h-11 px-3"
+                    >
+                      {t("previous")}
                     </Button>
                   )}
                   <Button

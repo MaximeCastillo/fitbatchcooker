@@ -168,6 +168,68 @@ test("the tour walks four steps and then closes", async ({ page }) => {
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("the tour steps back with Previous", async ({ page }) => {
+  await signUp(page);
+  await page.goto("/batch?tour=1");
+
+  const tour = page.getByRole("dialog");
+  const next = tour.getByRole("button", { name: /Next|Suivant/i });
+  const previous = tour.getByRole("button", { name: /Previous|Précédent/i });
+
+  // Nothing to go back to on the greeting.
+  await expect(tour.getByText("1/4")).toBeVisible();
+  await expect(previous).toHaveCount(0);
+
+  await next.click();
+  await expect(tour.getByText("2/4")).toBeVisible();
+  const chatTitle = await tour.getByRole("heading").textContent();
+  await next.click();
+  await expect(tour.getByText("3/4")).toBeVisible();
+
+  // Back to the chat step: both the content AND the spotlight must return to it.
+  await previous.click();
+  await expect(tour.getByText("2/4")).toBeVisible();
+  await expect(tour.getByRole("heading")).toHaveText(chatTitle!);
+  await page.waitForTimeout(500); // wait out the 300ms spotlight glide
+  const offset = await page.evaluate(() => {
+    const target = [...document.querySelectorAll<HTMLElement>('[data-tour="nav-chat"]')].find(
+      (el) => el.checkVisibility({ checkVisibilityCSS: true }),
+    )!;
+    const spot = [...document.body.querySelectorAll("div[aria-hidden]")].find((el) =>
+      (el as HTMLElement).style.boxShadow?.includes("9999px"),
+    ) as HTMLElement;
+    const t = target.getBoundingClientRect();
+    const s = spot.getBoundingClientRect();
+    return { dTop: s.top - t.top, dLeft: s.left - t.left };
+  });
+  expect(offset.dTop).toBeCloseTo(-6, 0);
+  expect(offset.dLeft).toBeCloseTo(-6, 0);
+
+  // And back to the greeting, where the control disappears again — and the anchorless step
+  // must dim the WHOLE screen. React reuses the overlay node between the two branches, so the
+  // cutout's imperative geometry used to survive onto the veil and shrink it to the previous
+  // target; distinct keys fix that, this guards it.
+  await previous.click();
+  await expect(tour.getByText("1/4")).toBeVisible();
+  await expect(previous).toHaveCount(0);
+  await page.waitForTimeout(500);
+  const veil = await page.evaluate(() => {
+    const overlay = [...document.body.children].find(
+      (node) =>
+        node.tagName === "DIV" &&
+        node.hasAttribute("aria-hidden") &&
+        getComputedStyle(node).zIndex === "40",
+    )!;
+    const rect = overlay.getBoundingClientRect();
+    return {
+      dWidth: rect.width - window.innerWidth,
+      dHeight: rect.height - window.innerHeight,
+    };
+  });
+  expect(veil.dWidth).toBeCloseTo(0, 0);
+  expect(veil.dHeight).toBeCloseTo(0, 0);
+});
+
 test("the tour is relaunchable from the account page", async ({ page }) => {
   await signUp(page);
   await page.goto("/account");
