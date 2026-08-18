@@ -2,23 +2,13 @@
 // server action and the client list both go through them, so the "who can be deleted"
 // answer can't drift between the checkbox that's greyed out and the guard that runs.
 
-// Throwaway accounts created by the E2E suite. They live in the same Supabase project as
-// real accounts (single free-plan database — see PROD_CHECKLIST.md), which is the whole
-// reason this page exists. Same prefix as e2e/helpers.ts.
-const TEST_ACCOUNT_EMAIL_PREFIX = "e2e+";
-
 // The shape the page needs to render and reason about one account.
 export type AdminAccount = {
   id: string;
   email: string;
   createdAt: Date;
   isOnboarded: boolean;
-  isTestAccount: boolean;
 };
-
-export function isTestAccountEmail(email: string): boolean {
-  return email.toLowerCase().startsWith(TEST_ACCOUNT_EMAIL_PREFIX);
-}
 
 // "Onboarded" = the person got far enough to have a protein target, either explicit or
 // derived from a weight (the welcome screen writes one or the other).
@@ -41,7 +31,6 @@ export function toAdminAccount(user: {
     email: user.email,
     createdAt: user.createdAt,
     isOnboarded: isOnboarded(user),
-    isTestAccount: isTestAccountEmail(user.email),
   };
 }
 
@@ -57,12 +46,4 @@ export function deletableAccountIds(
   return accounts
     .filter((account) => account.id !== currentUserId && requested.has(account.id))
     .map((account) => account.id);
-}
-
-export function testAccountIds(accounts: AdminAccount[], currentUserId: string): string[] {
-  return deletableAccountIds(
-    accounts,
-    accounts.filter((account) => account.isTestAccount).map((account) => account.id),
-    currentUserId,
-  );
 }

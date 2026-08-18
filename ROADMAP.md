@@ -106,10 +106,11 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
 - Durcissement avant prod → voir `PROD_CHECKLIST.md` (ne pas dupliquer ici).
 
 ## ✅ Livré récemment
-- **Page `/admin`** : flag `User.isAdmin` (posé en SQL), liste des comptes (créé le, onboardé,
-  badge « test »), suppression multiple avec **modale de confirmation obligatoire**, purge des
-  comptes `e2e+…@example.com`. Suppression complète = Supabase Auth (*service-role key*, serveur
-  only) **+** cascade des données. Un admin ne peut pas se supprimer lui-même. Issue #11.
+- **Page `/admin`** : flag `User.isAdmin` (posé en SQL), liste des comptes (créé le, onboardé),
+  suppression multiple avec **modale de confirmation obligatoire**. Suppression complète =
+  Supabase Auth (*service-role key*, serveur only) **+** cascade des données. Un admin ne peut
+  pas se supprimer lui-même. Au passage, le **teardown e2e purge aussi `auth.users`** : plus
+  d'orphelins, et pas de bouton de purge dans l'app. Issue #11.
 - **Onboarding, 3 briques** : (1) **écran de bienvenue** `/welcome` où l'inscription atterrit —
   prénom + poids, et la **jauge signature se remplit en direct** pendant la frappe (le moment « aha »
   arrive *pendant* l'onboarding) ; (2) **empty state de `/batch`** qui porte le CTA et relance sur la

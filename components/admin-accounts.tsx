@@ -15,13 +15,12 @@ import {
 } from "@/components/ui/dialog";
 
 // One row as the page hands it over: already formatted and already judged server-side
-// (isSelf, isTestAccount), so this component only tracks what's checked.
+// (isSelf), so this component only tracks what's checked.
 export type AdminAccountRow = {
   id: string;
   email: string;
   createdAtLabel: string;
   isOnboarded: boolean;
-  isTestAccount: boolean;
   isSelf: boolean;
 };
 
@@ -50,9 +49,6 @@ export function AdminAccounts({ accounts }: { accounts: AdminAccountRow[] }) {
   const selectedAccounts = accounts.filter((account) =>
     selectedIds.includes(account.id),
   );
-  const testAccounts = accounts.filter(
-    (account) => account.isTestAccount && !account.isSelf,
-  );
 
   function toggle(accountId: string) {
     setSelectedIds((current) =>
@@ -64,25 +60,15 @@ export function AdminAccounts({ accounts }: { accounts: AdminAccountRow[] }) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          className="h-11 text-base"
-          disabled={testAccounts.length === 0}
-          onClick={() => setSelectedIds(testAccounts.map((account) => account.id))}
-        >
-          {t("selectTestAccounts", { count: testAccounts.length })}
-        </Button>
-        <Button
-          variant="destructive"
-          className="h-11 text-base"
-          disabled={selectedAccounts.length === 0}
-          onClick={() => setIsConfirming(true)}
-        >
-          <Trash2 />
-          {t("deleteSelection", { count: selectedAccounts.length })}
-        </Button>
-      </div>
+      <Button
+        variant="destructive"
+        className="h-11 self-start text-base"
+        disabled={selectedAccounts.length === 0}
+        onClick={() => setIsConfirming(true)}
+      >
+        <Trash2 />
+        {t("deleteSelection", { count: selectedAccounts.length })}
+      </Button>
 
       <ul className="flex flex-col gap-2">
         {accounts.map((account) => (
@@ -110,11 +96,6 @@ export function AdminAccounts({ accounts }: { accounts: AdminAccountRow[] }) {
             {account.isSelf && (
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
                 {t("youBadge")}
-              </span>
-            )}
-            {account.isTestAccount && (
-              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-                {t("testBadge")}
               </span>
             )}
           </li>

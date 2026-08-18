@@ -17,6 +17,9 @@ env:
   DIRECT_URL: ${{ secrets.DIRECT_URL }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  # Lets the E2E teardown delete test accounts from auth.users too. If the secret is
+  # missing the suite still passes — the teardown warns and skips that half.
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
 jobs:
   ci:
@@ -51,7 +54,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       # E2E hit the shared Supabase DB (same as local runs). Throwaway accounts
-      # use the e2e+ prefix and the global teardown purges them.
+      # match lib/test-accounts.ts and the global teardown purges them from our
+      # tables AND from Supabase Auth.
       - name: E2E tests
         run: npm run e2e
 

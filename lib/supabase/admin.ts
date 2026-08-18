@@ -4,8 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 // never leave the server. Kept in its own module (no "use client" file may import it) and
 // read from a non-NEXT_PUBLIC_ env var, so it cannot be bundled for the browser by
 // accident. Unlike lib/supabase/server.ts, it acts as the project, not as the signed-in
-// person — only /admin uses it, to delete rows in auth.users.
-function createSupabaseAdminClient() {
+// person. Used by /admin and by the E2E teardown, both to reach auth.users.
+export function createSupabaseAdminClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY is missing — cannot delete auth users.");
@@ -36,4 +36,27 @@ export async function deleteAuthUsers(userIds: string[]): Promise<string[]> {
   }
 
   return deletedIds;
+}
+
+// Every account in Supabase Auth. Paginated because listUsers caps a page at 1000; we stop
+// on the first short page. Only the E2E teardown needs this: auth.users is the one place
+// where accounts survive with no matching row in our database, so it has to be read from
+// the source rather than derived from Prisma.
+export async function listAuthUsers(): Promise<{ id: string; email: string }[]> {
+  const supabase = createSupabaseAdminClient();
+  const perPage = 1000;
+  const users: { id: string; email: string }[] = [];
+
+  for (let page = 1; ; page++) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    if (error) throw new Error(`listing auth users failed: ${error.message}`);
+
+    users.push(
+      ...data.users
+        .filter((user) => user.email)
+        .map((user) => ({ id: user.id, email: user.email! })),
+    );
+
+    if (data.users.length < perPage) return users;
+  }
 }

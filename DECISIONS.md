@@ -654,3 +654,20 @@ bases sont séparées, la purge n'a plus lieu d'être côté prod.
 **Écarté :** un rôle/enum de rôles (YAGNI — un booléen suffit), et une action serveur dédiée
 « purger » (le bouton **présélectionne** les comptes de test et passe par la même modale, donc
 un seul chemin de suppression à auditer).
+
+## 2026-08-18 — Purge des comptes de test : corriger la cause, pas le symptôme
+**Constat :** le teardown Playwright ne supprimait que les lignes Prisma — son propre
+commentaire l'assumait (« The Supabase auth.users rows remain (no service-role key) »).
+Depuis que la CI rejoue les e2e à chaque PR, `auth.users` accumulait un orphelin par
+inscription de test, que **rien** ne nettoyait : `/admin` liste depuis Prisma, donc son
+bouton « purger » ne les voyait même pas.
+**Décision :** le teardown nettoie les deux côtés — Auth d'abord (il **énumère**
+`auth.users`, seule façon d'atteindre le stock déjà accumulé), nos tables ensuite. Clé de
+service absente = warning et on saute, jamais d'échec de suite pour un nettoyage.
+**Conséquence assumée :** le bouton « Purger les comptes de test » de `/admin` et le badge
+« test » sont **retirés** — la purge est automatique, la page se recentre sur la gestion des
+vrais comptes.
+**Garde-fou :** un compte de test = préfixe `e2e+` **ET** domaine `@example.com` (avant :
+préfixe seul). On supprime dans Auth sans confirmation, donc un vrai `e2e+perso@gmail.com`
+doit survivre. La règle vit dans `lib/test-accounts.ts`, unique source pour la suite qui
+crée les comptes et le teardown qui les efface (elle était dupliquée à trois endroits).

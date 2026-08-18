@@ -31,7 +31,6 @@ export default async function AdminPage({
     email: account.email,
     createdAtLabel: dateFormatter.format(account.createdAt),
     isOnboarded: account.isOnboarded,
-    isTestAccount: account.isTestAccount,
     isSelf: account.id === admin.id,
   }));
 

@@ -270,11 +270,9 @@
   "admin": {
     "title": "Account management",
     "accountCount": "{count, plural, one {# account} other {# accounts}}",
-    "selectTestAccounts": "Select test accounts ({count})",
     "deleteSelection": "Delete selection ({count})",
     "onboarded": "profile completed",
     "notOnboarded": "profile not completed",
-    "testBadge": "test",
     "youBadge": "you",
     "confirmTitle": "Delete permanently?",
     "confirmWarning": "{count, plural, one {This account and all its data (recipes, batches, preferences) will be permanently deleted. This can't be undone.} other {These # accounts and all their data (recipes, batches, preferences) will be permanently deleted. This can't be undone.}}",

@@ -270,11 +270,9 @@
   "admin": {
     "title": "Gestion des comptes",
     "accountCount": "{count, plural, one {# compte} other {# comptes}}",
-    "selectTestAccounts": "Sélectionner les comptes de test ({count})",
     "deleteSelection": "Supprimer la sélection ({count})",
     "onboarded": "profil complété",
     "notOnboarded": "profil non complété",
-    "testBadge": "test",
     "youBadge": "toi",
     "confirmTitle": "Supprimer définitivement ?",
     "confirmWarning": "{count, plural, one {Ce compte et toutes ses données (recettes, batches, préférences) seront supprimés définitivement. C'est irréversible.} other {Ces # comptes et toutes leurs données (recettes, batches, préférences) seront supprimés définitivement. C'est irréversible.}}",
