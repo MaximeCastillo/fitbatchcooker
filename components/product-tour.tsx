@@ -163,7 +163,12 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
       {createPortal(
         selector === null ? (
           // Greeting step: nothing to point at, so just dim the screen.
+          // The key matters: without it React sees a <div> replacing a <div> in the same slot
+          // and REUSES the node, so the cutout's imperative top/left/width/height (written
+          // straight to the DOM below, invisible to React) survive onto the veil and shrink it
+          // to the previous step's target. Distinct keys force a real unmount.
           <div
+            key="veil"
             aria-hidden
             className="pointer-events-none fixed inset-0 z-40 bg-black/50"
           />
@@ -174,6 +179,7 @@ export function ProductTour({ autoStart }: { autoStart: boolean }) {
           // `outline` rather than `ring`, because Tailwind's ring is itself a box-shadow and
           // would collide with the spread.
           <div
+            key="spotlight"
             ref={spotlightRef}
             aria-hidden
             style={{ boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.5)" }}

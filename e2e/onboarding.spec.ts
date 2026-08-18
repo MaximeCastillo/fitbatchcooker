@@ -205,10 +205,29 @@ test("the tour steps back with Previous", async ({ page }) => {
   expect(offset.dTop).toBeCloseTo(-6, 0);
   expect(offset.dLeft).toBeCloseTo(-6, 0);
 
-  // And back to the greeting, where the control disappears again.
+  // And back to the greeting, where the control disappears again — and the anchorless step
+  // must dim the WHOLE screen. React reuses the overlay node between the two branches, so the
+  // cutout's imperative geometry used to survive onto the veil and shrink it to the previous
+  // target; distinct keys fix that, this guards it.
   await previous.click();
   await expect(tour.getByText("1/4")).toBeVisible();
   await expect(previous).toHaveCount(0);
+  await page.waitForTimeout(500);
+  const veil = await page.evaluate(() => {
+    const overlay = [...document.body.children].find(
+      (node) =>
+        node.tagName === "DIV" &&
+        node.hasAttribute("aria-hidden") &&
+        getComputedStyle(node).zIndex === "40",
+    )!;
+    const rect = overlay.getBoundingClientRect();
+    return {
+      dWidth: rect.width - window.innerWidth,
+      dHeight: rect.height - window.innerHeight,
+    };
+  });
+  expect(veil.dWidth).toBeCloseTo(0, 0);
+  expect(veil.dHeight).toBeCloseTo(0, 0);
 });
 
 test("the tour is relaunchable from the account page", async ({ page }) => {
