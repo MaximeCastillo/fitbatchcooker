@@ -263,6 +263,20 @@
   }
 }
 
+/* Admin: the shield braces — a quick raise, then it settles back. */
+@keyframes nav-shield {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  35% {
+    transform: scale(1.12) translateY(-1px);
+  }
+  65% {
+    transform: scale(0.97) translateY(0);
+  }
+}
+
 /* The typing dots exist only for the hover animation — invisible at rest, and hence
    on touch devices and under reduced motion, where that animation never runs. */
 .nav-typing-dot {
@@ -311,6 +325,10 @@
 
   .nav-link:hover [data-nav-icon="ingredients"] {
     animation: nav-wiggle 380ms ease-in-out;
+  }
+
+  .nav-link:hover [data-nav-icon="admin"] {
+    animation: nav-shield 320ms ease-out;
   }
 }
 
