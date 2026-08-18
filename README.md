@@ -48,6 +48,8 @@ Prisma 7 n'a plus de `directUrl` : l'URL du runtime passe par le driver adapter
 | `npm run build` | Build de prod (`prisma generate && next build`) |
 | `npm start` | Sert le build de prod |
 | `npm run lint` | ESLint |
+| `npm test` | Tests unitaires (Vitest) |
+| `npm run e2e` | Tests end-to-end (Playwright) — démarre le dev server au besoin, purge les comptes `e2e+` en fin de suite |
 | `npx prisma migrate dev --name <nom>` | Crée **et** applique une migration (dev) |
 | `npx prisma migrate deploy` | Applique les migrations en attente (prod) |
 | `npx prisma generate` | Régénère le client Prisma (`lib/generated/prisma`) |
