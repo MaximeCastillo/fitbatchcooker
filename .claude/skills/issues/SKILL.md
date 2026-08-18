@@ -160,14 +160,17 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
    au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
-   ⚠️ **Le proxy de la VM neutralise les URLs d'images à CHAQUE écriture de
-   PR** (création comme édition : elles ressortent entourées de backticks,
-   donc cassées). Écrire le bloc d'images normalement malgré tout, et signaler
-   dans le message final « vignettes à réactiver par le mainteneur » — une
-   session locale les répare en un patch du body. Une fois réparées, **ne plus
-   réécrire la section images depuis la VM** ; les éditions ultérieures du
-   body sont possibles à condition de ne pas toucher aux zones contenant des
-   images.
+   ⚠️ **Certaines écritures de PR depuis la VM ressortent avec les URLs
+   d'images neutralisées** (entourées de backticks, donc cassées). C'est
+   intermittent — observé sur certaines écritures, pas d'autres — et dépend
+   vraisemblablement du chemin d'écriture. Protocole : écrire le body via
+   `gh` avec `--body-file` (création) ou `gh api pulls/<n> -X PATCH -F
+   body=@file` (édition), puis **se relire systématiquement** après toute
+   écriture contenant des images (`gh api …/pulls/<n> --jq .body`, chercher
+   des backticks autour de `https://`). Si neutralisé : retenter une fois via
+   `gh api` ; si ça persiste, laisser tel quel et signaler « vignettes à
+   réactiver » dans le message final — une session locale du mainteneur
+   répare en un patch.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
