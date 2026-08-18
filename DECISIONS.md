@@ -611,7 +611,37 @@ déployé (preview Vercel) revient à Maxime. Skill `/issues` mis à jour.
 **Validé au passage :** premier ticket 100 % cloud livré (issue #10 → PR #12) — dev,
 vérifs, screenshots, PR conformes au skill, limites annoncées honnêtement.
 
-## 2026-08-15 — Page `/admin` : un pansement assumé sur « une seule base pour dev et prod »
+## 2026-08-15 — Posture silencieuse des agents `/issues`
+**Décision :** en mode réalisation, l'agent travaille en silence — il n'interpelle le
+mainteneur que bloqué sur un choix produit/archi. Chat final minimal (PR + ce qui
+l'attend) ; démarche et vérifications dans la PR ; pédagogie dans un bloc repliable
+`📚 Choix & concepts` en fin de PR ; commentaires de code au strict minimum.
+**Pourquoi :** le round 2 (3 sessions parallèles, ~15 min) a montré que la valeur est
+dans l'empreinte GitHub, pas dans le chat. Moins de friction = plus d'agents lançables.
+
+## 2026-08-17 — CI GitHub Actions cadrée : l'arbitre neutre (issue #17)
+**Décision :** une CI GHA sur chaque PR rejoue TOUT (lint, units, build, e2e) — y compris
+ce que l'agent a déjà passé : ses vérifs sont auto-déclarées et invalidées par un rebase,
+la CI juge le code final sur machine propre. Les runners ont l'egress libre → les e2e avec
+DB y tournent (l'impasse « cloud » n'en était pas une : c'était le mauvais étage).
+E2e contre la base partagée pour l'instant (pas de migrate en CI, jamais) ; base de test
+dédiée = évolution notée dans #17. Protocole CI rouge : l'agent lit logs + traces
+Playwright via `gh` (HTTPS), 2 tentatives de correction, puis handover commenté.
+
+## 2026-08-17 — Découverte : des écritures de PR depuis la VM cassent parfois les images
+**Découverte (recette round 2, corrigée en séance par le mainteneur) :** certaines
+écritures de body de PR depuis une VM cloud ressortent avec les URLs d'images entourées
+de backticks (création de la PR #14, puis son édition) — mais PAS toutes : les créations
+des PRs #15/#16 sont intactes. Intermittent, vraisemblablement lié au chemin d'écriture
+utilisé par l'agent. Les blobs épinglés au SHA survivent, eux, au rebase comme à la
+suppression de branche.
+**Protocole (skill) :** écrire via `gh --body-file` / `gh api -F body=@file`, puis
+SE RELIRE après toute écriture contenant des images ; retenter une fois si neutralisé ;
+sinon seulement, signaler « vignettes à réactiver » (réparation locale en un patch).
+Bonus gravés au passage : checklist de recette au format `- [ ] **1.**` (cases cochables
++ numéros stables) et nommage des sessions cloud.
+
+## 2026-08-18 — Page `/admin` : un pansement assumé sur « une seule base pour dev et prod »
 **Décision :** un booléen `User.isAdmin` (posé à la main en SQL, aucune UI de promotion) et
 une page `/admin` : liste des comptes, suppression multiple derrière une **modale de
 confirmation obligatoire**, purge des comptes `e2e+…@example.com`. Suppression = Supabase

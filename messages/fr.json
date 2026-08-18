@@ -227,6 +227,7 @@
     "sectionHint": "Un rappel des trois endroits qui comptent.",
     "replay": "Relancer la visite",
     "progress": "{current}/{total}",
+    "previous": "Précédent",
     "next": "Suivant",
     "done": "Terminé",
     "skip": "Passer",

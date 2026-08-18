@@ -649,3 +649,12 @@ locale via Chrome, ça marche.
 
 **Victoire :** trois heures « perdues » vendredi transformées en carte complète de ce que
 le cloud sait faire — écrite dans DECISIONS, le skill et le script, plus jamais à payer.
+
+**Round 2 (15/08) — le stress-test à trois.** Trois sessions cloud lancées en parallèle
+depuis le mobile (`/issues 7`, `8`, `11`) : verrous pris proprement, trois PRs conformes
+en ~15 minutes, migration commitée sans être appliquée, zéro collision. Deux frictions
+corrigées en vol depuis la tour de contrôle : URLs de screenshots cassées par des
+backticks, et titres de PR en français — or **le titre de la PR devient le message du
+commit au squash**, donc titre anglais gitmoji obligatoire (corps en français). Décision
+bonus : posture silencieuse des agents (tout dans la PR, chat minimal, pédagogie dans un
+bloc repliable 📚). La sensation du jour : « j'ai lancé une équipe de trois développeurs. »

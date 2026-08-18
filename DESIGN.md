@@ -68,6 +68,9 @@ Changer l'identité = éditer ces variables (**reskin complet piloté par tokens
   `-translate-y` / `scale` au clic, transitions couleur/hauteur ~700 ms.
 - Patterns maison : barre de décompte de l'undo, sceau qui apparaît, bulles du
   chaudron.
+- **Icônes de nav** : une micro-animation par destination au survol (empilement,
+  points « il écrit », couverts, wiggle). CSS pur, ~300–400 ms, **hover desktop
+  uniquement** (`hover: hover` + `pointer: fine`) — jamais au tap ni au clavier.
 - Tout ce qui bouge se coupe en `motion-reduce`.
 
 ## Ton & gamification

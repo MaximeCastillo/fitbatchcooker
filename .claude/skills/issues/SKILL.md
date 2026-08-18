@@ -71,29 +71,54 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
 2. **Branche** depuis un `main` à jour : `issue/<n>-<slug>`. Ne jamais commiter
    sur `main` dans ce mode.
 3. **Implémenter** en suivant le body de l'issue — le « Hors scope » implicite :
-   ne rien faire qui n'est pas dans les critères d'acceptation.
+   ne rien faire qui n'est pas dans les critères d'acceptation. Si le code ajouté
+   n'existe qu'à cause d'une contrainte provisoire du projet (et que le projet
+   tient un registre de dette, ex. `PROD_CHECKLIST.md`), ajouter sa ligne au
+   registre **dans la même PR**.
 4. **Vérifier pour de vrai** : lint + tests + build, puis le scénario de la
    section Vérification sur le dev server.
 5. **Screenshots** : capturer le résultat (états avant/après si pertinent),
    les commiter sous `.github/pr-assets/issue-<n>/` sur la branche.
-6. **PR** — trois blocs, dans cet ordre :
+6. **PR** — titre en **anglais, gitmoji, formulé comme un commit** (au squash,
+   GitHub en fait le message du commit sur `main` — un titre français y
+   violerait la convention commits-en-anglais). Le **corps** reste en français.
+   Trois blocs, dans cet ordre :
    - **Résumé** : 2-3 lignes (quoi + pourquoi), `Closes #<n>`, ⚠️ migration
      éventuelle en tête. Screenshots embarqués, URL de preview.
    - **✅ Vérifié par l'agent** : compte rendu compact de ce qui a été vérifié
      et comment (tests, mesures, recette locale). C'est un rapport, PAS une
      checklist — personne ne refait ces vérifications.
    - **🧪 À recetter** : UNIQUEMENT les angles morts de l'agent (ce qu'il n'a
-     pas pu vérifier lui-même), en cases à cocher rédigées **comme un guide
-     utilisateur** : des actions simples groupées par page/parcours (« sur la
-     page X, clique Y → il se passe Z »), zéro jargon technique. Tout coché =
-     le recetteur peut approuver.
+     pas pu vérifier lui-même), en cases à cocher **numérotées au format
+     `- [ ] **1.** …`** (numéro en gras DANS la puce : une liste ordonnée
+     `1. [ ]` ne rend pas de case cochable sur GitHub). La numérotation
+     continue à travers les sous-sections, pour que le mainteneur puisse dire
+     « point 6 » pendant la recette. Rédigées **comme un guide utilisateur** :
+     des actions simples groupées par page/parcours (« sur la page X, clique Y
+     → il se passe Z »), zéro jargon technique. Tout coché = le recetteur peut
+     approuver.
+   **Aucune mention d'IA dans la PR** — pas de footer « Generated with Claude
+   Code » ni lien de session ; si la plateforme l'ajoute à la création, le
+   retirer aussitôt (`gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F
+   body=@body.md`).
    Sur l'issue : retirer `in-progress`, poser `to-review`.
 7. **Migration Prisma dans la branche ?** Ne jamais l'appliquer sur la DB
    (partagée avec la prod). La commiter seulement, et l'annoncer en tête de PR :
    `⚠️ Contient une migration — appliquer manuellement avant merge`.
 8. Si `main` a bougé entre-temps : rebase avant d'ouvrir la PR, résoudre les
    conflits (typiquement `messages/*.json`).
-9. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
+9. **La CI est l'arbitre.** Elle rejoue tout (lint, units, build, e2e) sur
+   chaque push — ses résultats priment sur les vérifications locales de
+   l'agent (auto-déclarées, et invalidées par un rebase). CI rouge : lire les
+   logs (`gh run view --log-failed`) et les traces Playwright en artefact
+   (`gh run download <run-id>`) — les deux passent en HTTPS, donc accessibles
+   même depuis une VM cloud. Corriger, pousser, laisser la CI rejouer.
+   **Deux tentatives max sur un même échec** : à la 3ᵉ rouge, s'arrêter,
+   commenter la PR (ce qui a été compris et tenté) et passer la main au
+   mainteneur. NB : une PR contenant une migration a des e2e rouges tant que
+   la migration n'est pas appliquée manuellement — c'est attendu, ne pas
+   « corriger ».
+10. **Merge** : jamais sans le signal formel du mainteneur (bloc « À recetter »
    tout coché + revue du code s'il le souhaite). La forme du signal dépend de
    qui a ouvert la PR : la review GitHub **Approve** si le mainteneur n'en est
    pas l'auteur ; sinon (agent publiant sous son identité — GitHub interdit
@@ -133,20 +158,53 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    **retirer dans le commit suivant** (`git rm -r .github/pr-assets`) — ainsi le
    squash ne les emporte jamais dans `main`. Dans la PR, les référencer par
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
-   au SHA, elles survivent à la suppression de la branche). JAMAIS
+   au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
+   ⚠️ **Certaines écritures de PR depuis la VM ressortent avec les URLs
+   d'images neutralisées** (entourées de backticks, donc cassées). C'est
+   intermittent — observé sur certaines écritures, pas d'autres — et dépend
+   vraisemblablement du chemin d'écriture. Protocole : écrire le body via
+   `gh` avec `--body-file` (création) ou `gh api pulls/<n> -X PATCH -F
+   body=@file` (édition), puis **se relire systématiquement** après toute
+   écriture contenant des images (`gh api …/pulls/<n> --jq .body`, chercher
+   des backticks autour de `https://`). Si neutralisé : retenter une fois via
+   `gh api` ; si ça persiste, laisser tel quel et signaler « vignettes à
+   réactiver » dans le message final — une session locale du mainteneur
+   répare en un patch.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
    c'est OK : le squash + suppression de branche la rend éphémère. Le slug
    dérive du premier prompt de la session → un prompt court et descriptif
-   (« Traite l'issue #7 : bouton précédent du guide ») donne un slug lisible.
+   (« /issues 7 — bouton Précédent du tour ») donne un slug ET un nom de
+   session lisibles quand plusieurs sessions tournent en parallèle. Si un
+   outil de renommage de session est disponible, se renommer
+   « #<issue> <titre court> » dès le verrou posé, puis « PR #<pr> · #<issue>
+   <titre court> » dès la PR ouverte — le mainteneur navigue entre ses
+   sessions par ces noms.
 4. La PR suit le format du Mode 2 (Résumé / ✅ Vérifié par l'agent /
    🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
    tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est
    verte.
 5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
    injoignable) : le signaler, purge faite en local plus tard.
+
+## Posture dans le chat (en réalisant)
+
+Le mainteneur lance des agents précisément pour ne PAS devoir les suivre :
+
+- **Travailler en silence.** Ne l'interpeller que bloqué sur un choix produit ou
+  d'archi que l'issue ne tranche pas — et d'abord chercher la réponse soi-même
+  (code, `PROJECT_SPEC.md`, `DECISIONS.md`), comme un bon dev autonome.
+- **Message final minimal** : lien de la PR + ce qui attend le mainteneur
+  (recette, migration, secret). Tout le reste — démarche, vérifications, choix —
+  vit dans la PR : c'est l'historique du code, pas le chat.
+- **Pédagogie dans la PR, pas dans le chat.** Le mainteneur apprend la stack :
+  les choix non évidents et concepts intéressants vont dans un bloc repliable en
+  fin de Résumé — `<details><summary>📚 Choix & concepts</summary>…</details>` —
+  qu'il ouvre quand il en a envie, sans friction.
+- **Commentaires de code au strict minimum** (cf. CLAUDE.md) : une contrainte que
+  le code ne peut pas montrer, jamais de narration ni de justification du diff.
 
 Fin de file : petit récap des PRs ouvertes, et signaler ce qui a bloqué le cas
 échéant (issue ambiguë → commentaire sur l'issue + label `ready` retiré).
