@@ -628,18 +628,16 @@ E2e contre la base partagée pour l'instant (pas de migrate en CI, jamais) ; bas
 dédiée = évolution notée dans #17. Protocole CI rouge : l'agent lit logs + traces
 Playwright via `gh` (HTTPS), 2 tentatives de correction, puis handover commenté.
 
-## 2026-08-17 — Découverte : des écritures de PR depuis la VM cassent parfois les images
-**Découverte (recette round 2, corrigée en séance par le mainteneur) :** certaines
-écritures de body de PR depuis une VM cloud ressortent avec les URLs d'images entourées
-de backticks (création de la PR #14, puis son édition) — mais PAS toutes : les créations
-des PRs #15/#16 sont intactes. Intermittent, vraisemblablement lié au chemin d'écriture
-utilisé par l'agent. Les blobs épinglés au SHA survivent, eux, au rebase comme à la
-suppression de branche.
-**Protocole (skill) :** écrire via `gh --body-file` / `gh api -F body=@file`, puis
-SE RELIRE après toute écriture contenant des images ; retenter une fois si neutralisé ;
-sinon seulement, signaler « vignettes à réactiver » (réparation locale en un patch).
-Bonus gravés au passage : checklist de recette au format `- [ ] **1.**` (cases cochables
-+ numéros stables) et nommage des sessions cloud.
+## 2026-08-18 — PRs cloud : incident images/HTML clos, deux conventions retenues
+Pendant les incidents GitHub des 17-18/08, des écritures de PR depuis les VM cloud sont
+ressorties altérées (URLs d'images entourées de backticks, balises `<details>` supprimées).
+Attribué aux incidents ; depuis, tout passe. On ne garde AUCUN protocole de réparation —
+juste, dans le skill : pédagogie en section simple `### 📚 Choix & concepts` (pas de bloc
+repliable : une règle qui marche partout bat une règle élégante), une relecture après
+écriture d'un body avec images, et le fait durable que les VM n'ont pas `gh` (opérations
+GitHub via le serveur MCP). Règle méta actée : **le skill ne doit jamais prescrire une
+retouche locale a posteriori par le mainteneur** — une règle qui l'exige est une friction
+à remplacer. Au passage : checklist de recette `- [ ] **1.**` et nommage des sessions.
 
 ## 2026-08-18 — Page `/admin` : un pansement assumé sur « une seule base pour dev et prod »
 **Décision :** un booléen `User.isAdmin` (posé à la main en SQL, aucune UI de promotion) et

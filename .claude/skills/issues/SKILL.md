@@ -111,8 +111,10 @@ Pour chaque issue, dans l'ordre de la file (`gh issue list --label ready`) :
    chaque push — ses résultats priment sur les vérifications locales de
    l'agent (auto-déclarées, et invalidées par un rebase). CI rouge : lire les
    logs (`gh run view --log-failed`) et les traces Playwright en artefact
-   (`gh run download <run-id>`) — les deux passent en HTTPS, donc accessibles
-   même depuis une VM cloud. Corriger, pousser, laisser la CI rejouer.
+   (`gh run download <run-id>`) — en session cloud, `gh` n'existe pas :
+   transposer vers les outils du serveur MCP GitHub disponibles ; si les logs
+   restent hors de portée, le dire dans la PR plutôt que deviner. Corriger,
+   pousser, laisser la CI rejouer.
    **Deux tentatives max sur un même échec** : à la 3ᵉ rouge, s'arrêter,
    commenter la PR (ce qui a été compris et tenté) et passer la main au
    mainteneur. NB : une PR contenant une migration a des e2e rouges tant que
@@ -145,6 +147,9 @@ séquence dans une session : tout finirait dans la même PR.
 variables d'env, l'egress de la VM est HTTPS-via-proxy uniquement — **le
 Postgres brut (5432/6543) est bloqué**, donc dev server authentifié, e2e locaux,
 migrate et studio sont impossibles (validé le 2026-08-13, voir DECISIONS).
+**La VM n'a pas `gh`** : toutes les opérations GitHub passent par le serveur
+MCP GitHub (`create_pull_request`, `update_pull_request`…) — transposer les
+commandes `gh` de ce skill vers ces outils.
 
 ⚠️ **Chromium n'a aucun réseau sortant depuis la VM** (vérifié 2026-08-16 :
 `ERR_CONNECTION_RESET` partout, proxy ou pas, alors que `curl` passe) → recetter
@@ -160,17 +165,9 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    `https://github.com/<owner>/<repo>/blob/<sha>/<chemin>?raw=true` (épinglées
    au SHA, elles survivent à la suppression de la branche ET au rebase). JAMAIS
    `raw.githubusercontent.com` : 404 sur un repo privé.
-   ⚠️ **Certaines écritures de PR depuis la VM ressortent avec les URLs
-   d'images neutralisées** (entourées de backticks, donc cassées). C'est
-   intermittent — observé sur certaines écritures, pas d'autres — et dépend
-   vraisemblablement du chemin d'écriture. Protocole : écrire le body via
-   `gh` avec `--body-file` (création) ou `gh api pulls/<n> -X PATCH -F
-   body=@file` (édition), puis **se relire systématiquement** après toute
-   écriture contenant des images (`gh api …/pulls/<n> --jq .body`, chercher
-   des backticks autour de `https://`). Si neutralisé : retenter une fois via
-   `gh api` ; si ça persiste, laisser tel quel et signaler « vignettes à
-   réactiver » dans le message final — une session locale du mainteneur
-   répare en un patch.
+   Après une écriture de body contenant des images, se relire une fois : si
+   les URLs ressortent altérées (ex. entourées de backticks — vu pendant des
+   incidents GitHub), réécrire le body une fois. C'est tout.
 3. Pousser tôt, ouvrir la PR (la preview Vercel build en parallèle), `Closes #n`,
    label `to-review`. En session cloud, la branche assignée `claude/…` remplace
    `issue/<n>-slug` — la plateforme l'impose (le push est verrouillé dessus),
@@ -186,8 +183,8 @@ la preview Vercel depuis la VM ne marche PAS. Le découpage des vérifications :
    🧪 À recetter) — depuis le cloud, le bloc « À recetter » contient d'office
    tout ce qui exige auth ou DB. Donner l'URL de la preview dès qu'elle est
    verte.
-5. La purge des comptes de test ne peut pas tourner depuis la VM (DB
-   injoignable) : le signaler, purge faite en local plus tard.
+5. La purge des comptes de test e2e est automatique (teardown Playwright, qui
+   tourne aussi dans la CI) : ne pas s'en occuper depuis la VM.
 
 ## Posture dans le chat (en réalisant)
 
@@ -200,9 +197,10 @@ Le mainteneur lance des agents précisément pour ne PAS devoir les suivre :
   (recette, migration, secret). Tout le reste — démarche, vérifications, choix —
   vit dans la PR : c'est l'historique du code, pas le chat.
 - **Pédagogie dans la PR, pas dans le chat.** Le mainteneur apprend la stack :
-  les choix non évidents et concepts intéressants vont dans un bloc repliable en
-  fin de Résumé — `<details><summary>📚 Choix & concepts</summary>…</details>` —
-  qu'il ouvre quand il en a envie, sans friction.
+  les choix non évidents et concepts intéressants vont dans une section
+  `### 📚 Choix & concepts` en fin de Résumé — une section simple, PAS de bloc
+  repliable `<details>` (les balises HTML ne survivent pas à tous les chemins
+  d'écriture, et une règle qui marche partout bat une règle élégante).
 - **Commentaires de code au strict minimum** (cf. CLAUDE.md) : une contrainte que
   le code ne peut pas montrer, jamais de narration ni de justification du diff.
 
