@@ -695,3 +695,14 @@ s'appelle claude-plugins) ; pas de version pinnée au catalogue → la résoluti
 dernier commit (itération rapide). L'invocation plugin est `/issues:issues` ; la copie
 locale (qui prime) reste en place tant que la session-test cloud n'a pas validé la
 résolution depuis une VM.
+
+## 2026-08-20 — Sessions cloud : les plugins projet ne sont pas résolus → amorce CLAUDE.md
+Session-test cloud : la VM ignore `extraKnownMarketplaces`/`enabledPlugins` du
+`settings.json` projet (`installed_plugins.json` vide — ui-ux-pro-max et taste-skill
+n'ont d'ailleurs jamais existé côté cloud). Le seul chemin supporté est la distribution
+par organisation (claude.ai/admin-settings/plugins), réservée aux plans Team/Enterprise —
+inaccessible ici. **Décision : amorce dans CLAUDE.md** — trois lignes indiquant qu'en
+cloud, si `/issues` n'est pas chargé, l'agent lit le SKILL.md à la source dans
+`MaximeCastillo/claude-plugins` via le MCP GitHub (l'app a accès à tous les repos) et le
+suit. Pas une copie : un panneau indicateur — zéro divergence possible, la VM lit la
+source de vérité à chaque session. En local, la résolution plugin reste native.

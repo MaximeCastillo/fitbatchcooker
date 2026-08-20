@@ -136,6 +136,16 @@ vit dans le skill **`/session`** (`.claude/skills/session/`). L'invoquer au déb
 session pour retrouver le rythme. Ce `CLAUDE.md` reste la constitution ; le skill est la
 procédure.
 
+## Skill /issues (plugin marketplace)
+
+Le workflow d'issues vit dans le plugin `issues` de la marketplace
+`MaximeCastillo/claude-plugins` (déclarée dans `.claude/settings.json`) — pas de
+copie locale, ne pas en recréer une (elle masquerait le plugin). **En session
+cloud, les plugins ne sont pas résolus au démarrage du conteneur** : quand
+`/issues` est invoqué et que le skill n'est pas chargé, lire
+`plugins/issues/skills/issues/SKILL.md` dans ce repo via le serveur MCP GitHub
+et le suivre comme si le skill était chargé.
+
 ## Tenue de la doc (courte !)
 
 - Mets à jour `PROJECT_SPEC.md` quand le *cœur* du produit/archi change.
