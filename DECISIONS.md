@@ -716,3 +716,11 @@ frontmatter que le plugin, corps = « local : invoquer issues:issues ; cloud : l
 SKILL.md dans claude-plugins via MCP GitHub »). Zéro substance locale, donc zéro
 divergence — la règle : le workflow ne s'édite QUE dans claude-plugins. L'amorce
 CLAUDE.md est réduite à un rappel de cette règle.
+
+## 2026-08-20 — Le plugin est renommé `maxime` : une collection nommée par son éditeur
+La norme observée chez les créateurs de plugins : un plugin mono-outil porte le nom du
+produit (`context7`, `ruby-lsp`) ; une collection porte le nom de l'éditeur
+(`anthropic-skills`). Le plugin `issues` (qui donnait le canonique redondant
+`issues:issues`) devient **`maxime`** — la collection accueillera `session` et `kickoff`
+plus tard. Rien ne change à l'usage : le nom court `/issues` reste l'invocation ; le
+canonique devient `maxime:issues`. Plugin v0.2.0.
