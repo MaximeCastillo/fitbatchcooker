@@ -658,3 +658,31 @@ backticks, et titres de PR en français — or **le titre de la PR devient le me
 commit au squash**, donc titre anglais gitmoji obligatoire (corps en français). Décision
 bonus : posture silencieuse des agents (tout dans la PR, chat minimal, pédagogie dans un
 bloc repliable 📚). La sensation du jour : « j'ai lancé une équipe de trois développeurs. »
+
+## 2026-08-20 — La marketplace : le skill /issues devient un vrai paquet
+
+**Construit :** le repo `MaximeCastillo/claude-plugins` — marketplace perso de plugins
+Claude Code. Le skill `/issues` y vit désormais en source unique (plugin
+`maxime-castillo`, généralisé : les spécificités projet restent dans le CLAUDE.md de
+chaque consommateur). fitbatchcooker le consomme via `settings.json` versionné en local,
+et via un **stub-pointeur** de 10 lignes en cloud (les VM ne résolvent pas les plugins —
+le stub fait lire la source par le MCP GitHub à chaque session). Validé de bout en bout,
+local ET cloud, au commit près.
+
+**Concepts appris :** l'écosystème plugin (marketplace = catalogue, plugin = paquet,
+skill = commande — trois noms de nature différente) ; résolution *à l'installation*
+(plugin, cache local) vs *à l'exécution* (stub cloud, toujours frais) ; le nom court
+d'un skill de plugin marche tant qu'aucune commande ne le prend (le canonique
+`maxime-castillo:issues` n'est que l'adresse complète) ; la description d'un skill est
+aussi son critère de déclenchement automatique (d'où le marqueur `[stub → …]` en tête,
+pas à la place) ; et l'hygiène d'identité git : email principal du compte sur les
+projets persos (pérennité + frontière juridique), le global reste pro.
+
+**Méthode :** trois itérations de nommage en discutant AVANT de pousser (nouvelle règle),
+chaque hypothèse testée sur banc d'essai local jetable avant d'y croire — y compris
+contre un rapport de doc erroné (le doute de Maxime sur le préfixe obligatoire a gagné
+contre l'agent doc, preuve empirique à l'appui).
+
+**Victoire :** un test à blanc sur VM neuve qui suit la chaîne complète — stub → add_repo
+→ lecture MCP au HEAD — et rapporte tout juste. L'issue #13 (GHA @claude) est recadrée
+pour ce nouveau monde. Prochaine étape : forger des issues et un test grandeur nature.
