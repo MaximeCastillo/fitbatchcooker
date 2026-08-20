@@ -138,7 +138,7 @@ procédure.
 
 ## Skill /issues (plugin marketplace)
 
-La substance du workflow d'issues vit dans le plugin `maxime` de la marketplace
+La substance du workflow d'issues vit dans le plugin `maxime-castillo` de la marketplace
 `MaximeCastillo/claude-plugins` (déclarée dans `.claude/settings.json`). Le
 `.claude/skills/issues/` local n'est qu'un **stub-pointeur** (nécessaire en
 cloud, où les plugins ne sont pas résolus) : ne jamais y mettre de contenu —

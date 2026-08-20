@@ -5,15 +5,15 @@ description: Transformer des retours bruts (démo, idées, bugs) en issues GitHu
 
 # /issues — pointeur vers le plugin (AUCUNE substance ici)
 
-La substance de ce skill vit dans le plugin `maxime` de la marketplace
+La substance de ce skill vit dans le plugin `maxime-castillo` de la marketplace
 `MaximeCastillo/claude-plugins`. Ce fichier n'est qu'un pointeur — ne JAMAIS
 y ajouter de contenu : toute amélioration du workflow s'édite dans le repo
 claude-plugins, pas ici.
 
-- **Session locale** (le skill `maxime:issues` est chargé) : invoquer
-  `maxime:issues` avec les mêmes arguments et suivre ses instructions.
+- **Session locale** (le skill `maxime-castillo:issues` est chargé) : invoquer
+  `maxime-castillo:issues` avec les mêmes arguments et suivre ses instructions.
 - **Session cloud** (les plugins ne sont pas résolus au démarrage du
-  conteneur) : lire `plugins/maxime/skills/issues/SKILL.md` du repo
+  conteneur) : lire `plugins/maxime-castillo/skills/issues/SKILL.md` du repo
   `MaximeCastillo/claude-plugins` via le serveur MCP GitHub, puis suivre ces
   instructions comme si le skill était chargé. Ce repo n'est pas dans le
   scope GitHub initial de la session : l'attacher d'abord si nécessaire

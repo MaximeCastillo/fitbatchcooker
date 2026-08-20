@@ -3,10 +3,10 @@
     "context7@claude-plugins-official": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "taste-skill@taste-skill": true,
-    "maxime@maxime-plugins": true
+    "maxime-castillo@maxime-castillo-marketplace": true
   },
   "extraKnownMarketplaces": {
-    "maxime-plugins": {
+    "maxime-castillo-marketplace": {
       "source": {
         "source": "github",
         "repo": "MaximeCastillo/claude-plugins"

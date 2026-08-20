@@ -724,3 +724,12 @@ produit (`context7`, `ruby-lsp`) ; une collection porte le nom de l'éditeur
 `issues:issues`) devient **`maxime`** — la collection accueillera `session` et `kickoff`
 plus tard. Rien ne change à l'usage : le nom court `/issues` reste l'invocation ; le
 canonique devient `maxime:issues`. Plugin v0.2.0.
+
+## 2026-08-20 — Nommage final de l'écosystème plugin : tout au nom de l'éditeur
+Après essais (`issues` → redondant, `maxime` → trop court), le nommage se pose sur
+l'identité complète : plugin **`maxime-castillo`** (préfixe canonique
+`maxime-castillo:issues`, extensible à `maxime-castillo:session`…), marketplace
+**`maxime-castillo-marketplace`**. Le repo GitHub reste `claude-plugins` : son nom
+n'apparaît que dans l'URL d'installation, jamais dans un préfixe. L'invocation
+quotidienne reste `/issues` (nom court). Au passage, règle de collaboration : en
+discussion (nommage, design), préparer et montrer, ne pousser qu'après validation.
