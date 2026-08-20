@@ -45,7 +45,8 @@ côté serveur uniquement.
 - **Commits petits et fréquents**, à chaque étape logique (on suit l'avancement).
 - **Messages en anglais**, avec un **emoji façon gitmoji** en tête (ex. `✨ Add ...`,
   `🔧 Configure ...`, `🐛 Fix ...`, `📝 Update docs`, `♻️ Refactor ...`).
-- **Auteur = Maxime** (`maxime@hop3team.com`). Claude commite en son nom.
+- **Auteur = Maxime** (`maxime.castillo@gmail.com` — email principal du compte).
+  Claude commite en son nom.
 - **JAMAIS de trailer `Co-Authored-By`** ni aucune mention d'IA dans les messages.
 
 ## Comment travailler avec l'auteur (IMPORTANT — posture de coach)
