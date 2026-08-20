@@ -706,3 +706,13 @@ cloud, si `/issues` n'est pas chargé, l'agent lit le SKILL.md à la source dans
 `MaximeCastillo/claude-plugins` via le MCP GitHub (l'app a accès à tous les repos) et le
 suit. Pas une copie : un panneau indicateur — zéro divergence possible, la VM lit la
 source de vérité à chaque session. En local, la résolution plugin reste native.
+
+## 2026-08-20 — /issues en cloud : l'amorce CLAUDE.md ne suffit pas, stub-pointeur skill
+Test réel : « Unknown command: /issues » — le parseur de slash de la plateforme rejette
+le message AVANT que le modèle (et donc le CLAUDE.md) ne le voie. Or les sessions cloud
+chargent bien les skills projet (`.claude/skills/` du repo cloné) — seuls les plugins ne
+sont pas résolus. **Décision : un stub-pointeur** `.claude/skills/issues/SKILL.md` (même
+frontmatter que le plugin, corps = « local : invoquer issues:issues ; cloud : lire le
+SKILL.md dans claude-plugins via MCP GitHub »). Zéro substance locale, donc zéro
+divergence — la règle : le workflow ne s'édite QUE dans claude-plugins. L'amorce
+CLAUDE.md est réduite à un rappel de cette règle.

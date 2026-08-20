@@ -138,13 +138,11 @@ procédure.
 
 ## Skill /issues (plugin marketplace)
 
-Le workflow d'issues vit dans le plugin `issues` de la marketplace
-`MaximeCastillo/claude-plugins` (déclarée dans `.claude/settings.json`) — pas de
-copie locale, ne pas en recréer une (elle masquerait le plugin). **En session
-cloud, les plugins ne sont pas résolus au démarrage du conteneur** : quand
-`/issues` est invoqué et que le skill n'est pas chargé, lire
-`plugins/issues/skills/issues/SKILL.md` dans ce repo via le serveur MCP GitHub
-et le suivre comme si le skill était chargé.
+La substance du workflow d'issues vit dans le plugin `issues` de la marketplace
+`MaximeCastillo/claude-plugins` (déclarée dans `.claude/settings.json`). Le
+`.claude/skills/issues/` local n'est qu'un **stub-pointeur** (nécessaire en
+cloud, où les plugins ne sont pas résolus) : ne jamais y mettre de contenu —
+toute amélioration du workflow s'édite dans le repo claude-plugins.
 
 ## Tenue de la doc (courte !)
 
