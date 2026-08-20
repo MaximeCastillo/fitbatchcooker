@@ -682,3 +682,16 @@ liste les points décochés et attend confirmation (le « ok merge si CI verte �
 passer 2 points non recettés en prod ne se reproduira pas). **Pas de commentaire GitHub
 depuis le cloud** — le serveur MCP y injecte un footer IA après coup, incontrôlable ;
 la règle « aucune mention d'IA » ne vaut que sur ce que l'agent contrôle.
+
+## 2026-08-20 — Le skill /issues devient un plugin versionné (marketplace maxime-plugins)
+Le skill vivait copié dans le repo — inréutilisable ailleurs, divergent à terme. Il est
+extrait dans **`MaximeCastillo/claude-plugins`** (repo privé, ≈ RubyGems perso) : catalogue
+`marketplace.json`, plugin `issues` v0.1.0, SKILL.md **généralisé** (les spécificités
+projet — Prisma, base partagée, i18n — restent dans le CLAUDE.md de chaque consommateur).
+fitbatchcooker le consomme via `.claude/settings.json` versionné (≈ Gemfile) : toute
+session, locale ou VM cloud, résout le plugin depuis GitHub. Deux découvertes : Claude Code
+**rejette un nom de catalogue imitant l'officiel** (d'où `maxime-plugins`, seul le repo
+s'appelle claude-plugins) ; pas de version pinnée au catalogue → la résolution suit le
+dernier commit (itération rapide). L'invocation plugin est `/issues:issues` ; la copie
+locale (qui prime) reste en place tant que la session-test cloud n'a pas validé la
+résolution depuis une VM.
