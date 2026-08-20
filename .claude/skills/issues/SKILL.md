@@ -15,4 +15,6 @@ claude-plugins, pas ici.
 - **Session cloud** (les plugins ne sont pas résolus au démarrage du
   conteneur) : lire `plugins/issues/skills/issues/SKILL.md` du repo
   `MaximeCastillo/claude-plugins` via le serveur MCP GitHub, puis suivre ces
-  instructions comme si le skill était chargé.
+  instructions comme si le skill était chargé. Ce repo n'est pas dans le
+  scope GitHub initial de la session : l'attacher d'abord si nécessaire
+  (`add_repo`) — la lecture MCP suffit, pas besoin de le cloner.
