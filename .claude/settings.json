@@ -1,6 +1,6 @@
 {
   "extraKnownMarketplaces": {
-    "claude-plugins": {
+    "maxime-plugins": {
       "source": {
         "source": "github",
         "repo": "MaximeCastillo/claude-plugins"
@@ -11,6 +11,6 @@
     "context7@claude-plugins-official": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "taste-skill@taste-skill": true,
-    "issues@claude-plugins": true
+    "issues@maxime-plugins": true
   }
 }
