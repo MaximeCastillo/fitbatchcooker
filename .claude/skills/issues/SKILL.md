@@ -1,6 +1,6 @@
 ---
 name: issues
-description: Transformer des retours bruts (démo, idées, bugs) en issues GitHub prêtes pour un agent autonome, puis réaliser les issues `ready` — une branche par issue, une PR courte avec screenshots. À invoquer soit pour forger des issues depuis des retours, soit pour traiter la file d'issues.
+description: "[stub → plugin maxime-castillo:issues] Transformer des retours bruts (démo, idées, bugs) en issues GitHub prêtes pour un agent autonome, puis réaliser les issues `ready`. En local, préférer l'entrée maxime-castillo:issues (le plugin) ; ce stub existe pour les sessions cloud, qui ne résolvent pas les plugins."
 ---
 
 # /issues — pointeur vers le plugin (AUCUNE substance ici)
