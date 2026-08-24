@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import type { IngredientCategory } from "@/lib/generated/prisma/enums";
@@ -36,6 +36,10 @@ const CATEGORY_ORDER: IngredientCategory[] = [
   "OTHER",
 ];
 
+// How many cards the list reveals at once. The catalog is fetched whole (it's small and
+// public); what hurts is rendering 400+ cards, so we only paginate the DISPLAY.
+const PAGE_SIZE = 40;
+
 // Client-side search + category filter over the (small) global catalog — no server
 // round-trip needed at this size. Tapping an ingredient opens a reverse-search modal
 // (recipes that use it). `canSave` gates the bookmark toggle inside that modal.
@@ -51,6 +55,8 @@ export function IngredientBrowser({
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<IngredientCategory | null>(null);
   const [selected, setSelected] = useState<Ingredient | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Search ONLY the displayed language: matching the hidden one would surface rows whose
   // visible name doesn't contain what you typed, which reads as a bug. (The chef's
@@ -65,6 +71,35 @@ export function IngredientBrowser({
   const presentCategories = CATEGORY_ORDER.filter((c) =>
     ingredients.some((ing) => ing.category === c),
   );
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
+  // Infinite scroll, display-only: reveal one more slice when the sentinel shows up. No
+  // fetch, so no anti-double-load guard is needed — instead the effect re-runs on every
+  // extension, which re-arms the observer and keeps revealing while the sentinel stays in
+  // view (a filter that shrinks the list can't leave a gap below the fold).
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) setVisibleCount((count) => count + PAGE_SIZE);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visibleCount, filtered.length]);
+
+  // Every filter change restarts the window: keeping the offset of a narrow result set
+  // would dump a wider one on screen all at once.
+  function changeQuery(nextQuery: string) {
+    setQuery(nextQuery);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  function changeCategory(nextCategory: IngredientCategory | null) {
+    setCategory(nextCategory);
+    setVisibleCount(PAGE_SIZE);
+  }
 
   const chipClass = (active: boolean) =>
     cn(
@@ -84,7 +119,7 @@ export function IngredientBrowser({
         <input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => changeQuery(e.target.value)}
           placeholder={t("search")}
           aria-label={t("search")}
           className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-3 text-sm outline-none focus-visible:border-ring"
@@ -94,7 +129,7 @@ export function IngredientBrowser({
       <div className="mb-5 flex flex-wrap gap-1.5">
         <button
           type="button"
-          onClick={() => setCategory(null)}
+          onClick={() => changeCategory(null)}
           aria-pressed={category === null}
           className={chipClass(category === null)}
         >
@@ -104,7 +139,7 @@ export function IngredientBrowser({
           <button
             key={c}
             type="button"
-            onClick={() => setCategory(category === c ? null : c)}
+            onClick={() => changeCategory(category === c ? null : c)}
             aria-pressed={category === c}
             className={chipClass(category === c)}
           >
@@ -118,7 +153,7 @@ export function IngredientBrowser({
         <p className="text-muted-foreground">{t("empty")}</p>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
-          {filtered.map((ing) => (
+          {visible.map((ing) => (
             <li key={ing.id}>
               <button
                 type="button"
@@ -152,6 +187,8 @@ export function IngredientBrowser({
           ))}
         </ul>
       )}
+
+      {hasMore && <div ref={sentinelRef} className="h-10" aria-hidden />}
 
       <IngredientRecipesModal
         ingredient={selected}
