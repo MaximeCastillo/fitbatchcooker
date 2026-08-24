@@ -733,3 +733,15 @@ l'identité complète : plugin **`maxime-castillo`** (préfixe canonique
 n'apparaît que dans l'URL d'installation, jamais dans un préfixe. L'invocation
 quotidienne reste `/issues` (nom court). Au passage, règle de collaboration : en
 discussion (nommage, design), préparer et montrer, ne pousser qu'après validation.
+
+## 2026-08-24 — Backticks dans les bodys de PR : élucidé, ce n'était pas un incident
+Le post-mortem du 2026-08-18 (« incidents GitHub, clos ») était incomplet : l'agent de
+l'issue #18 a prouvé (15 mesures, seuil net) que le chemin d'écriture GitHub du cloud
+enveloppe de backticks toute **URL ≥ ~150 caractères** — déterministe, pas transitoire.
+Gravé dans le skill (plugin v0.4.0) : **SHA court** (7 car., résolu par GitHub,
+immuabilité conservée, −33 car.), **budget ~140 car./URL**, images en
+`![](…?raw=true)` (affichage inline), **jamais de HTML** (`<img>` vidé de son src,
+échec silencieux). Et la règle « une réécriture, c'est tout » est reformulée : relecture
+du body après CHAQUE écriture (fait partie du livrable), une réécriture seulement après
+diagnostic — le plafond porte sur les tentatives aveugles, pas sur les corrections
+diagnostiquées.
