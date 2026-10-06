@@ -55,9 +55,9 @@ pour la philosophie protéines/part et `DECISIONS.md` pour le pourquoi.
   `search_ingredients` AVANT de composer, mais `gpt-4o-mini` propose souvent d'abord et se fait
   refuser ensuite. Pistes : durcir le prompt, ou passer à un modèle qui suit mieux la consigne.
   *(Moins douloureux depuis le catalogue bilingue + 420 entrées, mais toujours là.)*
-- **Activer le bot / clé LLM (BYO key)** : page **Paramètres** pour saisir sa clé (chiffrée,
-  serveur only). **Mode par défaut** avec la clé de l'auteur mais **bridé** (limite d'usage)
-  pour que n'importe qui teste. MVP = **ouvert sans limite**, on prévoit juste le bridage/config.
+- **Monétisation et quotas IA** : choisir un *merchant of record*, brancher les abonnements
+  Stripe, et brider l'usage du chef par abonnement (clé plateforme unique, plus de BYO-key :
+  voir `DECISIONS.md` du 2026-10-06).
 - **Comptes admin, suite** : le booléen `User.isAdmin` + la page `/admin` existent (voir « Livré
   récemment »). Reste le vrai sujet : gérer les limites d'usage et voir la consommation.
 - **Compte — suppression** : bouton « supprimer mon compte ». La plomberie est là depuis `/admin`

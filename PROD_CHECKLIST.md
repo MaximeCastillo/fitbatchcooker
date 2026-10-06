@@ -17,8 +17,8 @@ dans `DECISIONS.md`.
       de tokens. _(DECISIONS — 2026-07-20, sécurité bot)_
 - [ ] **Restreindre les signups** (allowlist / invitation) tant que la clé OpenAI est
       partagée — sinon n'importe qui peut créer un compte et brûler tes tokens.
-- [ ] **BYO-key par user** (spec §6) — chaque user fournit sa clé (stockée chiffrée) et
-      paie ses propres tokens. Le vrai fix économique **et** sécurité.
+- [ ] **Quotas d'usage IA par user**, liés aux abonnements — clé plateforme unique côté
+      serveur (le BYO-key est abandonné). _(DECISIONS — 2026-10-06)_
 - [ ] **Politique de push / branches.** En MVP on **commite et push directement sur `main`
       sans validation** (assumé : pas de conséquence prod). Avant d'ouvrir : brancher + PR +
       review, au moins pour les changements sensibles (auth, migrations, secrets).

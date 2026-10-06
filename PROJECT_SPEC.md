@@ -69,7 +69,7 @@ de Rails et découvre toute la stack).
 | Base de données| Supabase (Postgres managé)     |                                                |
 | Auth           | Supabase Auth                  | Email/password + OAuth plus tard si voulu      |
 | ORM            | Prisma                         | Choisi vs Drizzle pour un ressenti proche de Rails |
-| IA             | Clé API fournie par l'user (BYO)| Un seul fournisseur pour démarrer (voir §6)   |
+| IA             | Clé plateforme + quotas/user    | Un seul fournisseur pour démarrer (voir §6)   |
 | Hébergement    | Vercel (app) + Supabase (data) |                                                |
 
 **Règles d'or dès le jour 1 :**
@@ -211,16 +211,15 @@ le reste est capté léger.
 
 ---
 
-## 6. Fournisseur IA — Bring Your Own Key (BYO)
+## 6. Fournisseur IA — clé plateforme et quotas
 
-Choix : **l'user fournit sa propre clé API** (l'app ne paie pas l'inférence). Note :
-un abonnement grand public (ChatGPT Plus, Claude Pro) ne donne *pas* d'accès
-programmatique — il faut une **clé API développeur**, facturée à l'usage. Ça convient
-à un contexte perso / power-user, ce qui est l'intention ici.
+Choix (2026-10-06, remplace le BYO-key) : **une seule clé API côté serveur**, celle de
+l'auteur, et des **limites d'usage par utilisateur** liées aux abonnements. Le BYO-key
+réservait l'app aux power-users : trop de friction pour un produit grand public. Le coût
+d'inférence se maîtrise par les quotas et se finance par l'abonnement.
 
 **Gestion des clés (sujet d'apprentissage important) :**
-- Stocker les clés **chiffrées au repos**. Jamais en clair.
-- Jamais exposer la clé au navigateur. Déchiffrer et utiliser **côté serveur
+- Jamais exposer la clé au navigateur. L'utiliser **côté serveur
   uniquement**.
 - Démarrer avec **un seul fournisseur**. Pas d'abstraction multi-fournisseurs
   maintenant (SDK différents = complexité). Plus tard si besoin réel. YAGNI.

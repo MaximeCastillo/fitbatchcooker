@@ -745,3 +745,13 @@ immuabilité conservée, −33 car.), **budget ~140 car./URL**, images en
 du body après CHAQUE écriture (fait partie du livrable), une réécriture seulement après
 diagnostic — le plafond porte sur les tentatives aveugles, pas sur les corrections
 diagnostiquées.
+
+## 2026-10-06 — IA : clé plateforme + quotas par abonnement (Remplace « bring-your-own key » du 2026-07-17)
+**Décision :** abandon du BYO-key. Une seule clé API côté serveur (celle de l'auteur), et des
+**limites d'usage par utilisateur**, liées aux futurs abonnements (Stripe, via un *merchant of
+record* à choisir).
+**Pourquoi :** le BYO-key réserve l'app aux utilisateurs avancés : trop de friction pour un
+produit grand public. Le coût d'inférence se maîtrise par les quotas et se finance par
+l'abonnement, comme un vrai produit.
+**Alternatives :** BYO-key (écarté : frein à l'adoption) ; clé plateforme sans limite
+(écarté : coût et abus non maîtrisés).
