@@ -121,3 +121,7 @@ la stratégie dans `DECISIONS.md`).
 - [`DECISIONS.md`](./DECISIONS.md) — historique des décisions (le « pourquoi »)
 - [`LEARNING_LOG.md`](./LEARNING_LOG.md) — journal d'apprentissage par session
 - [`PROD_CHECKLIST.md`](./PROD_CHECKLIST.md) — dettes temporaires à rembourser avant la prod
+
+---
+
+© 2026 Maxime Castillo — tous droits réservés. Le code est visible pour présenter mon travail ; il n’est pas sous licence open source.
