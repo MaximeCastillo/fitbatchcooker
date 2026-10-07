@@ -686,3 +686,18 @@ contre l'agent doc, preuve empirique à l'appui).
 **Victoire :** un test à blanc sur VM neuve qui suit la chaîne complète — stub → add_repo
 → lecture MCP au HEAD — et rapporte tout juste. L'issue #13 (GHA @claude) est recadrée
 pour ce nouveau monde. Prochaine étape : forger des issues et un test grandeur nature.
+
+## 2026-10-07 — Retour après une pause : la base s'était endormie
+
+**Construit :** un cron Vercel quotidien (`vercel.json`) qui appelle `/api/keepalive`
+(`SELECT 1` via Prisma, protégé par `CRON_SECRET`), pour que Supabase ne mette plus le
+projet en pause.
+
+**Concepts appris :** l'offre gratuite Supabase met le projet en pause après ~7 jours sans
+activité (le DNS disparaît : `ENOTFOUND` dans les logs E2E) ; lire une CI rouge en partant
+de l'étape qui casse ; Vercel Cron ; un secret partagé lu par les deux côtés depuis une seule
+variable d'environnement (le planificateur l'envoie, la route le vérifie) : sa valeur ne sert
+pas à faire correspondre deux saisies, elle doit juste être impossible à deviner.
+
+**Victoire :** de « la CI est rouge » à « la prod ne peut plus s'endormir » en une session,
+cron vérifié en prod (200).
