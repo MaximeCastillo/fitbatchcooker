@@ -755,3 +755,11 @@ produit grand public. Le coût d'inférence se maîtrise par les quotas et se fi
 l'abonnement, comme un vrai produit.
 **Alternatives :** BYO-key (écarté : frein à l'adoption) ; clé plateforme sans limite
 (écarté : coût et abus non maîtrisés).
+
+## 2026-10-07 — Keep-alive quotidien de la base Supabase
+**Décision :** un cron Vercel (`vercel.json`) appelle chaque jour `/api/keepalive`, qui fait
+un `SELECT 1` via Prisma, protégé par `CRON_SECRET`.
+**Pourquoi :** l'offre gratuite Supabase met le projet en pause après ~7 jours sans activité :
+la prod et la CI tombent (DNS supprimé), ce qui est arrivé en octobre 2026.
+**Alternatives :** GitHub Action planifiée (écartée : GitHub désactive les crons après 60 jours
+sans activité sur le repo, le même piège) ; offre payante Supabase (prématuré).
